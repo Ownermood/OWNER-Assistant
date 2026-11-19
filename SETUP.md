@@ -1,4 +1,4 @@
-# Ultroid Setup (Easy Guide)
+# OWNER Assistant Setup (Easy Guide)
 
 Sab kuch isi ek repo mein hai: bot + saare extra plugins (`addons/` folder).
 Alag addons repo ya `ADDONS_URL` ki zaroorat **nahi** hai.

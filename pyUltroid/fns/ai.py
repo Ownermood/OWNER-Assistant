@@ -10,6 +10,7 @@
 Used by the `aiwrapper` plugin and by the chatbot (`addai` / `repai`).
 """
 
+import asyncio
 import json
 import re
 
@@ -116,6 +117,8 @@ def _error_text(provider, payload, status):
     msg = _error_message(payload)
     if status == 429:
         return f"⚠️ Rate limit exceeded ({provider}). Try again later.\n`{msg}`"
+    if status in (500, 502, 503):
+        return f"⚠️ {provider} servers are busy right now, try again in a minute.\n`{msg}`"
     return f"Error ({status}): {msg}"
 
 
@@ -172,6 +175,14 @@ async def _ai_request(provider, prompt, api_key, model, stream, system, retried=
                     payload = await resp.json(content_type=None)
                 except Exception:
                     payload = {"error": (await resp.text())[:300]}
+                if resp.status in (429, 500, 502, 503) and not retried:
+                    # Busy / overloaded: wait a moment and try once more.
+                    await asyncio.sleep(3)
+                    async for part in _ai_request(
+                        provider, prompt, api_key, model, stream, system, retried=True
+                    ):
+                        yield part
+                    return
                 newer = None if retried else _suggested_model(payload, model)
                 if resp.status in (400, 404) and newer:
                     # Retired model: use the one the provider suggests.

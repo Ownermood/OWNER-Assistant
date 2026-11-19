@@ -18,6 +18,7 @@ from pyUltroid.fns.helper import inline_mention
 from strings import get_string
 
 from . import *
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
 
 Owner_info_msg = udB.get_key("BOT_INFO_START")
 custom_info = True
@@ -29,7 +30,7 @@ if Owner_info_msg is None:
 
 **Message Forwards** - {udB.get_key("PMBOT")}
 
-**Ultroid [v{ultroid_version}](https://github.com/TeamUltroid/Ultroid), powered by @TeamUltroid**
+**{BOT_NAME} [v{ultroid_version}]({REPO_URL})**
 """
 
 
@@ -68,7 +69,7 @@ async def own(event):
         mention=event.sender.mention, me=inline_mention(ultroid_bot.me)
     )
     if custom_info:
-        msg += "\n\n• Powered by **@TeamUltroid**"
+        msg += f"\n\n• Powered by **{BOT_NAME}**"
     await event.edit(
         msg,
         buttons=[Button.inline("Close", data="closeit")],
@@ -113,7 +114,7 @@ async def ultroid(event):
             if udB.get_key("PMBOT"):
                 ok = "You can contact my master using this bot!!\n\nSend your Message, I will Deliver it To Master."
             await event.reply(
-                f"Hey there {mention}, this is Ultroid Assistant of {me}!\n\n{ok}",
+                f"Hey there {mention}, this is {BOT_NAME} of {me}!\n\n{ok}",
                 file=udB.get_key("STARTMEDIA"),
                 buttons=[Button.inline("Info.", data="ownerinfo")]
                 if Owner_info_msg
@@ -160,7 +161,7 @@ async def ultroid(event):
 @callback("stat", owner=True)
 async def botstat(event):
     ok = len(udB.get_key("BOT_USERS") or [])
-    msg = """Ultroid Assistant - Stats
+    msg = BOT_NAME + """ - Stats
 Total Users - {}""".format(
         ok,
     )

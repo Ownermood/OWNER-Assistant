@@ -12,23 +12,21 @@ from telethon.errors import (
 )
 
 from . import LOG_CHANNEL, LOGS, Button, asst, eor, get_string, ultroid_cmd
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
 
-REPOMSG = """
-• **ULTROID USERBOT** •\n
-• Repo - [Click Here](https://github.com/TeamUltroid/Ultroid)
-• Addons - [Click Here](https://github.com/TeamUltroid/UltroidAddons)
-• Support - @UltroidSupportChat
+REPOMSG = f"""
+• **{BOT_NAME_CAPS}** •\n
+• Repo - [Click Here]({REPO_URL})
+• Based on [Ultroid](https://github.com/TeamUltroid/Ultroid)
 """
 
 RP_BUTTONS = [
     [
-        Button.url(get_string("bot_3"), "https://github.com/TeamUltroid/Ultroid"),
-        Button.url("Addons", "https://github.com/TeamUltroid/UltroidAddons"),
+        Button.url(get_string("bot_3"), REPO_URL),
     ],
-    [Button.url("Support Group", "t.me/UltroidSupportChat")],
 ]
 
-ULTSTRING = """🎇 **Thanks for Deploying Ultroid Userbot!**
+ULTSTRING = f"""🎇 **Thanks for Deploying {BOT_NAME}!**
 
 • Here, are the Some Basic stuff from, where you can Know, about its Usage."""
 

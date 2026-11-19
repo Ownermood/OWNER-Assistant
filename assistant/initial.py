@@ -8,16 +8,17 @@
 import re
 
 from . import *
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
 
 STRINGS = {
-    1: """🎇 **Thanks for Deploying Ultroid Userbot!**
+    1: f"""🎇 **Thanks for Deploying {BOT_NAME}!**
 
 • Here, are the Some Basic stuff from, where you can Know, about its Usage.""",
-    2: """🎉** About Ultroid**
+    2: f"""🎉** About {BOT_NAME}**
 
-🧿 Ultroid is Pluggable and powerful Telethon Userbot, made in Python from Scratch. It is Aimed to Increase Security along with Addition of Other Useful Features.
+🧿 {BOT_NAME} is Pluggable and powerful Telethon Userbot, made in Python from Scratch. It is Aimed to Increase Security along with Addition of Other Useful Features.
 
-❣ Made by **@TeamUltroid**""",
+❣ Based on **Ultroid** by @TeamUltroid""",
     3: """**💡• FAQs •**
 
 -> [Username Tracker](https://t.me/UltroidUpdates/24)
@@ -31,14 +32,14 @@ STRINGS = {
 -> [Setting Up PmBot](https://t.me/UltroidUpdates/2)
 -> [Also Check](https://t.me/UltroidUpdates/14)
 
-**• To Know About Updates**
-  - Join @TeamUltroid.""",
+**• Updates**
+  - Your repo: {REPO_URL}""".format(REPO_URL=REPO_URL),
     4: f"""• `To Know All Available Commands`
 
   - `{HNDLR}help`
   - `{HNDLR}cmds`""",
-    5: """• **For Any Other Query or Suggestion**
-  - Move to **@UltroidSupportChat**.
+    5: f"""• **For Any Other Query or Suggestion**
+  - Open an issue on your repo: {REPO_URL}/issues
 
 • Thanks for Reaching till END.""",
 }

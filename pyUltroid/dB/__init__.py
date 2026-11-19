@@ -19,17 +19,10 @@ DEVLIST = [
     803243487,  # @hellboi_atul
 ]
 
-ULTROID_IMAGES = [
-    f"https://graph.org/file/{_}.jpg"
-    for _ in [
-        "ec250c66268b62ee4ade6",
-        "3c25230ae30d246194eba",
-        "b01715a61b9e876c0d45d",
-        "4ceaf720a96a24527ecff",
-        "a96223b574f29f3f0d184",
-        "6e081d339a01cc6190393",
-    ]
-]
+from ..branding import BRAND_IMAGES
+
+# Banner pictures (OWNER Assistant)
+ULTROID_IMAGES = BRAND_IMAGES
 
 stickers = [
     "CAADAQADeAIAAm_BZBQh8owdViocCAI",

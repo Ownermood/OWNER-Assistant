@@ -30,6 +30,7 @@ from pyUltroid.fns.tools import Carbon, async_searcher, get_paste, telegraph_cli
 from pyUltroid.startup.loader import Loader
 
 from . import *
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
 
 # --------------------------------------------------------------------#
 telegraph = telegraph_client()
@@ -50,7 +51,7 @@ def text_to_url(event):
 
 _buttons = {
     "otvars": {
-        "text": "Other Variables to set for @TeamUltroid:",
+        "text": f"Other Variables to set for {BOT_NAME}:",
         "buttons": [
             [
                 Button.inline("Tᴀɢ Lᴏɢɢᴇʀ", data="taglog"),
@@ -348,7 +349,7 @@ async def changes(okk):
                 language="md",
             )
             return await okk.edit(
-                f"**• Ultroid Userbot •**{cli}", file=img, buttons=button
+                f"**• {BOT_NAME} •**{cli}", file=img, buttons=button
             )
         except Exception as er:
             LOGS.exception(er)
@@ -460,7 +461,7 @@ async def _(e):
         code = await conv.get_response()
         if GDrive._create_token_file(code=code.text):
             await conv.send_message(
-                "`Success!\nYou are all set to use Google Drive with Ultroid Userbot.`",
+                f"`Success!\nYou are all set to use Google Drive with {BOT_NAME}.`",
                 buttons=Button.inline("Main Menu", data="setter"),
             )
         else:

@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="./resources/extras/logo_readme.jpg" alt="TeamUltroid Logo">
+  <img src="./resources/extras/owner_assistant_1.jpg" alt="OWNER Assistant">
 </p>
 <h1 align="center">
-  <b>Ultroid - UserBot</b>
+  <b>OWNER Assistant</b>
 </h1>
 
-<b>A stable pluggable Telegram userbot + Voice & Video Call music bot, based on Telethon.</b>
+<b>Personal Telegram assistant (userbot) based on <a href="https://github.com/TeamUltroid/Ultroid">Ultroid</a>, built with Telethon.</b>
 
 [![](https://img.shields.io/badge/Ultroid-v0.8-crimson)](#)
 [![Stars](https://img.shields.io/github/stars/TeamUltroid/Ultroid?style=flat-square&color=yellow)](https://github.com/TeamUltroid/Ultroid/stargazers)

@@ -29,12 +29,12 @@ from pyUltroid.fns.tools import (
 )
 
 from . import *
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
 from . import _ult_cache
 
 SUP_BUTTONS = [
     [
-        Button.url("• Repo •", url="https://github.com/TeamUltroid/Ultroid"),
-        Button.url("• Support •", url="t.me/UltroidSupportChat"),
+        Button.url("• Repo •", url=REPO_URL),
     ],
 ]
 
@@ -163,14 +163,14 @@ async def _(e):
 async def repo(e):
     res = [
         await e.builder.article(
-            title="Ultroid Userbot",
+            title=BOT_NAME,
             description="Userbot | Telethon",
             thumb=wb(ultpic, 0, "image/jpeg", []),
-            text="• **ULTROID USERBOT** •",
+            text=f"• **{BOT_NAME_CAPS}** •",
             buttons=SUP_BUTTONS,
         ),
     ]
-    await e.answer(res, switch_pm="Ultroid Repo.", switch_pm_param="start")
+    await e.answer(res, switch_pm=f"{BOT_NAME} Repo.", switch_pm_param="start")
 
 
 @in_pattern("go", owner=True)
@@ -553,7 +553,7 @@ async def inline_tl(ult):
             [
                 await ult.builder.article(
                     title="How to Use?",
-                    description="Tl Searcher by Ultroid",
+                    description="Tl Searcher",
                     url="https://t.me/TeamUltroid",
                     text=text,
                 )
@@ -592,7 +592,7 @@ InlinePlugin.update(
         "Sᴇᴀʀᴄʜ Oɴ Gᴏᴏɢʟᴇ": "go TeamUltroid",
         "WʜɪSᴘᴇʀ": "wspr @username Hello🎉",
         "YᴏᴜTᴜʙᴇ Dᴏᴡɴʟᴏᴀᴅᴇʀ": "yt Ed Sheeran Perfect",
-        "Piston Eval": "run javascript console.log('Hello Ultroid')",
+        "Piston Eval": "run javascript console.log('Hello OWNER')",
         "OʀᴀɴɢᴇFᴏx🦊": "ofox beryllium",
         "Tᴡɪᴛᴛᴇʀ Usᴇʀ": "twitter theultroid",
         "Fᴅʀᴏɪᴅ Sᴇᴀʀᴄʜ": "fdroid telegram",
