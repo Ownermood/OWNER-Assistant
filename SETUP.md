@@ -138,7 +138,7 @@ Bot chalne ke baad apne chat mein likho, restart ki zaroorat nahi:
 | `.setdb GDRIVE_CLIENT_ID / GDRIVE_CLIENT_SECRET` | Google Drive (optional, default bhi hai) | console.cloud.google.com |
 | `.setdb PISTON_URI url` | inline code runner (`@bot run`) | apna Piston server |
 
-AI model badalna ho: `.setdb GEMINI_MODEL gemini-2.5-pro` (aise hi `OPENAI_MODEL`, `ANTHROPIC_MODEL`, `DEEPSEEK_MODEL`).
+AI model badalna ho: `.setdb GEMINI_MODEL gemini-pro-latest` (aise hi `OPENAI_MODEL`, `ANTHROPIC_MODEL`, `DEEPSEEK_MODEL`).
 
 ---
 

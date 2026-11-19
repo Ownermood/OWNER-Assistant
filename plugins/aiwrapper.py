@@ -28,7 +28,7 @@ Set API keys using:
 Set custom models using:
     • OPENAI_MODEL: default: gpt-5-mini
     • ANTHROPIC_MODEL: default: claude-opus-5-5
-    • GEMINI_MODEL: default: gemini-2.5-flash
+    • GEMINI_MODEL: default: gemini-flash-latest
     • DEEPSEEK_MODEL: default: deepseek-chat
 """
 

@@ -13,7 +13,7 @@ __doc__ = get_help("help_database")
 
 import re
 
-from . import Redis, eor, get_string, udB, ultroid_cmd
+from . import Redis, eor, get_string, mask_secret, udB, ultroid_cmd
 
 
 @ultroid_cmd(pattern="setdb( (.*)|$)", fullsudo=True)
@@ -29,7 +29,7 @@ async def _(ult):
             data[1] = f"{str(udB.get_key(data[0]))} {data[1]}"
         udB.set_key(data[0], data[1])
         await ult.eor(
-            f"**DB Key Value Pair Updated\nKey :** `{data[0]}`\n**Value :** `{data[1]}`"
+            f"**DB Key Value Pair Updated\nKey :** `{data[0]}`\n**Value :** `{mask_secret(data[0], data[1])}`"
         )
 
     except BaseException:

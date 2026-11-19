@@ -11,6 +11,7 @@ Used by the `aiwrapper` plugin and by the chatbot (`addai` / `repai`).
 """
 
 import json
+import re
 
 import aiohttp
 
@@ -24,7 +25,8 @@ ENDPOINTS = {
 DEFAULT_MODELS = {
     "gpt": "gpt-5-mini",
     "antr": "claude-opus-5-5",
-    "gemini": "gemini-2.5-flash",
+    # Google alias that always points at the current Flash model
+    "gemini": "gemini-flash-latest",
     "deepseek": "deepseek-chat",
 }
 
@@ -98,17 +100,37 @@ def _build_request(provider, prompt, api_key, model, stream, system=None):
     return headers, {"model": model, "messages": messages, "stream": stream}
 
 
-def _error_text(provider, payload, status):
+def _error_message(payload):
+    # Gemini's OpenAI-compatible endpoint wraps errors in a list.
+    if isinstance(payload, list) and payload:
+        payload = payload[0]
     err = payload.get("error") if isinstance(payload, dict) else None
     if isinstance(err, dict):
-        msg = err.get("message") or str(err)
-    elif err:
-        msg = str(err)
-    else:
-        msg = str(payload)[:300]
+        return err.get("message") or str(err)
+    if err:
+        return str(err)
+    return str(payload)[:300]
+
+
+def _error_text(provider, payload, status):
+    msg = _error_message(payload)
     if status == 429:
         return f"⚠️ Rate limit exceeded ({provider}). Try again later.\n`{msg}`"
     return f"Error ({status}): {msg}"
+
+
+_SUGGESTED_MODEL = re.compile(r"use (?:models/)?([a-z0-9][a-z0-9.\-]+)", re.I)
+
+
+def _suggested_model(payload, current):
+    """Model the provider tells us to use instead of a retired one, if any."""
+    msg = _error_message(payload)
+    if "model" not in msg.lower():
+        return None
+    match = _SUGGESTED_MODEL.search(msg)
+    if match and match.group(1) != current:
+        return match.group(1).rstrip(".")
+    return None
 
 
 def _extract_text(provider, payload):
@@ -132,56 +154,73 @@ async def ai_response(provider, prompt, api_key, model=None, stream=False, syste
     With stream=False it yields the whole answer once. Errors are yielded as text.
     """
     model = model or DEFAULT_MODELS[provider]
-    headers, data = _build_request(provider, prompt, api_key, model, stream, system)
     try:
-        async with aiohttp.ClientSession(timeout=_TIMEOUT) as session:
-            async with session.post(
-                ENDPOINTS[provider], headers=headers, json=data
-            ) as resp:
-                if resp.status != 200:
-                    try:
-                        payload = await resp.json(content_type=None)
-                    except Exception:
-                        payload = {"error": (await resp.text())[:300]}
-                    yield _error_text(provider, payload, resp.status)
-                    return
-
-                if not stream:
-                    payload = await resp.json(content_type=None)
-                    yield _extract_text(provider, payload)
-                    return
-
-                # Server-sent events: one `data: {...}` line per event.
-                async for raw in resp.content:
-                    line = raw.decode("utf-8", "ignore").strip()
-                    if not line.startswith("data:"):
-                        continue
-                    chunk = line[5:].strip()
-                    if not chunk or chunk == "[DONE]":
-                        continue
-                    try:
-                        event = json.loads(chunk)
-                    except json.JSONDecodeError:
-                        continue
-                    if provider == "antr":
-                        etype = event.get("type")
-                        if etype == "content_block_delta":
-                            delta = event.get("delta", {})
-                            if delta.get("type") == "text_delta" and delta.get("text"):
-                                yield delta["text"]
-                        elif etype == "message_delta":
-                            if event.get("delta", {}).get("stop_reason") == "refusal":
-                                yield "\n⚠️ Claude declined this request."
-                        elif etype == "error":
-                            yield f"Error: {event.get('error', {}).get('message', event)}"
-                    else:
-                        choices = event.get("choices") or []
-                        if choices:
-                            text = (choices[0].get("delta") or {}).get("content")
-                            if text:
-                                yield text
+        async for part in _ai_request(provider, prompt, api_key, model, stream, system):
+            yield part
     except Exception as er:
         yield f"Error: {er}"
+
+
+async def _ai_request(provider, prompt, api_key, model, stream, system, retried=False):
+    headers, data = _build_request(provider, prompt, api_key, model, stream, system)
+    async with aiohttp.ClientSession(timeout=_TIMEOUT) as session:
+        async with session.post(
+            ENDPOINTS[provider], headers=headers, json=data
+        ) as resp:
+            if resp.status != 200:
+                try:
+                    payload = await resp.json(content_type=None)
+                except Exception:
+                    payload = {"error": (await resp.text())[:300]}
+                newer = None if retried else _suggested_model(payload, model)
+                if resp.status in (400, 404) and newer:
+                    # Retired model: use the one the provider suggests.
+                    yield (
+                        f"_(`{model}` is retired, used `{newer}`. "
+                        f"Set it permanently: `.setdb {MODEL_KEYS[provider]} {newer}`)_\n\n"
+                    )
+                    async for part in _ai_request(
+                        provider, prompt, api_key, newer, stream, system, retried=True
+                    ):
+                        yield part
+                    return
+                yield _error_text(provider, payload, resp.status)
+                return
+
+            if not stream:
+                payload = await resp.json(content_type=None)
+                yield _extract_text(provider, payload)
+                return
+
+            # Server-sent events: one `data: {...}` line per event.
+            async for raw in resp.content:
+                line = raw.decode("utf-8", "ignore").strip()
+                if not line.startswith("data:"):
+                    continue
+                chunk = line[5:].strip()
+                if not chunk or chunk == "[DONE]":
+                    continue
+                try:
+                    event = json.loads(chunk)
+                except json.JSONDecodeError:
+                    continue
+                if provider == "antr":
+                    etype = event.get("type")
+                    if etype == "content_block_delta":
+                        delta = event.get("delta", {})
+                        if delta.get("type") == "text_delta" and delta.get("text"):
+                            yield delta["text"]
+                    elif etype == "message_delta":
+                        if event.get("delta", {}).get("stop_reason") == "refusal":
+                            yield "\n⚠️ Claude declined this request."
+                    elif etype == "error":
+                        yield f"Error: {event.get('error', {}).get('message', event)}"
+                else:
+                    choices = event.get("choices") or []
+                    if choices:
+                        text = (choices[0].get("delta") or {}).get("content")
+                        if text:
+                            yield text
 
 
 async def ai_complete(provider, prompt, api_key, model=None, system=None):
