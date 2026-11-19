@@ -5,12 +5,31 @@
 # This file is a part of < https://github.com/TeamUltroid/Ultroid/ >
 # PLease read the GNU Affero General Public License in <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
-if [ -d "resources" ]
-then
-    echo "Current directory Identified.."
-else
-    apt install git -y
-    git clone https://github.com/TeamUltroid/Ultroid
-    cd Ultroid
+# Termux installer:  bash install-termux
+REPO="${REPO:-https://github.com/Ownermood/Ultroid}"
+
+echo "Installing Termux packages (this takes a while the first time)..."
+pkg update -y && pkg upgrade -y
+# Heavy python libs come prebuilt from Termux, so pip doesn't have to compile them.
+pkg install -y python git ffmpeg mediainfo clang make binutils \
+    libjpeg-turbo libpng libffi openssl libxml2 libxslt rust \
+    python-pillow python-numpy python-cryptography
+pkg install -y opencv-python 2>/dev/null || echo "opencv not available, a few image commands will be off."
+
+if [ ! -d "resources" ] || [ ! -d "pyUltroid" ]; then
+    if [ -d "Ultroid/pyUltroid" ]; then
+        cd Ultroid || exit 1
+    else
+        git clone "$REPO" Ultroid && cd Ultroid || exit 1
+    fi
 fi
-bash resources/startup/termux.sh
+
+bash installer.sh --no-root
+
+[ -f .env ] || cp .env.sample .env
+
+echo ""
+echo "Done! Next steps:"
+echo "  1) bash sessiongen          -> make your SESSION (sent to Saved Messages)"
+echo "  2) nano .env                -> paste SESSION, API_ID, API_HASH"
+echo "  3) termux-wake-lock && bash startup"
