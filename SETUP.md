@@ -7,18 +7,26 @@ Alag addons repo ya `ADDONS_URL` ki zaroorat **nahi** hai.
 
 Baaki sab (assistant bot, log group, database) bot khud bana leta hai.
 
-**SESSION kaise banaye:**
+**SESSION kaise banaye** (repo folder ke andar):
 
 ```bash
-python3 sessiongen
+bash sessiongen
 ```
 
-Phone number aur OTP daalo, jo lambi string mile wo `SESSION` hai.
-(Ya Telegram par `@SessionGeneratorBot` se **Telethon** session banao.)
+Docker use kar rahe ho aur VPS par Python nahi hai, to ye chalao:
+
+```bash
+docker compose run --rm ultroid python3 resources/session/ssgen.py
+```
+
+`1` (Telethon) chuno, API ID/HASH, phone number aur OTP daalo.
+Session aapke Telegram ke **Saved Messages** mein aa jaayega, wahi `SESSION` hai.
+(Kisi anjaan bot/website se session mat banwana: wo aapka account le sakte hain.)
 
 > ⚠️ SESSION kisi ko mat dena. Isse koi bhi aapka account chala sakta hai.
 
-`API_ID` / `API_HASH` optional hain. Apne chahiye to https://my.telegram.org → *API development tools* se lo.
+Session banane ke liye `API_ID` / `API_HASH` chahiye: https://my.telegram.org → *API development tools*.
+Wahi dono `.env` mein bhi daal do (bot ke liye optional hain, par apne wale safe rehte hain).
 
 ---
 
