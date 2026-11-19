@@ -91,6 +91,8 @@ def main():
     ultroid_bot.run_in_loop(WasItRestart(udB))
 
     try:
+        from .fns.helper import cleanup_cache
+
         cleanup_cache()
     except BaseException:
         pass

@@ -14,7 +14,7 @@
 
 import os
 
-from pyUltroid.fns.tools import _webupload_cache
+from pyUltroid.fns.tools import _webupload_cache, webupload_buttons
 
 from . import Button, asst, get_string, ultroid_cmd
 
@@ -50,18 +50,5 @@ async def _(event):
 
     else:
         __cache = f"{event.chat_id}:{event.id}"
-        buttons = [
-            [
-                Button.inline("catbox", data=f"flcatbox//{__cache}"),
-                Button.inline("transfer", data=f"fltransfer//{__cache}"),
-            ],
-            [
-                Button.inline("filebin", data=f"flfilebin//{__cache}"),
-                Button.inline("0x0.st", data=f"fl0x0.st//{__cache}"),
-            ],
-            [
-                Button.inline("file.io", data=f"flfile.io//{__cache}"),
-                Button.inline("siasky", data=f"flsiasky//{__cache}"),
-            ],
-        ]
+        buttons = webupload_buttons(__cache)
         await xx.edit("Choose Server to Upload File...", buttons=buttons)

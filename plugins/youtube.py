@@ -19,6 +19,8 @@
 • `{i}ytsv <(youtube) search query>`
    Search and download video from youtube.
 """
+import asyncio
+
 from pyUltroid.fns.ytdl import download_yt, get_yt_link
 
 from . import get_string, requests, ultroid_cmd
@@ -47,7 +49,8 @@ async def download_from_youtube_(event):
         except BaseException:
             return await xx.eor(get_string("youtube_2"))
     elif opt == "v":
-        ytd["format"] = "best"
+        ytd["format"] = "bestvideo*+bestaudio/best"
+        ytd["merge_output_format"] = "mp4"
         ytd["outtmpl"] = "%(id)s.mp4"
         ytd["postprocessors"] = [{"key": "FFmpegMetadata"}]
         url = event.pattern_match.group(2)
@@ -64,19 +67,20 @@ async def download_from_youtube_(event):
             query = event.text.split(" ", 1)[1]
         except IndexError:
             return await xx.eor(get_string("youtube_5"))
-        url = get_yt_link(query)
+        url = await asyncio.to_thread(get_yt_link, query)
         if not url:
             return await xx.edit(get_string("unspl_1"))
         await xx.eor(get_string("youtube_6"))
     elif opt == "sv":
-        ytd["format"] = "best"
+        ytd["format"] = "bestvideo*+bestaudio/best"
+        ytd["merge_output_format"] = "mp4"
         ytd["outtmpl"] = "%(id)s.mp4"
         ytd["postprocessors"] = [{"key": "FFmpegMetadata"}]
         try:
             query = event.text.split(" ", 1)[1]
         except IndexError:
             return await xx.eor(get_string("youtube_7"))
-        url = get_yt_link(query)
+        url = await asyncio.to_thread(get_yt_link, query)
         if not url:
             return await xx.edit(get_string("unspl_1"))
         await xx.eor(get_string("youtube_8"))

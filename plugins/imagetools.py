@@ -218,15 +218,12 @@ async def ultd(event):
     if ultt.endswith(".tgs"):
         await xx.edit(get_string("sts_9"))
     file = await con.convert(ultt, convert_to="png", outname="ult")
-    lnk = upf(file)
-    r = await async_searcher(
-        f"https://nekobot.xyz/api/imagegen?type=blurpify&image={lnk}", re_json=True
-    )
-    ms = r.get("message")
-    if not r["success"]:
-        return await xx.edit(ms)
-    await download_file(ms, "ult.png")
-    img = Image.open("ult.png").convert("RGB")
+    # Done locally now (the nekobot "blurpify" API is unreliable).
+    from PIL import ImageOps
+
+    gray = Image.open(file).convert("L")
+    img = ImageOps.colorize(gray, black="#0b0b3b", white="#7aa7ff", mid="#3a5bd9")
+    img.save("ult.png", "PNG")
     img.save("ult.webp", "webp")
     await event.client.send_file(
         event.chat_id,

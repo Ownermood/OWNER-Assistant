@@ -23,7 +23,7 @@ from datetime import timedelta
 import aiohttp
 import pytz
 
-from . import async_searcher, get_string, udB, ultroid_cmd
+from . import LOGS, async_searcher, get_string, udB, ultroid_cmd
 
 
 async def get_timezone(offset_seconds, use_utc=False):
@@ -135,25 +135,22 @@ async def air_pollution(event):
     if not input_str:
         await event.eor("`No Location was Given...`", time=5)
         return
-    if input_str.lower() == "perth":
-        geo_url = f"https://geocode.xyz/perth%20au?json=1"
-    else:
-        geo_url = f"https://geocode.xyz/{input_str}?json=1"
-    geo_data = await async_searcher(geo_url, re_json=True)
     try:
-        longitude = geo_data["longt"]
-        latitude = geo_data["latt"]
-    except KeyError as e:
+        geo_data = await async_searcher(
+            "https://api.openweathermap.org/geo/1.0/direct",
+            params={"q": input_str, "limit": 1, "appid": x},
+            re_json=True,
+        )
+    except Exception as e:
         LOGS.info(e)
+        geo_data = None
+    if not isinstance(geo_data, list) or not geo_data:
         await event.eor("`Unable to find coordinates for the given location.`", time=5)
         return
-    try:
-        city = geo_data["standard"]["city"]
-        prov = geo_data["standard"]["prov"]
-    except KeyError as e:
-        LOGS.info(e)
-        await event.eor("`Unable to find city for the given coordinates.`", time=5)
-        return
+    place = geo_data[0]
+    latitude, longitude = place["lat"], place["lon"]
+    city = place.get("name", input_str)
+    prov = place.get("state") or place.get("country", "")
     air_pollution_data = await get_air_pollution_data(latitude, longitude, x)
     if air_pollution_data is None:
         await event.eor(

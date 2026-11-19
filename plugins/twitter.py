@@ -11,7 +11,7 @@
 • `{i}tw <tweet text>`
     Tweet the text.
 
-• `{i}twr <tweet id/link>`
+• `{i}twdetail <tweet id/link>`
     Get tweet details with reply/quote/comment count.
 
 • `{i}twuser <username>`

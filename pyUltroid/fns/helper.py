@@ -154,7 +154,7 @@ if run_as_module:
         if event.text[9:] != "f":
             read = open(dl).read()
             for dan in KEEP_SAFE().All:
-                if re.search(dan, read):
+                if dan in read:
                     os.remove(dl)
                     return await ok.edit(
                         f"**Installation Aborted.**\n**Reason:** Occurance of `{dan}` in `{reply.file.name}`.\n\nIf you trust the provider and/or know what you're doing, use `{HNDLR}install f` to force install.",
@@ -263,7 +263,7 @@ async def bash(cmd, run_code=0):
     err = stderr.decode().strip() or None
     out = stdout.decode().strip()
     if not run_code and err:
-        if match := re.match("\/bin\/sh: (.*): ?(\w+): not found", err):
+        if match := re.match(r"/bin/sh: (.*): ?(\w+): not found", err):
             return out, f"{match.group(2).upper()}_NOT_FOUND"
     return out, err
 
@@ -617,3 +617,65 @@ async def shutdown(ult):
             )
     else:
         sys.exit()
+
+
+# ---------------- Safety + restart helpers ---------------- #
+
+
+class KEEP_SAFE:
+    """Code fragments that can leak or destroy the account.
+
+    `.install` refuses plugins containing these (unless forced with `.install f`)
+    and sudo users cannot `.eval` / `.bash` them.
+    """
+
+    All = [
+        "SESSION",
+        "StringSession",
+        "export_session_string",
+        "session_string",
+        "API_HASH",
+        "BOT_TOKEN",
+        "REDIS_PASSWORD",
+        "REDIS_URI",
+        "MONGO_URI",
+        "DATABASE_URL",
+        "HEROKU_API",
+        "DeleteAccountRequest",
+        "ResetAuthorizationRequest",
+        "ResetAuthorizationsRequest",
+        "GetAuthorizationsRequest",
+        "UpdatePasswordSettingsRequest",
+        "GetPasswordRequest",
+        "ResetWebAuthorization",
+        "AcceptLoginTokenRequest",
+        "ExportLoginTokenRequest",
+        "SendCodeRequest",
+        "auth_key",
+        ".env",
+        "os.environ",
+        "getenv",
+        "rm -rf",
+    ]
+
+
+def cleanup_cache():
+    """Remove temporary leftovers that should not survive a restart."""
+    for folder in ("resources/temp", "temp"):
+        if not os.path.isdir(folder):
+            continue
+        for name in os.listdir(folder):
+            path = os.path.join(folder, name)
+            try:
+                if os.path.isfile(path) or os.path.islink(path):
+                    os.remove(path)
+            except OSError:
+                pass
+
+
+def call_back():
+    """Run before `.restart` / `.update` replaces the running process."""
+    try:
+        cleanup_cache()
+    except Exception:
+        pass

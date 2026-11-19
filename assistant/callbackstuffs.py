@@ -384,14 +384,12 @@ async def _(e):
     if "|" in ok:
         ok, index = ok.split("|")
     with open(ok, "r") as hmm:
-        _, data = await get_paste(hmm.read())
+        _, data = await get_paste(hmm.read(), "py")
     if not data.get("link"):
-        return await e.answer(key[:30], alert=True)
-    if not key.startswith("http"):
-        link, raw = data["link"], data["raw"]
-    else:
-        link = key
-        raw = f"{key}/raw"
+        return await e.answer(
+            (data.get("error") or "Failed to paste.")[:200], alert=True
+        )
+    link, raw = data["link"], data["raw"]
     if ok.startswith("addons"):
         key = "Addons"
     elif ok.startswith("vcbot"):
@@ -452,7 +450,11 @@ async def _(e):
     if not e.is_private:
         return
     url = GDrive._create_token_file()
-    await e.edit("Go to the below link and send the code!")
+    await e.edit(
+        "Open the link below and allow access.\n"
+        "Your browser will then open a `http://localhost/?code=...` page that "
+        "does not load - copy that whole address and send it here."
+    )
     async with asst.conversation(e.sender_id) as conv:
         await conv.send_message(url)
         code = await conv.get_response()

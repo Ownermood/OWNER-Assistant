@@ -23,7 +23,9 @@
 • `{i}reverse`
     Reply an Image or sticker to find its sauce.
 """
+import asyncio
 import os
+from urllib.parse import quote
 
 import requests
 from bs4 import BeautifulSoup as bs
@@ -41,7 +43,17 @@ from telethon.tl.types import DocumentAttributeAudio
 from pyUltroid.fns.misc import google_search
 from pyUltroid.fns.tools import get_google_images, saavn_search
 
-from . import LOGS, async_searcher, con, eod, fast_download, get_string, ultroid_cmd
+from . import (
+    LOGS,
+    Button,
+    async_searcher,
+    cat_uploader,
+    con,
+    eod,
+    fast_download,
+    get_string,
+    ultroid_cmd,
+)
 
 
 @ultroid_cmd(
@@ -131,46 +143,38 @@ async def goimg(event):
 
 @ultroid_cmd(pattern="reverse$")
 async def reverse(event):
+    # Google's old "searchbyimage" endpoint was retired (it now redirects to
+    # Lens and can't be scraped), so upload the image and link the engines.
     reply = await event.get_reply_message()
-    if not reply:
+    if not (reply and (reply.photo or reply.sticker or reply.document)):
         return await event.eor("`Reply to an Image`")
     ult = await event.eor(get_string("com_1"))
     dl = await reply.download_media()
     file = await con.convert(dl, convert_to="png")
-    img = Image.open(file)
-    x, y = img.size
-    files = {"encoded_image": (file, open(file, "rb"))}
-    grs = requests.post(
-        "https://www.google.com/searchbyimage/upload",
-        files=files,
-        allow_redirects=False,
-    )
-    loc = grs.headers.get("Location")
-    response = await async_searcher(
-        loc,
-        headers={
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:58.0) Gecko/20100101 Firefox/58.0",
-        },
-    )
-    with open("response.html", "w") as f:
-        f.write(response)
-    xx = bs(response, "html.parser")
-    div = xx.find_all("div", {"class": "kb0PBd"})[0]
-    alls = div.find("a")
-    link = alls["href"]
-    text = alls.text
-    await ult.edit(f"`Dimension ~ {x} : {y}`\nSauce ~ [{text}](google.com{link})")
-    images = await get_google_images(text)
-    for z in images[:2]:
-        try:
-            await event.client.send_file(
-                event.chat_id,
-                file=z["original"],
-                caption="Similar Images Realted to Search",
-            )
-        except Exception as er:
-            LOGS.exception(er)
-    os.remove(file)
+    try:
+        img = Image.open(file)
+        x, y = img.size
+        link = await asyncio.to_thread(cat_uploader.upload_file, file)
+    except Exception as er:
+        LOGS.exception(er)
+        return await ult.edit(f"`Failed to upload image: {er}`")
+    finally:
+        for path in {dl, file}:
+            if path and os.path.exists(path):
+                os.remove(path)
+    enc = quote(link, safe="")
+    buttons = [
+        [Button.url("Google Lens", f"https://lens.google.com/uploadbyurl?url={enc}")],
+        [
+            Button.url(
+                "Yandex", f"https://yandex.com/images/search?rpt=imageview&url={enc}"
+            ),
+            Button.url(
+                "Bing", f"https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:{enc}"
+            ),
+        ],
+    ]
+    await ult.edit(f"`Dimension ~ {x} : {y}`\nOpen a search engine below:", buttons=buttons)
 
 
 @ultroid_cmd(
@@ -183,7 +187,7 @@ async def siesace(e):
     eve = await e.eor(f"`Searching for {song} on Saavn...`")
     try:
         data = (await saavn_search(song))[0]
-    except IndexError:
+    except (IndexError, TypeError, KeyError):
         return await eve.eor(f"`{song} not found on saavn.`")
     try:
         title = data["title"]
