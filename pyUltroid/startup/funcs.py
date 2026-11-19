@@ -8,7 +8,9 @@
 import asyncio
 import os
 import random
+import re
 import shutil
+import sys
 import time
 from datetime import datetime, timezone as dt_timezone
 from random import randint
@@ -182,72 +184,97 @@ async def keep_redis_alive():
         await asyncio.sleep(interval)
 
 
+_BOT_HELP = (
+    "Could not create the assistant bot automatically. Make a bot at @BotFather "
+    "(/newbot), put its token in BOT_TOKEN in your .env and restart."
+)
+_TOKEN_RE = re.compile(r"\d{6,}:[A-Za-z0-9_-]{30,}")
+
+
+async def _botfather_reply(conv, text):
+    """Send `text` to BotFather and wait for its real answer (handles flood waits)."""
+    for _ in range(3):
+        await conv.send_message(text)
+        reply = (await conv.get_response()).raw_text or ""
+        wait = re.search(r"try again in (\d+) seconds", reply)
+        if not wait:
+            return reply
+        await asyncio.sleep(int(wait.group(1)) + 2)
+    return reply
+
+
+async def _create_assistant_bot(client):
+    who = client.me
+    name = f"{who.first_name}'s Bot"[:64]
+    usernames = []
+    if who.username:
+        usernames.append(f"{who.username}_bot"[:32])
+    uid = str(who.id)
+    usernames.append(f"ultroid_{uid[-6:]}_bot")
+    usernames += [f"ultroid_{uid[-5:]}{randint(10, 999)}_bot" for _ in range(3)]
+
+    bf = "BotFather"
+    await client(UnblockRequest(bf))
+    async with client.conversation(bf, timeout=60) as conv:
+        await _botfather_reply(conv, "/cancel")
+        reply = await _botfather_reply(conv, "/newbot")
+        if reply.startswith("That I cannot do") or "20 bots" in reply:
+            LOGS.critical("You already have 20 bots. Delete one at @BotFather.")
+            return None, None
+        reply = await _botfather_reply(conv, name)
+        if not reply.startswith("Good"):
+            reply = await _botfather_reply(conv, "My Assistant Bot")
+            if not reply.startswith("Good"):
+                return None, None
+        for username in usernames:
+            reply = await _botfather_reply(conv, username)
+            if "Done!" in reply:
+                token = _TOKEN_RE.search(reply)
+                return (token.group(0) if token else None), username
+            if not reply.startswith("Sorry"):
+                break
+        await _botfather_reply(conv, "/cancel")
+    return None, None
+
+
 async def autobot():
     from .. import udB, ultroid_bot
 
     if udB.get_key("BOT_TOKEN"):
         return
     await ultroid_bot.start()
-    LOGS.info("MAKING A TELEGRAM BOT FOR YOU AT @BotFather, Kindly Wait")
-    who = ultroid_bot.me
-    name = who.first_name + "'s Bot"
-    if who.username:
-        username = who.username + "_bot"
-    else:
-        username = "ultroid_" + (str(who.id))[5:] + "_bot"
-    bf = "@BotFather"
-    await ultroid_bot(UnblockRequest(bf))
-    await ultroid_bot.send_message(bf, "/cancel")
-    await asyncio.sleep(1)
-    await ultroid_bot.send_message(bf, "/newbot")
-    await asyncio.sleep(1)
-    isdone = (await ultroid_bot.get_messages(bf, limit=1))[0].text
-    if isdone.startswith("That I cannot do.") or "20 bots" in isdone:
-        LOGS.critical(
-            "Please make a Bot from @BotFather and add it's token in BOT_TOKEN, as an env var and restart me."
-        )
-        import sys
 
+    # Don't hammer @BotFather on every container restart.
+    last_fail = udB.get_key("_AUTOBOT_FAILED") or 0
+    if time.time() - float(last_fail) < 3600:
+        LOGS.critical(_BOT_HELP)
+        await asyncio.sleep(600)
         sys.exit(1)
-    await ultroid_bot.send_message(bf, name)
-    await asyncio.sleep(1)
-    isdone = (await ultroid_bot.get_messages(bf, limit=1))[0].text
-    if not isdone.startswith("Good."):
-        await ultroid_bot.send_message(bf, "My Assistant Bot")
-        await asyncio.sleep(1)
-        isdone = (await ultroid_bot.get_messages(bf, limit=1))[0].text
-        if not isdone.startswith("Good."):
-            LOGS.critical(
-                "Please make a Bot from @BotFather and add it's token in BOT_TOKEN, as an env var and restart me."
-            )
-            import sys
 
-            sys.exit(1)
-    await ultroid_bot.send_message(bf, username)
-    await asyncio.sleep(1)
-    isdone = (await ultroid_bot.get_messages(bf, limit=1))[0].text
-    await ultroid_bot.send_read_acknowledge("botfather")
-    if isdone.startswith("Sorry,"):
-        ran = randint(1, 100)
-        username = "ultroid_" + (str(who.id))[6:] + str(ran) + "_bot"
-        await ultroid_bot.send_message(bf, username)
-        await asyncio.sleep(1)
-        isdone = (await ultroid_bot.get_messages(bf, limit=1))[0].text
-    if isdone.startswith("Done!"):
-        token = isdone.split("`")[1]
+    LOGS.info("MAKING A TELEGRAM BOT FOR YOU AT @BotFather, Kindly Wait")
+    try:
+        token, username = await _create_assistant_bot(ultroid_bot)
+    except Exception as er:
+        LOGS.exception(er)
+        token, username = None, None
+    try:
+        await ultroid_bot.send_read_acknowledge("BotFather")
+    except Exception:
+        pass
+
+    if token:
         udB.set_key("BOT_TOKEN", token)
+        udB.del_key("_AUTOBOT_FAILED")
         await enable_inline(ultroid_bot, username)
         LOGS.info(
             f"Done. Successfully created @{username} to be used as your assistant bot!"
         )
-    else:
-        LOGS.info(
-            "Please Delete Some Of your Telegram bots at @Botfather or Set Var BOT_TOKEN with token of a bot"
-        )
+        return
 
-        import sys
-
-        sys.exit(1)
+    udB.set_key("_AUTOBOT_FAILED", time.time())
+    LOGS.critical(_BOT_HELP)
+    await asyncio.sleep(600)
+    sys.exit(1)
 
 
 async def autopilot():
@@ -551,9 +578,10 @@ def _version_changes(udb):
 
 async def enable_inline(ultroid_bot, username):
     bf = "BotFather"
-    await ultroid_bot.send_message(bf, "/setinline")
-    await asyncio.sleep(1)
-    await ultroid_bot.send_message(bf, f"@{username}")
-    await asyncio.sleep(1)
-    await ultroid_bot.send_message(bf, "Search")
+    try:
+        async with ultroid_bot.conversation(bf, timeout=60) as conv:
+            for text in ("/setinline", f"@{username}", "Search"):
+                await _botfather_reply(conv, text)
+    except Exception as er:
+        LOGS.info(f"Could not enable inline mode automatically: {er}")
     await ultroid_bot.send_read_acknowledge(bf)
