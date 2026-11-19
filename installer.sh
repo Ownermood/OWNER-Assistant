@@ -89,6 +89,11 @@ pip_install_file() {
     # package does not stop the rest from installing
     [ -f "$1" ] || return
     tr -d '\r' <"$1" | grep -vE '^\s*(#|$)' | while read -r pkg; do
+        # On Termux, opencv comes from `pkg install opencv-python`; building it
+        # with pip takes hours, so skip it when cv2 already works.
+        if [ -n "$TERMUX_VERSION" ] && [[ "$pkg" == opencv* ]] && python3 -c "import cv2" 2>/dev/null; then
+            continue
+        fi
         python3 -m pip install -q --no-cache-dir "$pkg" || echo "  skipped: $pkg"
     done
 }
@@ -99,7 +104,14 @@ install_requirements() {
     python3 -m pip install -q --upgrade pip 2>/dev/null || PIP_FLAGS="--break-system-packages"
     export PIP_BREAK_SYSTEM_PACKAGES=1
     echo "Installing requirements..."
-    python3 -m pip install -q --no-cache-dir $PIP_FLAGS -r requirements.txt || exit 1
+    if ! python3 -m pip install -q --no-cache-dir $PIP_FLAGS -r requirements.txt; then
+        echo "Some requirements failed, retrying one by one..."
+        pip_install_file requirements.txt
+        python3 -c "import telethon, decouple, git, aiohttp" || {
+            echo "Core requirements could not be installed. Fix the errors above and run again."
+            exit 1
+        }
+    fi
     echo "Installing optional requirements..."
     pip_install_file resources/startup/optional-requirements.txt
     echo "Installing addons requirements..."

@@ -68,6 +68,38 @@ Database na diya to data ek local file mein save hota hai. VPS/PC ke liye ye the
 
 ---
 
+## Tarika 2b: Termux (Android phone)
+
+[Termux](https://f-droid.org/packages/com.termux/) **F-Droid se** install karo (Play Store wala purana hai), phir:
+
+```bash
+pkg install -y git && git clone https://github.com/Ownermood/Ultroid && cd Ultroid
+```
+
+```bash
+bash install-termux
+```
+
+```bash
+bash sessiongen
+```
+
+`.env` mein `SESSION`, `API_ID`, `API_HASH` bharo:
+
+```bash
+nano .env
+```
+
+```bash
+termux-wake-lock && bash startup
+```
+
+- Phone ki **Battery optimization** Termux ke liye band karo, warna Android bot ko band kar dega.
+- Termux band karoge / phone restart hoga to bot ruk jaayega; wapas `cd Ultroid && bash startup`.
+- Kuch heavy commands (video compress, kuch image tools) phone par slow ya band ho sakte hain.
+
+---
+
 ## Tarika 3: Heroku / Render / Koyeb / Railway (cloud)
 
 1. Is repo ko deploy karo (Dockerfile se build hota hai, aapka hi code chalega).
