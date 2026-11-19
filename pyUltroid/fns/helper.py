@@ -232,9 +232,7 @@ if run_as_module:
     @run_async
     def gen_chlog(repo, diff):
         """Generate Changelogs..."""
-        UPSTREAM_REPO_URL = (
-            Repo().remotes[0].config_reader.get("url").replace(".git", "")
-        )
+        UPSTREAM_REPO_URL = Var.UPSTREAM_REPO.replace(".git", "")
         ac_br = repo.active_branch.name
         ch_log = tldr_log = ""
         ch = f"<b>Ultroid {ultroid_version} updates for <a href={UPSTREAM_REPO_URL}/tree/{ac_br}>[{ac_br}]</a>:</b>"
@@ -275,11 +273,9 @@ async def bash(cmd, run_code=0):
 async def updater():
     from .. import LOGS
 
-    try:
-        off_repo = Repo().remotes[0].config_reader.get("url").replace(".git", "")
-    except Exception as er:
-        LOGS.exception(er)
-        return
+    from ..configs import Var
+
+    off_repo = Var.UPSTREAM_REPO.replace(".git", "")
     try:
         repo = Repo()
     except NoSuchPathError as error:
@@ -294,12 +290,17 @@ async def updater():
         repo = Repo.init()
         origin = repo.create_remote("upstream", off_repo)
         origin.fetch()
-        repo.create_head("main", origin.refs.main)
-        repo.heads.main.set_tracking_branch(origin.refs.main)
-        repo.heads.main.checkout(True)
+        branch = Var.UPSTREAM_BRANCH
+        ref = origin.refs[branch]
+        repo.create_head(branch, ref)
+        repo.heads[branch].set_tracking_branch(ref)
+        repo.heads[branch].checkout(True)
     ac_br = repo.active_branch.name
-    repo.create_remote("upstream", off_repo) if "upstream" not in repo.remotes else None
+    if "upstream" not in repo.remotes:
+        repo.create_remote("upstream", off_repo)
     ups_rem = repo.remote("upstream")
+    if ups_rem.url.replace(".git", "") != off_repo:
+        ups_rem.set_url(off_repo)
     ups_rem.fetch(ac_br)
     changelog, tl_chnglog = await gen_chlog(repo, f"HEAD..upstream/{ac_br}")
     return bool(changelog)

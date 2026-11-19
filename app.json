@@ -9,40 +9,48 @@
         "python",
         "ultroid"
     ],
-    "repository": "https://github.com/TeamUltroid/Ultroid",
+    "repository": "https://github.com/Ownermood/Ultroid",
     "website": "https://ultroid.tech",
     "success_url": "https://t.me/TeamUltroid",
     "stack": "container",
     "env": {
-        "API_ID": {
-            "description": "You api id, from my.telegram.org or @ScrapperRoBot.",
-            "value": "", 
-            "required": false
+        "SESSION": {
+            "description": "Telethon string session of your account. Make it with `python3 sessiongen` or @SessionGeneratorBot. (REQUIRED)",
+            "value": "",
+            "required": true
         },
-        "API_HASH": {
-            "description": "You api hash, from my.telegram.org or @ScrapperRoBot.",
+        "API_ID": {
+            "description": "From my.telegram.org (optional, a default is used if empty).",
             "value": "",
             "required": false
         },
-        "SESSION": {
-            "description": "Session String (telethon or pyrogram) for your telegram user account. The userbot will NOT work without a session string!!",
-            "value": ""
+        "API_HASH": {
+            "description": "From my.telegram.org (optional, a default is used if empty).",
+            "value": "",
+            "required": false
         },
         "REDIS_URI": {
-            "description": "Redis endpoint URL, from redislabs.com",
-            "value": ""
+            "description": "Database. Free Redis from redis.io / upstash.com, e.g. redis://default:pass@host:port. Or leave empty and fill MONGO_URI.",
+            "value": "",
+            "required": false
         },
         "REDIS_PASSWORD": {
-            "description": "Redis endpoint password, from redislabs.com",
-            "value": ""
+            "description": "Only if your REDIS_URI is host:port without password.",
+            "value": "",
+            "required": false
+        },
+        "MONGO_URI": {
+            "description": "Alternative database: free MongoDB Atlas URL.",
+            "value": "",
+            "required": false
         },
         "HEROKU_API": {
-            "description": "Heroku API token. Mandatory for Heroku Deploy...",
+            "description": "Heroku API key (for .usage and restarts). Optional.",
             "value": "",
             "required": false
         },
         "HEROKU_APP_NAME": {
-            "description": "Name of your Heroku app, given in the first blank on this page. To be added if deploying to heroku ONLY.",
+            "description": "Your Heroku app name (same as above). Optional.",
             "value": "",
             "required": false
         }

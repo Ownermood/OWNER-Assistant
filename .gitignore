@@ -9,6 +9,9 @@ test*
 *.mp4
 *.tgs
 *.txt
+!requirements.txt
+!addons/addons.txt
+!resources/startup/optional-requirements.txt
 /*.jpg
 /*.png
 /*.mp4
@@ -20,7 +23,8 @@ resources/extras/thumbnail.jpg
 resources/auth/
 
 # Directories
-addons/
+addons/.git/
+addons/.installed
 vcbot/
 __pycache__/
 venv/

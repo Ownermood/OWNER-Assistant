@@ -710,7 +710,7 @@ async def _(e):
 async def pmset(event):
     BT = (
         [Button.inline("Aᴅᴅᴏɴs  Oғғ", data="edof")]
-        if udB.get_key("ADDONS")
+        if udB.get_key("ADDONS") is not False  # addons are on by default
         else [Button.inline("Aᴅᴅᴏɴs  Oɴ", data="edon")]
     )
 
