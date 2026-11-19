@@ -154,7 +154,7 @@ async def startup_stuff():
             LOGS.debug(er)
         except BaseException:
             LOGS.critical(
-                "Incorrect Timezone ,\nCheck Available Timezone From Here https://graph.org/Ultroid-06-18-2\nSo Time is Default UTC"
+                "Incorrect Timezone ,\nUse a name like Asia/Kolkata (see en.wikipedia.org/wiki/List_of_tz_database_time_zones)\nSo Time is Default UTC"
             )
             os.environ["TZ"] = "UTC"
             time.tzset()
@@ -505,7 +505,7 @@ async def ready():
         BTTS = Button.inline("• Click to Start •", "initft_2")
         udB.set_key("INIT_DEPLOY", "Done")
     else:
-        MSG = f"**Ultroid has been deployed!**\n➖➖➖➖➖➖➖➖➖➖\n**UserMode**: {inline_mention(ultroid_bot.me)}\n**Assistant**: @{asst.me.username}\n➖➖➖➖➖➖➖➖➖➖\n**Support**: @TeamUltroid\n➖➖➖➖➖➖➖➖➖➖"
+        MSG = f"**{BOT_NAME} has been deployed!**\n➖➖➖➖➖➖➖➖➖➖\n**UserMode**: {inline_mention(ultroid_bot.me)}\n**Assistant**: @{asst.me.username}\n➖➖➖➖➖➖➖➖➖➖\n**Support**: @TeamUltroid\n➖➖➖➖➖➖➖➖➖➖"
         BTTS, PHOTO = None, None
         prev_spam = udB.get_key("LAST_UPDATE_LOG_SPAM")
         if prev_spam:
@@ -533,10 +533,6 @@ async def ready():
     if spam_sent and not spam_sent.media:
         udB.set_key("LAST_UPDATE_LOG_SPAM", spam_sent.id)
 
-    try:
-        await ultroid_bot(JoinChannelRequest("TheUltroid"))
-    except Exception as er:
-        LOGS.exception(er)
 
 
 async def WasItRestart(udb):

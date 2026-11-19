@@ -359,7 +359,7 @@ async def piston_run(event):
             thumb=wb(
                 "https://graph.org/file/e33c57fc5f1044547e4d8.jpg", 0, "image/jpeg", []
             ),
-            text=f'**Inline Usage**\n\n`@{asst.me.username} run python print("hello world")`\n\n[Language List](https://graph.org/Ultroid-09-01-6)',
+            text=f'**Inline Usage**\n\n`@{asst.me.username} run python print("hello world")`\n\n[Language List](https://github.com/engineer-man/piston#supported-languages)',
         )
         return await event.answer([result])
     if not PISTON_LANGS:
@@ -384,7 +384,7 @@ async def piston_run(event):
             thumb=wb(
                 "https://graph.org/file/e33c57fc5f1044547e4d8.jpg", 0, "image/jpeg", []
             ),
-            text=f'**Inline Usage**\n\n`@{asst.me.username} run python print("hello world")`\n\n[Language List](https://graph.org/Ultroid-09-01-6)',
+            text=f'**Inline Usage**\n\n`@{asst.me.username} run python print("hello world")`\n\n[Language List](https://github.com/engineer-man/piston#supported-languages)',
         )
         return await event.answer([result])
     try:
@@ -554,7 +554,7 @@ async def inline_tl(ult):
                 await ult.builder.article(
                     title="How to Use?",
                     description="Tl Searcher",
-                    url="https://t.me/TeamUltroid",
+                    url=REPO_URL,
                     text=text,
                 )
             ],
@@ -577,7 +577,7 @@ async def inline_tl(ult):
                 await ult.builder.article(
                     title=key.__name__,
                     description=tyyp,
-                    url="https://t.me/TeamUltroid",
+                    url=REPO_URL,
                     text=text[:4000],
                 )
             )
@@ -589,12 +589,12 @@ InlinePlugin.update(
     {
         "Pʟᴀʏ Sᴛᴏʀᴇ Aᴘᴘs": "app telegram",
         "Mᴏᴅᴅᴇᴅ Aᴘᴘs": "mods minecraft",
-        "Sᴇᴀʀᴄʜ Oɴ Gᴏᴏɢʟᴇ": "go TeamUltroid",
+        "Sᴇᴀʀᴄʜ Oɴ Gᴏᴏɢʟᴇ": "go OWNER Assistant",
         "WʜɪSᴘᴇʀ": "wspr @username Hello🎉",
         "YᴏᴜTᴜʙᴇ Dᴏᴡɴʟᴏᴀᴅᴇʀ": "yt Ed Sheeran Perfect",
         "Piston Eval": "run javascript console.log('Hello OWNER')",
         "OʀᴀɴɢᴇFᴏx🦊": "ofox beryllium",
-        "Tᴡɪᴛᴛᴇʀ Usᴇʀ": "twitter theultroid",
+        "Tᴡɪᴛᴛᴇʀ Usᴇʀ": "twitter telegram",
         "Fᴅʀᴏɪᴅ Sᴇᴀʀᴄʜ": "fdroid telegram",
         "Sᴀᴀᴠɴ sᴇᴀʀᴄʜ": "saavn",
         "Tʟ Sᴇᴀʀᴄʜ": "tl",

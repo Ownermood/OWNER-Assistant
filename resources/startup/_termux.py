@@ -43,7 +43,7 @@ APT_PACKAGES = ["ffmpeg", "neofetch", "mediainfo"]
 
 DISCLAIMER_TEXT = ""
 
-COPYRIGHT = f"©️ TeamUltroid {datetime.now().year}"
+COPYRIGHT = f"©️ OWNER Assistant {datetime.now().year}"
 
 HEADER = f"""{Fore.MAGENTA}
 ╔╗ ╔╗╔╗  ╔╗            ╔╗
@@ -238,7 +238,7 @@ Enter [ A = Ask for each, I = Install all, S = Skip, E = Exit]"""
 ask_and_wait_opt()
 
 print(f"\n{Fore.RED}#EXTRA Features...\n")
-print(f"{Fore.YELLOW}* Do you want to get Ultroid Logs in Colors? [Y/N] ")
+print(f"{Fore.YELLOW}* Do you want to get Logs in Colors? [Y/N] ")
 inp = input("").strip().lower()
 if inp in ["yes", "y"]:
     print(f"{Fore.GREEN}*Spoking the Magical Mantras*")
@@ -253,12 +253,12 @@ if not path.exists(".env"):
 
 print(with_header(f"\n{Fore.GREEN}You are all Done! 🥳"))
 sleep(0.2)
-print(f"Use 'bash startup' to try running Ultroid.{Fore.RESET}")
+print(f"Use 'bash startup' to start OWNER Assistant.{Fore.RESET}")
 sleep(0.5)
 print(
-    "\nYou can head over to @UltroidSupportChat, if you get stuck somewhere, and need help."
+    "\nIf you get stuck, read SETUP.md in your repo."
 )
 sleep(0.5)
-print("\nMade with ❤️ by @TeamUltroid...")
+print("\nOWNER Assistant")
 
 system("pip3 uninstall -q colorama -y")

@@ -7,13 +7,12 @@
 
 
 echo "
-            ┏┳┓╋┏┓╋╋╋╋┏┓┏┓
-            ┃┃┣┓┃┗┳┳┳━╋╋┛┃
-            ┃┃┃┗┫┏┫┏┫╋┃┃╋┃
-            ┗━┻━┻━┻┛┗━┻┻━┛
-
-      Visit @TheUltroid for updates!!
-
+  _____        ___   _ _____ ____
+ / _ \ \      / / \ | | ____|  _ \
+| | | \ \ /\ / /|  \| |  _| | |_) |
+| |_| |\ V  V / | |\  | |___|  _ <
+ \___/  \_/\_/  |_| \_|_____|_| \_\
+        A S S I S T A N T
 "
 if [ -f .env ] ; then set -o allexport; source <(tr -d '\r' < .env | sed -e '/^\s*#/d;/^\s*$/d'); set +o allexport ; fi
 if [ $SESSION1 ] ; then python3 multi_client.py ; else python3 -m pyUltroid ; fi

@@ -61,13 +61,13 @@ alive_1: "**The OWNER Assistant...**\n\n
 ┏━━━━━━━━━━━━━━━━━━━━━\n
 ┣ **Owner** - `{}`\n
 ┣ **Version** - `{}`\n
-┣ **Py-Ultroid** - `{}`\n
+┣ **Core** - `{}`\n
 ┣ **UpTime** - `{}`\n
 ┣ **Python** - `{}`\n
 ┣ **Telethon** - `{}`\n
 ┣ **Branch** - `{}`\n
 ┗━━━━━━━━━━━━━━━━━━━━━"
-log: " Ultroid userbot ගේ **Heroku** Logs.\n[මෙතනත් ]({}) paste කර ඇත!"
+log: " OWNER Assistant userbot ගේ **Heroku** Logs.\n[මෙතනත් ]({}) paste කර ඇත!"
 ping: "** වැඩ වැඩ මහත්තයො ** Pong !! ** `{}ms`\n**Uptime** - `{}`"
 usage: "**⚙️ Dyno භාවිතය ⚙️**:\n\n
  -> **{}** `ගේ Dyno භාවිතය`:\n
@@ -100,7 +100,7 @@ chats_2: "`මේ චැට් එක මකා දැමිය නොහැක`
 chats_3: "`මම පරිපාලක නෙමෙයි`"
 chats_4: "#Deleted\nමකාදැමුවා {}"
 chats_5: "ඔයාගේ [{}]({}) Group එක හැඩුවා ලොක්කා..!"
-chats_6: "@TeamUltroid සමඟ එකතු වන්න"
+chats_6: "OWNER Assistant සමඟ එකතු වන්න"
 
 # converter
 cvt_1: "media/Document එකකට රිප්ලයි කරන්න."
@@ -146,17 +146,17 @@ sf_14: "SuperFBan Completed.\nTotal Feds - {}.\nExcluded - {}.\n Affected {} fed
 sf_15: "Starting a Mass-UnFedBan..."
 sf_16: "SuperUnFBan Completed.\nTotal Feds - {}.\nExcluded - {}.\n Affected {} feds.\n#TB"
 sf_17: "`Give me someones id, or reply to somones message to check his/her fedstat.`"
-sf_18: "List of feds {} has been banned in.\n\nCollected using Ultroid."
+sf_18: "List of feds {} has been banned in.\n\nCollected using OWNER Assistant."
 sf_19: "**Error**\n `Unblock` @MissRose_Bot `and try again!"
 sf_20: "`Extracting information...`"
-sf_21: "\n\nFedInfo Extracted by Ultroid"
+sf_21: "\n\nFedInfo Extracted by OWNER Assistant"
 
 # gdrive
 gdrive_1: "`You have already authorised with Google Drive`"
 gdrive_2: "Go [here](https://console.developers.google.com/flows/enableapi?apiid=drive) and get your `GDRIVE_CLIENT_ID` and `GDRIVE_CLIENT_SECRET`\n\n
 Send your GDRIVE_CLIENT_ID and GDRIVE_CLIENT_SECRET as this.\n`GDRIVE_CLIENT_ID GDRIVE_CLIENT_SECRET` separated by space."
 gdrive_3: "`Wrong Client Id`"
-gdrive_4: "`Something went wrong! Send `/auth` again.\nIf same happens contact `@TeamUltroid"
+gdrive_4: "`Something went wrong! Send `/auth` again.\nIf same happens contact `OWNER Assistant"
 gdrive_5: "`Success!\nYou are all set to use Google Drive with OWNER Assistant.`"
 gdrive_6: "`Go to `{}` and send ``/auth.`"
 gdrive_7: "**Successfully Uploaded File on G-Drive :**\n\n[{}]({})"
@@ -269,7 +269,7 @@ help_autoban: "`{i} ඔටෝකික් <on / ace>`\n    සක්රීය �
 can_2: "Δ # #USUSTAMEUPDATE\n\n@ {} UN පරිශීලක නාමය @ "
 aki_1: "ක්රීඩාව අවසන් කර ඇත ...."
 youtube_8: "වීඩියෝ ගීතය බාගත කිරීම ... '"
-help_button: "-\n\nIT `{i} බොත්තම the බොත්තම් ආකෘතියක් සහිත පෙළ\n   බොත්තම් සාදන්න ඔබට පින්තූරයට පිළිතුරු දිය හැකිය\n\nආකෘතිය: - `{i} බොත්තම එතන!@ Useuthroid 😎.\n[අල්තොයිඩ් |T.me/ThultroidT.me/ulkronidupportchat |එකම]\n[Teamblid | |t.me/temaultroid] `"
+help_button: "-\n\nIT `{i} බොත්තම the බොත්තම් ආකෘතියක් සහිත පෙළ\n   බොත්තම් සාදන්න ඔබට පින්තූරයට පිළිතුරු දිය හැකිය\n\nආකෘතිය: - `{i} බොත්තම එතන!@ Useuthroid 😎.\n[අල්තොයිඩ් |T.me/ThOWNER AssistantT.me/ulkronidupportchat |එකම]\n[Teamblid | |t.me/temaOWNER Assistant] `"
 bot_1: "හේයි, මම ජීවතුන් අතර සිටිමි."
 youtube_7: "වීඩියෝ බාගත කිරීම සඳහා මට (යූ ටියුබ්) සෙවුම් විමසුමක් දෙන්න!"
 com_5: "බාගත කිරීම ..."

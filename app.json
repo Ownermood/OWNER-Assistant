@@ -1,17 +1,16 @@
 {
-    "name": "Ultroid UserBot",
-    "description": "Pluggable telegram userbot, made in python using Telethon.",
-    "logo": "https://graph.org/file/031957757a4f6a5191040.jpg",
+    "name": "OWNER Assistant",
+    "description": "Personal Telegram assistant (userbot).",
+    "logo": "https://raw.githubusercontent.com/Ownermood/Ultroid/main/resources/extras/owner_assistant_1.jpg",
     "keywords": [
         "Telethon",
         "telegram",
         "userbot",
         "python",
-        "ultroid"
+        "owner-assistant"
     ],
     "repository": "https://github.com/Ownermood/Ultroid",
-    "website": "https://ultroid.tech",
-    "success_url": "https://t.me/TeamUltroid",
+    "success_url": "https://github.com/Ownermood/Ultroid",
     "stack": "container",
     "env": {
         "SESSION": {
@@ -56,7 +55,7 @@
         }
     },
     "formation": {
-        "ultroid": {
+        "worker": {
             "quantity": 1,
             "size": "eco"
         }

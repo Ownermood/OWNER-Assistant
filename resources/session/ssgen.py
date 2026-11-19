@@ -10,12 +10,12 @@ import os
 from time import sleep
 
 ULTROID = r"""
-  _    _ _ _             _     _
- | |  | | | |           (_)   | |
- | |  | | | |_ _ __ ___  _  __| |
- | |  | | | __| '__/ _ \| |/ _  |
- | |__| | | |_| | | (_) | | (_| |
-  \____/|_|\__|_|  \___/|_|\__,_|
+  _____        ___   _ _____ ____
+ / _ \ \      / / \ | | ____|  _ \
+| | | \ \ /\ / /|  \| |  _| | |_) |
+| |_| |\ V  V / | |\  | |___|  _ <
+ \___/  \_/\_/  |_| \_|_____|_| \_\
+        A S S I S T A N T
 """
 
 
@@ -81,11 +81,11 @@ def telethon_session():
     # logging in
     try:
         with TelegramClient(StringSession(), API_ID, API_HASH) as ultroid:
-            print("Generating a string session for •ULTROID•")
+            print("Generating a string session for OWNER Assistant")
             try:
                 ultroid.send_message(
                     "me",
-                    f"**ULTROID** `SESSION`:\n\n`{ultroid.session.save()}`\n\n**Do not share this anywhere!**",
+                    f"**OWNER Assistant** `SESSION`:\n\n`{ultroid.session.save()}`\n\n**Do not share this anywhere!**",
                 )
                 print(
                     "Your SESSION has been generated. Check your Telegram saved messages!"
@@ -109,7 +109,7 @@ def telethon_session():
     except Exception as er:
         print("Unexpected Error Occurred while Creating Session")
         print(er)
-        print("If you think It as a Bug, Report to @UltroidSupportChat.\n\n")
+        print("Try again, or check your API ID / HASH.\n\n")
 
 
 def pyro_session():
@@ -136,7 +136,7 @@ def pyro_session():
             ss = pyro.export_session_string()
             pyro.send_message(
                 "me",
-                f"`{ss}`\n\nAbove is your Pyrogram Session String for @TheUltroid. **DO NOT SHARE it.**",
+                f"`{ss}`\n\nAbove is your Pyrogram Session String for OWNER Assistant. **DO NOT SHARE it.**",
             )
             print("Session has been sent to your saved messages!")
             exit(0)
@@ -151,7 +151,7 @@ def main():
     try:
         type_of_ss = int(
             input(
-                "\nUltroid supports both telethon as well as pyrogram sessions.\n\nWhich session do you want to generate?\n1. Telethon Session.\n2. Pyrogram Session.\n\nEnter choice:  "
+                "\nOWNER Assistant supports both telethon as well as pyrogram sessions.\n\nWhich session do you want to generate?\n1. Telethon Session.\n2. Pyrogram Session.\n\nEnter choice:  "
             )
         )
     except Exception as e:
