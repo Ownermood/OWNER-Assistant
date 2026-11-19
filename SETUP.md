@@ -153,7 +153,16 @@ AI model badalna ho: `.setdb GEMINI_MODEL gemini-pro-latest` (aise hi `OPENAI_MO
 
 ## Update
 
-Telegram mein `.update` likho. Ye aapke repo (`UPSTREAM_REPO`) se naya code laata hai.
+**Docker par chal raha hai** (Tarika 1) → VPS par ye chalao (`.update` Docker mein kaam nahi karta,
+kyunki code image ke andar build hota hai):
+
+```bash
+cd ~/Ultroid && git pull && docker compose up -d --build
+```
+
+**Bina Docker** (Tarika 2 / Termux) → Telegram mein `.update` likho. Ye aapke repo (`UPSTREAM_REPO`) se naya code laata hai.
+
+Naya code aaya ya nahi: crash log ke "Last 5 commits" ya `git log --oneline -1` mein sabse naya merge dekho.
 
 ## Problem aaye to
 
