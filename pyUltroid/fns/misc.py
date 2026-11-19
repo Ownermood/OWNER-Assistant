@@ -26,6 +26,7 @@ from telethon.tl import types
 from telethon.utils import get_display_name, get_peer_id
 
 from .. import *
+from ..branding import BOT_NAME
 from .._misc._wrappers import eor
 
 if run_as_module:
@@ -159,8 +160,8 @@ async def allcmds(event, telegraph):
         for zz in LIST[z]:
             txt += HNDLR + zz + "\n"
         txt += "\n\n"
-    t = telegraph.create_page(title="Ultroid All Cmds", content=[txt])
-    await eor(event, f"All Ultroid Cmds : [Click Here]({t['url']})", link_preview=False)
+    t = telegraph.create_page(title=f"{BOT_NAME} All Cmds", content=[txt])
+    await eor(event, f"All {BOT_NAME} Cmds : [Click Here]({t['url']})", link_preview=False)
 
 
 async def ReTrieveFile(input_file_name):

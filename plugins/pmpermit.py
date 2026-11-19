@@ -840,7 +840,7 @@ async def in_pm_ans(event):
                 content=cont,
             )
         ]
-    await event.answer(res, switch_pm="• Ultroid •", switch_pm_param="start")
+    await event.answer(res, switch_pm="• OWNER Assistant •", switch_pm_param="start")
 
 
 @callback(re.compile("admin_only(.*)"), from_users=[ultroid_bot.uid])

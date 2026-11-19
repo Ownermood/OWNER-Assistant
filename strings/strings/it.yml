@@ -19,13 +19,13 @@ autopic_2: "Nessun risultato trovato per `{}`"
 autopic_3: "Hai una raccolta`{}` correlata alla tua ricerca! \nAvvio di Autopic!"
 
 # inline
-inline_1: "[Supporto Ultroid](t.me/UltroidSupportChat)\n\n
+inline_1: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n
 **Menù di aiuto di {}.\n\n
 Pʟᴜɢɪɴs ~ {}**"
-inline_2: "[Supporto Ultroid](t.me/UltroidSupportChat)\n\n
+inline_2: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n
 **Menù di aiuto di {}.\n\n
 Aᴅᴅᴏɴs ~ {}**"
-inline_3: "[Supporto Ultroid](t.me/UltroidSupportChat)\n\n
+inline_3: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n
 **Menù di aiuto di {}.\n\n
 Aᴅᴅᴏɴs ~ {}\n\n
 Vai e aggiungi la variabile ADDONS con valore true**"
@@ -56,7 +56,7 @@ afk_5: "`Andando AFK.`\n\n
 afk_6: "Sto andando AFK."
 
 # bot
-alive_1: "**L'Ultroid Userbot...**\n\n
+alive_1: "**L'OWNER Assistant...**\n\n
 **{}**\n\n
 ┏━━━━━━━━━━━━━━━━━━━━━\n
 ┣ **Owner** - `{}`\n
@@ -156,7 +156,7 @@ gdrive_2: "Vai [qui](https://console.developers.google.com/flows/enableapi?apiid
 Invia il tuo GDRIVE_CLIENT_ID e GDRIVE_CLIENT_SECRET come questo.\n`GDRIVE_CLIENT_ID GDRIVE_CLIENT_SECRET` separati dagli spazi."
 gdrive_3: "`Client Id sbagliato`"
 gdrive_4: "`Qualcosa è andato storto! Invia `/auth` di nuovo.\nSe lo stesso accade, contatta '@TeamUltroid"
-gdrive_5: "`Successo!\nSei pronto per utilizzare Google Drive con Ultroid Userbot.`"
+gdrive_5: "`Successo!\nSei pronto per utilizzare Google Drive con OWNER Assistant.`"
 gdrive_6: "`Vai a `{}` e invia ``/auth.`"
 gdrive_7: "**File caricato con successo su G-Drive:**\n\n[{}]({})"
 

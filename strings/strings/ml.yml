@@ -20,13 +20,13 @@ autopic_2: "ഇതും `{}` ആയി ബന്ധപ്പെട്ട ഒന
 autopic_3: "ഇതും `{}`  ബന്ധപ്പെട്ട ചിലത് കണ്ടെത്തി !\ nഓട്ടോപിക്ക് സ്റ്റാർട്ട് ചെയ്യുന്നു.. !"
 
 # inline
-inline_1: "[Uʟᴛʀᴏɪᴅ Sᴜᴘᴘᴏʀᴛ](t.me/UltroidSupportChat)\n\n
+inline_1: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n
 **ഹെല്പ് മെനു{}.\n\n
 പ്ലഗ്ഗിൻസ്~ {}**"
-inline_2: "[Uʟᴛʀᴏɪᴅ Sᴜᴘᴘᴏʀᴛ](t.me/UltroidSupportChat)\n\n
+inline_2: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n
 **ഹെൽപ്പ് മെനു {}.\n\n
 ആഡ് ഓണ്~ {}**"
-inline_3: "[Uʟᴛʀᴏɪᴅ Sᴜᴘᴘᴏʀᴛ](t.me/UltroidSupportChat)\n\n
+inline_3: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n
 **ഹെൽപ്പ് മെനു {}.\n\n
 ആഡ് ഓണ്~ {}\n\n
 ഹീറോക്കുവിൽ പോയി `ADDONS` എന്ന  Vᴀʀ  T സെറ്റ് ചെയ്യുക വാല്യു = Tʀᴜᴇ**"
@@ -57,7 +57,7 @@ afk_5: "`ഞാൻ പോകുന്നു..`\n\n
 afk_6: "ഞാൻ പോകുന്നു."
 
 # bot
-alive_1: "**The Ultroid Userbot...**\n\n
+alive_1: "**The OWNER Assistant...**\n\n
 **{}**\n\n
 ┏━━━━━━━━━━━━━━━━━━━━━\n
 ┣ **ഓണർ** - `{}`\n
@@ -157,7 +157,7 @@ gdrive_2: "Go [here](https://console.developers.google.com/flows/enableapi?apiid
 Send your GDRIVE_CLIENT_ID and GDRIVE_CLIENT_SECRET as this.\n`GDRIVE_CLIENT_ID GDRIVE_CLIENT_SECRET` seperated with space."
 gdrive_3: "`തന്ന ക്ലയന്റ് ഐഡി തെറ്റാണ്`"
 gdrive_4: "`എന്തോ തെറ്റു സംഭവിച്ചിരിക്കുന്നു. `/auth` എന്നു സെന്റ് ചെയ്യുക.\nഇത് വീണ്ടും സംഭവിച്ചാൽ ഞങ്ങളെ ബന്ധപ്പെടുക `@TeamUltroid"
-gdrive_5: "`പൂർത്തിയായി!\nവിജയകരമായി നിങ്ങൾഗൂഗിൾ ഡ്രൈവ്  Ultroid Userbot ആയി ബന്ധിപ്പിച്ചു.`"
+gdrive_5: "`പൂർത്തിയായി!\nവിജയകരമായി നിങ്ങൾഗൂഗിൾ ഡ്രൈവ്  OWNER Assistant ആയി ബന്ധിപ്പിച്ചു.`"
 gdrive_6: "`Go to `{}` and send ``/auth.`"
 gdrive_7: "**വിജയകരമായി ഗൂഗിൾ ഡ്രൈവിൽ അപ്ലോഡ് ചെയ്തിരിക്കുന്നു:**\n\n[{}]({})"
 

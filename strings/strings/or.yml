@@ -39,9 +39,9 @@ autopic_4: "AUTOPIC ୟୁଜ୍ ରେ ନଥିଲା !!"
 autopic_5: "AUTOPIC ଷ୍ଟୋପ୍ଡ!"
 
 # inline
-inline_1: "[ଅଲ୍ଟ୍ରଏଡ୍  ସମର୍ଥନ](t.me/UltroidSupportChat)\n\n**ସାହାଯ୍ୟ ମେନୁ  {}.\n\nପ୍ଲଗଇନ୍ସ  ~ {}**"
-inline_2: "[ଅଲ୍ଟ୍ରଏଡ୍  ସମର୍ଥନ](t.me/UltroidSupportChat)\n\n**ସାହାଯ୍ୟ ମେନୁ {}.\n\nଆଡନ୍ସ  ~ {}**"
-inline_3: "[ଅଲ୍ଟ୍ରଏଡ୍  ସମର୍ଥନ](t.me/UltroidSupportChat)\n\n**ସାହାଯ୍ୟ ମେନୁ  {}.\n\nଆଡନ୍ସ  ~ {}\n\nଯାଅ ଏବଂ ଯୋଗ କରନ୍ତୁ  `ADDONS` Vᴀʀ ଏବଂ Vᴀʟᴜᴇ `Tʀᴜᴇ` କରନ୍ତୁ**"
+inline_1: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n**ସାହାଯ୍ୟ ମେନୁ  {}.\n\nପ୍ଲଗଇନ୍ସ  ~ {}**"
+inline_2: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n**ସାହାଯ୍ୟ ମେନୁ {}.\n\nଆଡନ୍ସ  ~ {}**"
+inline_3: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n**ସାହାଯ୍ୟ ମେନୁ  {}.\n\nଆଡନ୍ସ  ~ {}\n\nଯାଅ ଏବଂ ଯୋଗ କରନ୍ତୁ  `ADDONS` Vᴀʀ ଏବଂ Vᴀʟᴜᴇ `Tʀᴜᴇ` କରନ୍ତୁ**"
 inline_4: "** {} ର  ବଟ୍\n\nମୁଖ୍ୟ ମେନୁ\n\nପ୍ଲଗଇନ୍ ~ {}\nଆଡନ୍ସ  ~ {}\nସମୁଦାୟ Cᴏᴍᴍᴀɴᴅs ~ {}**"
 inline_5: "**ମେନୁ ବନ୍ଦ ହୋଇଯାଇଛି**"
 inline_6: "**{} ଙ୍କ ଭଏସ୍ ଚାଟ୍ ହେଲ୍ପ ମେନୁ**\n**ଉପଲବ୍ଧ କମାଣ୍ଡସ୍:** `{}`\n\n@TeamUltroid"
@@ -153,7 +153,7 @@ gdrive_1: "`ଆପଣ ଗୁଗୁଲ୍ ଡ୍ରାଇଭ୍ ସହିତ ପ�
 gdrive_2: "[ଏଠାରେ](https://console.developers.google.com/flows/enableapi?apiid=drive) ଯାଆନ୍ତୁ ଏବଂ ଆପଣଙ୍କର `GDRIVE_CLIENT_ID` ଏବ `GDRIVE_CLIENT_SECRET` ପ୍ରାପ୍ତ କରନ୍ତୁ|\n\n`GDRIVE_CLIENT_ID GDRIVE_CLIENT_SECRET` ସ୍ପେସ୍ ଦ୍ୱାରା ପୃଥକ ହେଉଥିବା|/nଏହିପରି ଆପଣଙ୍କର `GDRIVE_CLIENT_ID` ଏବଂ `GDRIVE_CLIENT_SECRET` ପଠାନ୍ତୁ |"
 gdrive_3: "`ଭୁଲ Client Id`"
 gdrive_4: "`କିଛି ଭୁଲ ହୋଇ ଗଲା! ପୁନର୍ବାର `/ auth` ପଠାନ୍ତୁ |\nଯଦି ସମାନ ଘଟଣା ଘଟେ `@ TheUltroid` ସହିତ ଯୋଗାଯୋଗ କରନ୍ତୁ |"
-gdrive_5: "`ସଫଳତା!\nUltroid Userbot ସହିତ ଗୁଗୁଲ୍ ଡ୍ରାଇଭ୍ ବ୍ୟବହାର କରିବାକୁ ଆପଣ ପୂର୍ଣ୍ଣ ପ୍ରସ୍ତୁତ ଅଛନ୍ତି.`"
+gdrive_5: "`ସଫଳତା!\nOWNER Assistant ସହିତ ଗୁଗୁଲ୍ ଡ୍ରାଇଭ୍ ବ୍ୟବହାର କରିବାକୁ ଆପଣ ପୂର୍ଣ୍ଣ ପ୍ରସ୍ତୁତ ଅଛନ୍ତି.`"
 gdrive_6: "`{}` କୁ ଯାଆନ୍ତୁ ଏବଂ `/auth.` ପଠାନ୍ତୁ|"
 gdrive_7: "**ସଫଳତାର ସହିତ G-Drive ରେ ଫାଇଲ୍ ଅପଲୋଡ୍ ହୋଇଗଲା:**\n\n[{}]({})"
 
