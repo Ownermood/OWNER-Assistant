@@ -54,7 +54,9 @@ def main():
 
     pmbot = udB.get_key("PMBOT")
     manager = udB.get_key("MANAGER")
-    addons = udB.get_key("ADDONS") or Var.ADDONS
+    addons = udB.get_key("ADDONS")
+    if addons is None:
+        addons = Var.ADDONS
     vcbot = udB.get_key("VCBOT") or Var.VCBOT
     if HOSTED_ON == "okteto":
         vcbot = False
@@ -91,6 +93,8 @@ def main():
     ultroid_bot.run_in_loop(WasItRestart(udB))
 
     try:
+        from .fns.helper import cleanup_cache
+
         cleanup_cache()
     except BaseException:
         pass

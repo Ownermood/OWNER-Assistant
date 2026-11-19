@@ -1,0 +1,14 @@
+emoji>=2.0
+fonttools
+gtts
+phlogo
+pyfiglet
+pygments
+pyjokes
+quotefancy
+shazamio>=0.6
+speechrecognition
+speedtest-cli
+textblob
+wikipedia
+markdownify

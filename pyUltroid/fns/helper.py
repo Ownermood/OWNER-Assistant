@@ -154,7 +154,7 @@ if run_as_module:
         if event.text[9:] != "f":
             read = open(dl).read()
             for dan in KEEP_SAFE().All:
-                if re.search(dan, read):
+                if dan in read:
                     os.remove(dl)
                     return await ok.edit(
                         f"**Installation Aborted.**\n**Reason:** Occurance of `{dan}` in `{reply.file.name}`.\n\nIf you trust the provider and/or know what you're doing, use `{HNDLR}install f` to force install.",
@@ -232,9 +232,7 @@ if run_as_module:
     @run_async
     def gen_chlog(repo, diff):
         """Generate Changelogs..."""
-        UPSTREAM_REPO_URL = (
-            Repo().remotes[0].config_reader.get("url").replace(".git", "")
-        )
+        UPSTREAM_REPO_URL = Var.UPSTREAM_REPO.replace(".git", "")
         ac_br = repo.active_branch.name
         ch_log = tldr_log = ""
         ch = f"<b>Ultroid {ultroid_version} updates for <a href={UPSTREAM_REPO_URL}/tree/{ac_br}>[{ac_br}]</a>:</b>"
@@ -263,7 +261,7 @@ async def bash(cmd, run_code=0):
     err = stderr.decode().strip() or None
     out = stdout.decode().strip()
     if not run_code and err:
-        if match := re.match("\/bin\/sh: (.*): ?(\w+): not found", err):
+        if match := re.match(r"/bin/sh: (.*): ?(\w+): not found", err):
             return out, f"{match.group(2).upper()}_NOT_FOUND"
     return out, err
 
@@ -275,11 +273,9 @@ async def bash(cmd, run_code=0):
 async def updater():
     from .. import LOGS
 
-    try:
-        off_repo = Repo().remotes[0].config_reader.get("url").replace(".git", "")
-    except Exception as er:
-        LOGS.exception(er)
-        return
+    from ..configs import Var
+
+    off_repo = Var.UPSTREAM_REPO.replace(".git", "")
     try:
         repo = Repo()
     except NoSuchPathError as error:
@@ -294,12 +290,17 @@ async def updater():
         repo = Repo.init()
         origin = repo.create_remote("upstream", off_repo)
         origin.fetch()
-        repo.create_head("main", origin.refs.main)
-        repo.heads.main.set_tracking_branch(origin.refs.main)
-        repo.heads.main.checkout(True)
+        branch = Var.UPSTREAM_BRANCH
+        ref = origin.refs[branch]
+        repo.create_head(branch, ref)
+        repo.heads[branch].set_tracking_branch(ref)
+        repo.heads[branch].checkout(True)
     ac_br = repo.active_branch.name
-    repo.create_remote("upstream", off_repo) if "upstream" not in repo.remotes else None
+    if "upstream" not in repo.remotes:
+        repo.create_remote("upstream", off_repo)
     ups_rem = repo.remote("upstream")
+    if ups_rem.url.replace(".git", "") != off_repo:
+        ups_rem.set_url(off_repo)
     ups_rem.fetch(ac_br)
     changelog, tl_chnglog = await gen_chlog(repo, f"HEAD..upstream/{ac_br}")
     return bool(changelog)
@@ -617,3 +618,65 @@ async def shutdown(ult):
             )
     else:
         sys.exit()
+
+
+# ---------------- Safety + restart helpers ---------------- #
+
+
+class KEEP_SAFE:
+    """Code fragments that can leak or destroy the account.
+
+    `.install` refuses plugins containing these (unless forced with `.install f`)
+    and sudo users cannot `.eval` / `.bash` them.
+    """
+
+    All = [
+        "SESSION",
+        "StringSession",
+        "export_session_string",
+        "session_string",
+        "API_HASH",
+        "BOT_TOKEN",
+        "REDIS_PASSWORD",
+        "REDIS_URI",
+        "MONGO_URI",
+        "DATABASE_URL",
+        "HEROKU_API",
+        "DeleteAccountRequest",
+        "ResetAuthorizationRequest",
+        "ResetAuthorizationsRequest",
+        "GetAuthorizationsRequest",
+        "UpdatePasswordSettingsRequest",
+        "GetPasswordRequest",
+        "ResetWebAuthorization",
+        "AcceptLoginTokenRequest",
+        "ExportLoginTokenRequest",
+        "SendCodeRequest",
+        "auth_key",
+        ".env",
+        "os.environ",
+        "getenv",
+        "rm -rf",
+    ]
+
+
+def cleanup_cache():
+    """Remove temporary leftovers that should not survive a restart."""
+    for folder in ("resources/temp", "temp"):
+        if not os.path.isdir(folder):
+            continue
+        for name in os.listdir(folder):
+            path = os.path.join(folder, name)
+            try:
+                if os.path.isfile(path) or os.path.islink(path):
+                    os.remove(path)
+            except OSError:
+                pass
+
+
+def call_back():
+    """Run before `.restart` / `.update` replaces the running process."""
+    try:
+        cleanup_cache()
+    except Exception:
+        pass

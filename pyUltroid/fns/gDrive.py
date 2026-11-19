@@ -13,7 +13,9 @@ from mimetypes import guess_type
 from apiclient.http import LOGGER, MediaFileUpload, MediaIoBaseDownload
 from googleapiclient.discovery import build, logger
 from httplib2 import Http
-from oauth2client.client import OOB_CALLBACK_URN, OAuth2WebServerFlow
+from urllib.parse import parse_qs, urlparse
+
+from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import logger as _logger
 from oauth2client.file import Storage
 
@@ -34,7 +36,10 @@ class GDriveManager:
                 "https://www.googleapis.com/auth/drive.metadata",
             ],
             "dir_mimetype": "application/vnd.google-apps.folder",
-            "redirect_uri": OOB_CALLBACK_URN,
+            # Google blocked the old copy-paste (OOB) flow in 2022. With a
+            # loopback redirect the browser lands on http://localhost/?code=...
+            # (page won't load) and the user sends that URL (or just the code).
+            "redirect_uri": "http://localhost",
         }
         self.auth_token = udB.get_key("GDRIVE_AUTH_TOKEN")
         self.folder_id = udB.get_key("GDRIVE_FOLDER_ID")
@@ -51,7 +56,13 @@ class GDriveManager:
     def _create_token_file(self, code: str = None):
         if code and self._flow:
             _auth_flow = self._flow["_"]
-            credentials = _auth_flow.step2_exchange(code)
+            code = code.strip()
+            if "code=" in code:
+                code = parse_qs(urlparse(code).query).get("code", [code])[0]
+            try:
+                credentials = _auth_flow.step2_exchange(code)
+            except Exception:
+                return None
             Storage(self.token_file).put(credentials)
             return udB.set_key("GDRIVE_AUTH_TOKEN", str(open(self.token_file).read()))
         try:

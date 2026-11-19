@@ -25,6 +25,7 @@ from pyUltroid.fns.tools import (
     get_ofox,
     saavn_search,
     webuploader,
+    webupload_buttons,
 )
 
 from . import *
@@ -113,20 +114,7 @@ async def _(e):
     if "/" in filename:
         filename = filename.split("/")[-1]
     __cache = f"{chat_id}:{msg_id}"
-    buttons = [
-        [
-            Button.inline("anonfiles", data=f"flanonfiles//{__cache}"),
-            Button.inline("transfer", data=f"fltransfer//{__cache}"),
-        ],
-        [
-            Button.inline("bayfiles", data=f"flbayfiles//{__cache}"),
-            Button.inline("x0.at", data=f"flx0.at//{__cache}"),
-        ],
-        [
-            Button.inline("file.io", data=f"flfile.io//{__cache}"),
-            Button.inline("siasky", data=f"flsiasky//{__cache}"),
-        ],
-    ]
+    buttons = webupload_buttons(__cache)
     try:
         lnk = [
             await e.builder.article(
@@ -157,12 +145,18 @@ async def _(e):
     data = t[2:]
     host = data.split("//")[0]
     chat_id, msg_id = data.split("//")[1].split(":")
-    filename = _webupload_cache[int(chat_id)][int(msg_id)]
+    filename = _webupload_cache.get(int(chat_id), {}).get(int(msg_id))
+    if not filename:
+        return await e.edit("File not found, send the command again.")
     if "/" in filename:
         filename = filename.split("/")[-1]
     await e.edit(f"Uploading `{filename}` on {host}")
-    link = (await webuploader(chat_id, msg_id, host)).strip().replace("\n", "")
-    await e.edit(f"Uploaded `{filename}` on {host}.", buttons=Button.url("View", link))
+    link, error = await webuploader(chat_id, msg_id, host)
+    if not link:
+        return await e.edit(f"**{host}:** {error}")
+    await e.edit(
+        f"Uploaded `{filename}` on {host}.\n{link}", buttons=Button.url("View", link)
+    )
 
 
 @in_pattern("repo", owner=True)
@@ -234,8 +228,11 @@ async def _(e):
     start = 0 * 3 + 1
     da = base64.b64decode(choice(apis)).decode("ascii")
     url = f"https://www.googleapis.com/customsearch/v1?key={da}&cx=25b3b50edb928435b&q={quer}&start={start}"
-    data = await async_searcher(url, re_json=True)
-    search_items = data.get("items", [])
+    try:
+        data = await async_searcher(url, re_json=True)
+    except Exception:
+        data = {}
+    search_items = data.get("items", []) if isinstance(data, dict) else []
     modss = []
     for a in search_items:
         title = a.get("title")
@@ -271,7 +268,7 @@ async def _(e):
 
 APP_CACHE = {}
 RECENTS = {}
-PLAY_API = "https://googleplay.onrender.com/api/apps?q="
+PLAY_API = udB.get_key("PLAY_API") or "https://googleplay.onrender.com/api/apps?q="
 
 
 @in_pattern("app", owner=True)
@@ -296,8 +293,15 @@ async def _(e):
         pass
     foles = []
     url = PLAY_API + f.replace(" ", "+")
-    aap = await async_searcher(url, re_json=True)
-    for z in aap["results"][:50]:
+    try:
+        aap = await async_searcher(url, re_json=True)
+        apps = aap["results"][:50]
+    except Exception as er:
+        LOGS.info(f"app search: {er}")
+        return await e.answer(
+            [], switch_pm="App search service is down, try later.", switch_pm_param="start"
+        )
+    for z in apps:
         url = "https://play.google.com/store/apps/details?id=" + z["appId"]
         name = z["title"]
         desc = unescape(z["summary"])[:300].replace("<br>", "\n") + "..."
@@ -337,7 +341,9 @@ async def _(e):
     await e.answer(foles, switch_pm="Application Searcher.", switch_pm_param="start")
 
 
-PISTON_URI = "https://emkc.org/api/v2/piston/"
+# The public emkc.org Piston API became whitelist-only in 2025.
+# Self-host Piston and set PISTON_URI (e.g. http://localhost:2000/api/v2/piston/).
+PISTON_URI = udB.get_key("PISTON_URI") or "https://emkc.org/api/v2/piston/"
 PISTON_LANGS = {}
 
 
@@ -357,8 +363,18 @@ async def piston_run(event):
         )
         return await event.answer([result])
     if not PISTON_LANGS:
-        se = await async_searcher(f"{PISTON_URI}runtimes", re_json=True)
-        PISTON_LANGS.update({lang.pop("language"): lang for lang in se})
+        try:
+            se = await async_searcher(f"{PISTON_URI}runtimes", re_json=True)
+            PISTON_LANGS.update({lng.pop("language"): lng for lng in se})
+        except Exception as er:
+            LOGS.info(f"piston: {er}")
+            result = await event.builder.article(
+                title="Piston not reachable",
+                description="Set PISTON_URI to your own Piston server",
+                text="**Code runner is not reachable.**\n\nThe public Piston API is "
+                "whitelist-only now. Host your own Piston and set `PISTON_URI`.",
+            )
+            return await event.answer([result])
     if lang in PISTON_LANGS.keys():
         version = PISTON_LANGS[lang]["version"]
     else:
@@ -371,18 +387,20 @@ async def piston_run(event):
             text=f'**Inline Usage**\n\n`@{asst.me.username} run python print("hello world")`\n\n[Language List](https://graph.org/Ultroid-09-01-6)',
         )
         return await event.answer([result])
-    output = await async_searcher(
-        f"{PISTON_URI}execute",
-        post=True,
-        json={
-            "language": lang,
-            "version": version,
-            "files": [{"content": code}],
-        },
-        re_json=True,
-    )
-
-    output = output["run"]["output"] or get_string("instu_4")
+    try:
+        output = await async_searcher(
+            f"{PISTON_URI}execute",
+            post=True,
+            json={
+                "language": lang,
+                "version": version,
+                "files": [{"content": code}],
+            },
+            re_json=True,
+        )
+        output = output["run"]["output"] or get_string("instu_4")
+    except Exception as er:
+        output = f"Error: {er}"
     if len(output) > 3000:
         output = f"{output[:3000]}..."
     result = await event.builder.article(
@@ -448,64 +466,21 @@ async def do_magic(event):
     await event.answer(ress, switch_pm=msg, switch_pm_param="start")
 
 
-# Thanks to OpenSource
-_bearer_collected = [
-    "AAAAAAAAAAAAAAAAAAAAALIKKgEAAAAA1DRuS%2BI7ZRKiagD6KHYmreaXomo%3DP5Vaje4UTtEkODg0fX7nCh5laSrchhtLxeyEqxXpv0w9ZKspLD",
-    "AAAAAAAAAAAAAAAAAAAAAL5iUAEAAAAAmo6FYRjqdKlI3cNziIm%2BHUQB9Xs%3DS31pj0mxARMTOk2g9dvQ1yP9wknvY4FPBPUlE00smJcncw4dPR",
-    "AAAAAAAAAAAAAAAAAAAAAN6sVgEAAAAAMMjMMWrwgGyv7YQOWN%2FSAsO5SGM%3Dg8MG9Jq93Rlllaok6eht7HvRCruN4Vpzp4NaVsZaaHHWSTzKI8",
-]
-
-
 @in_pattern("twitter", owner=True)
 async def twitter_search(event):
-    try:
-        match = event.text.split(maxsplit=1)[1].lower()
-    except IndexError:
-        return await event.answer(
-            [], switch_pm="Enter Query to Search", switch_pm_param="start"
-        )
-    try:
-        return await event.answer(
-            _ult_cache["twitter"][match],
-            switch_pm="• Twitter Search •",
-            switch_pm_param="start",
-        )
-    except KeyError:
-        pass
-    headers = {"Authorization": f"bearer {choice(_bearer_collected)}"}
-    res = await async_searcher(
-        f"https://api.twitter.com/1.1/users/search.json?q={match}",
-        headers=headers,
-        re_json=True,
-    )
-    reso = []
-    for user in res:
-        thumb = wb(user["profile_image_url_https"], 0, "image/jpeg", [])
-        if user.get("profile_banner_url"):
-            url = user["profile_banner_url"]
-            text = f"[\xad]({url})• **Name :** `{user['name']}`\n"
-        else:
-            text = f"• **Name :** `{user['name']}`\n"
-        text += f"• **Description :** `{user['description']}`\n"
-        text += f"• **Username :** `@{user['screen_name']}`\n"
-        text += f"• **Followers :** `{user['followers_count']}`    • **Following :** `{user['friends_count']}`\n"
-        pro_ = "https://twitter.com/" + user["screen_name"]
-        text += f"• **Link :** [Click Here]({pro_})\n_"
-        reso.append(
+    # Twitter/X closed its free search API (v1.1) in 2023, so inline user
+    # search cannot work anymore. Use `.twuser <username>` (needs twikit login).
+    await event.answer(
+        [
             await event.builder.article(
-                title=user["name"],
-                description=user["description"],
-                url=pro_,
-                text=text,
-                thumb=thumb,
+                title="Twitter search is not available",
+                description="X closed its free API. Use .twuser <username>",
+                text="**Twitter/X inline search is not available anymore.**\n\n"
+                "X shut down its free API. Use `.twuser <username>` "
+                "after setting `TWITTER_USERNAME`, `TWITTER_EMAIL`, `TWITTER_PASSWORD`.",
             )
-        )
-    swi_ = f"🐦 Showing {len(reso)} Results!" if reso else "No User Found :("
-    await event.answer(reso, switch_pm=swi_, switch_pm_param="start")
-    if _ult_cache.get("twitter"):
-        _ult_cache["twitter"].update({match: reso})
-    else:
-        _ult_cache.update({"twitter": {match: reso}})
+        ]
+    )
 
 
 _savn_cache = {}
@@ -525,10 +500,14 @@ async def savn_s(event):
             switch_pm=f"Showing Results for {query}",
             switch_pm_param="start",
         )
-    results = await saavn_search(query)
+    results = await saavn_search(query) or []
+    if not isinstance(results, list):
+        results = []
     swi = "🎵 Saavn Search" if results else "No Results Found!"
     res = []
     for song in results:
+        if not isinstance(song, dict) or not song.get("url"):
+            continue
         thumb = wb(song["image"], 0, "image/jpeg", [])
         text = f"• **Title :** {song['title']}"
         text += f"\n• **Year :** {song['year']}"

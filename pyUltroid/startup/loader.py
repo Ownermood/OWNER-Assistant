@@ -45,6 +45,49 @@ def _after_load(loader, module, plugin_name=""):
                 loader._logger.exception(em)
 
 
+def _addons_bundled():
+    """True when `addons/` ships inside this repo (not a separate git clone)."""
+    return os.path.isfile("addons/__init__.py") and not os.path.exists("addons/.git")
+
+
+def _install_addon_requirements():
+    """pip install addons/addons.txt, but only when it changed since last time."""
+    req = "addons/addons.txt"
+    if not os.path.exists(req):
+        return
+    import hashlib
+
+    digest = hashlib.sha256(open(req, "rb").read()).hexdigest()
+    marker = "addons/.installed"
+    if os.path.exists(marker) and open(marker).read().strip() == digest:
+        return
+    res = subprocess.run(
+        [sys.executable, "-m", "pip", "install", "--no-cache-dir", "-q", "-r", req]
+    )
+    if res.returncode == 0:
+        with open(marker, "w") as f:
+            f.write(digest)
+
+
+def _prepare_addons():
+    url = udB.get_key("ADDONS_URL") or config("ADDONS_URL", None)
+    if _addons_bundled() and not url:
+        # Addons come with this repo: nothing to clone, just load them.
+        LOGS.info("Using addons bundled with this repo.")
+    else:
+        if url and _addons_bundled():
+            LOGS.info("ADDONS_URL is set, replacing bundled addons with it.")
+            rmtree("addons")
+        if os.path.exists("addons") and not os.path.exists("addons/.git"):
+            rmtree("addons")
+        if not os.path.exists("addons"):
+            src = url or "https://github.com/TeamUltroid/UltroidAddons.git"
+            subprocess.run(["git", "clone", "-q", src, "addons"])
+        else:
+            subprocess.run(["git", "-C", "addons", "pull", "-q"])
+    _install_addon_requirements()
+
+
 def load_other_plugins(addons=None, pmbot=None, manager=None, vcbot=None):
 
     # for official
@@ -67,32 +110,7 @@ def load_other_plugins(addons=None, pmbot=None, manager=None, vcbot=None):
 
     # for addons
     if addons:
-        if url := udB.get_key("ADDONS_URL"):
-            subprocess.run(f"git clone -q {url} addons", shell=True)
-        if os.path.exists("addons") and not os.path.exists("addons/.git"):
-            rmtree("addons")
-        if not os.path.exists("addons"):
-            subprocess.run(
-                f"git clone -q -b {Repo().active_branch} https://github.com/TeamUltroid/UltroidAddons.git addons",
-                shell=True,
-            )
-        else:
-            subprocess.run("cd addons && git pull -q && cd ..", shell=True)
-
-        if not os.path.exists("addons"):
-            subprocess.run(
-                "git clone -q https://github.com/TeamUltroid/UltroidAddons.git addons",
-                shell=True,
-            )
-        if os.path.exists("addons/addons.txt"):
-            # generally addons req already there so it won't take much time
-            # subprocess.run(
-            #        "rm -rf /usr/local/lib/python3.*/site-packages/pip/_vendor/.wh*"
-            #    )
-            subprocess.run(
-                f"{sys.executable} -m pip install --no-cache-dir -q -r ./addons/addons.txt",
-                shell=True,
-            )
+        _prepare_addons()
 
         _exclude = udB.get_key("EXCLUDE_ADDONS")
         _exclude = _exclude.split() if _exclude else []

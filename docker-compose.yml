@@ -1,14 +1,24 @@
+# Easiest local / VPS setup:
+#   1. cp .env.sample .env   and fill SESSION (and API_ID/API_HASH)
+#   2. docker compose up -d --build
+# A Redis database is started for you automatically, nothing else to set.
 services:
-  worker:
+  ultroid:
     build: .
+    env_file: .env
     environment:
-      REDIS_URI: $REDIS_URI
-      REDIS_PASSWORD: $REDIS_PASSWORD
-      SESSION: $SESSION
-      API_ID: $API_ID  # defaults to None
-      API_HASH: $API_HASH  # defaults to None
-      MONGO_URI: $MONGO_URI  # defaults to None
-      BOT_TOKEN: $BOT_TOKEN # Not mandatory
-      LOG_CHANNEL: $LOG_CHANNEL # Not mandatory
-      DATABASE_URL: $DATABASE_URL  # defaults to None
-      OKTETO_TOKEN: $OKTETO_TOKEN
+      # use the bundled redis unless you gave your own DB in .env
+      REDIS_URI: ${REDIS_URI:-redis://redis:6379}
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+volumes:
+  redis-data:

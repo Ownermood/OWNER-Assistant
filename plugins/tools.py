@@ -451,8 +451,9 @@ async def webss(event):
         except Exception as er:
             LOGS.exception(er)
     if not pic:
+        # keyless fallback (screenshotapi.net now needs a token)
         pic, msg = await download_file(
-            f"https://shot.screenshotapi.net/screenshot?&url={xurl}&output=image&file_type=png&wait_for_event=load",
+            f"https://image.thum.io/get/png/width/1280/{xurl}",
             path,
             validate=True,
         )

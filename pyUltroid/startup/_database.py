@@ -253,6 +253,15 @@ class RedisDB(_BaseDatabase):
         *args,
         **kwargs,
     ):
+        if host and host.startswith(("redis://", "rediss://")):
+            # Full URL (Redis Cloud / Upstash / Railway style)
+            extra = {"password": password} if password else {}
+            self.db = Redis.from_url(host, **extra, **kwargs)
+            self.set = self.db.set
+            self.get = self.db.get
+            self.keys = self.db.keys
+            self.delete = self.db.delete
+            return super().__init__()
         if host and ":" in host:
             spli_ = host.split(":")
             host = spli_[0]

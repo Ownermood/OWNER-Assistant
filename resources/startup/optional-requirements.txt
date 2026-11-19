@@ -20,7 +20,7 @@ opencv-python-headless
 pillow>=9.0.0
 profanitydetector
 psutil
-pypdf2>=1.26.0
+pypdf>=5.0.0
 pytz
 qrcode
 requests
@@ -28,6 +28,5 @@ twikit
 tabulate
 telegraph
 tgcrypto
-youtube-search-python
 yt-dlp
 # -------------------------------------------------------#

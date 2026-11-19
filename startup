@@ -15,5 +15,5 @@ echo "
       Visit @TheUltroid for updates!!
 
 "
-if [ -f .env ] ; then  set -o allexport; source .env; set +o allexport ; fi
+if [ -f .env ] ; then set -o allexport; source <(tr -d '\r' < .env | sed -e '/^\s*#/d;/^\s*$/d'); set +o allexport ; fi
 if [ $SESSION1 ] ; then python3 multi_client.py ; else python3 -m pyUltroid ; fi

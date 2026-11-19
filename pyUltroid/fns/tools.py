@@ -5,6 +5,7 @@
 # PLease read the GNU Affero General Public License in
 # <https://github.com/TeamUltroid/pyUltroid/blob/main/LICENSE>.
 
+import asyncio
 import json
 import math
 import os
@@ -236,73 +237,92 @@ async def saavn_search(query: str):
 _webupload_cache = {}
 
 
+# Upload hosts that still work (2026). Order = button order.
+WEBUPLOAD_SITES = ["catbox", "litterbox", "0x0.st", "filebin", "file.io", "tmpfiles"]
+
+
+def webupload_buttons(cache_key):
+    """Inline buttons for every supported upload host."""
+    btns = [
+        Button.inline(site, data=f"fl{site}//{cache_key}") for site in WEBUPLOAD_SITES
+    ]
+    return [btns[i : i + 2] for i in range(0, len(btns), 2)]
+
+
+async def _curl(*args):
+    proc = await asyncio.create_subprocess_exec(
+        "curl", "-sS", "-L", "--max-time", "600", *args,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE,
+    )
+    out, err = await proc.communicate()
+    return proc.returncode, out.decode(errors="ignore").strip(), err.decode(
+        errors="ignore"
+    ).strip()
+
+
 async def webuploader(chat_id: int, msg_id: int, uploader: str):
-    LOGS.info("webuploader function called with uploader: %s", uploader)
-    if chat_id in _webupload_cache and msg_id in _webupload_cache[chat_id]:
-        file = _webupload_cache[chat_id][msg_id]
-    else:
-        return "File not found in cache."
-
-    sites = {
-        "siasky": {"url": "https://siasky.net/skynet/skyfile", "json": True},
-        "file.io": {"url": "https://file.io/", "json": True},
-        "0x0.st": {"url": "https://0x0.st", "json": False},
-        "transfer": {"url": "https://transfer.sh", "json": False},
-        "catbox": {"url": "https://catbox.moe/user/api.php", "json": False},
-        "filebin": {"url": "https://filebin.net", "json": False},
-    }
-
-    if uploader and uploader in sites:
-        url = sites[uploader]["url"]
-        json_format = sites[uploader]["json"]
-    else:
-        return "Uploader not supported or invalid."
-
-    files = {"file": open(file, "rb")}  # Adjusted for both formats
-
+    """Upload a cached file to `uploader`. Returns (link or None, error or None)."""
+    chat_id, msg_id = int(chat_id), int(msg_id)
+    file = _webupload_cache.get(chat_id, {}).get(msg_id)
+    if not file or not os.path.exists(file):
+        return None, "File not found, send the command again."
+    if uploader not in WEBUPLOAD_SITES:
+        return None, "Uploader not supported."
+    name = os.path.basename(file)
     try:
-        if uploader == "filebin":
-            cmd = f"curl -X POST --data-binary '@{file}' -H 'filename: \"{file}\"' \"{url}\""
-            response = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-            if response.returncode == 0:
-                response_json = json.loads(response.stdout)
-                bin_id = response_json.get("bin", {}).get("id")
-                if bin_id:
-                    filebin_url = f"https://filebin.net/{bin_id}"
-                    return filebin_url
-                else:
-                    return "Failed to extract bin ID from Filebin response"
-            else:
-                return f"Failed to upload file to Filebin: {response.stderr.strip()}"
-        elif uploader == "catbox":
-            cmd = f"curl -F reqtype=fileupload -F time=24h -F 'fileToUpload=@{file}' {url}"
+        if uploader == "catbox":
+            code, out, err = await _curl(
+                "-F", "reqtype=fileupload", "-F", f"fileToUpload=@{file}",
+                "https://catbox.moe/user/api.php",
+            )
+        elif uploader == "litterbox":
+            code, out, err = await _curl(
+                "-F", "reqtype=fileupload", "-F", "time=72h",
+                "-F", f"fileToUpload=@{file}",
+                "https://litterbox.catbox.moe/resources/internals/api.php",
+            )
         elif uploader == "0x0.st":
-            cmd = f"curl -F 'file=@{file}' {url}"
-        elif uploader == "file.io" or uploader == "siasky":
-            try:
-                status = await async_searcher(
-                    url, data=files, post=True, re_json=json_format
-                )
-            except Exception as e:
-                return f"Failed to upload file: {e}"
-            if isinstance(status, dict):
-                if "skylink" in status:
-                    return f"https://siasky.net/{status['skylink']}"
-                if status.get("status") == 200:
-                    return status.get("link")
-        else:
-            raise ValueError("Uploader not supported")
-
-        response = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        if response.returncode == 0:
-            return response.stdout.strip()
-        else:
-            return f"Failed to upload file: {response.stderr.strip()}"
+            code, out, err = await _curl(
+                "-A", "Ultroid", "-F", f"file=@{file}", "https://0x0.st"
+            )
+        elif uploader == "filebin":
+            bin_id = secrets.token_hex(8)
+            code, out, err = await _curl(
+                "-X", "POST", "--data-binary", f"@{file}",
+                "-H", "Content-Type: application/octet-stream",
+                f"https://filebin.net/{bin_id}/{quote(name)}",
+            )
+            if code == 0:
+                out = f"https://filebin.net/{bin_id}"
+        elif uploader == "file.io":
+            code, out, err = await _curl("-F", f"file=@{file}", "https://file.io")
+            if code == 0:
+                try:
+                    out = json.loads(out).get("link") or out
+                except JSONDecodeError:
+                    pass
+        else:  # tmpfiles
+            code, out, err = await _curl(
+                "-F", f"file=@{file}", "https://tmpfiles.org/api/v1/upload"
+            )
+            if code == 0:
+                try:
+                    out = json.loads(out)["data"]["url"]
+                except (JSONDecodeError, KeyError, TypeError):
+                    pass
+    except FileNotFoundError:
+        return None, "`curl` is not installed."
     except Exception as e:
-        return f"Failed to upload file: {e}"
+        return None, f"Failed to upload file: {e}"
 
-    del _webupload_cache.get(chat_id, {})[msg_id]
-    return "Failed to get valid URL for the uploaded file."
+    if code != 0:
+        return None, f"Failed to upload file: {err or out}"
+    link = out.strip().splitlines()[-1] if out else ""
+    if not link.startswith("http"):
+        return None, f"Upload failed: {out[:200]}"
+    _webupload_cache.get(chat_id, {}).pop(msg_id, None)
+    return link, None
 
 
 def get_all_files(path, extension=None):
@@ -399,10 +419,11 @@ async def get_paste(data: str, extension: str = "txt"):
     except Exception:
         try:
             url = "https://dpaste.org/api/"
+            lexer = {"py": "python", "txt": "_text", "json": "json", "html": "html"}
             data = {
                 'format': 'json',
-                'content': data.encode('utf-8'),
-                'lexer': extension,
+                'content': data,
+                'lexer': lexer.get(extension, "_text"),
                 'expires': '604800',  # expire in week
             }
             res = await async_searcher(url, data=data, post=True, re_json=True)
@@ -494,18 +515,38 @@ async def get_google_images(query):
         return []
 
 
-# Thanks https://t.me/ImSafone for ChatBotApi
+# The old free chatbot API (api.safone.dev) is gone; the chatbot now uses
+# whichever AI provider key is set (GEMINI_API_KEY / OPENAI_API_KEY /
+# ANTHROPIC_KEY / DEEPSEEK_API_KEY). Pick one with CHATBOT_PROVIDER.
+
+_CHATBOT_SYSTEM = (
+    "You are a friendly person chatting on Telegram. Reply casually and briefly "
+    "(1-3 sentences), in the same language the other person uses."
+)
 
 
 async def get_chatbot_reply(message):
-    chatbot_base = "https://api.safone.dev/chatbot?query={}"
-    req_link = chatbot_base.format(
-        message,
-    )
+    from .ai import ai_complete, first_configured_provider, get_model
+
+    provider, api_key = first_configured_provider(udB)
+    if not provider:
+        LOGS.info("Chatbot: no AI API key set (e.g. GEMINI_API_KEY).")
+        return None
     try:
-        return (await async_searcher(req_link, re_json=True)).get("response")
+        reply = await ai_complete(
+            provider,
+            message,
+            api_key,
+            model=get_model(provider, udB),
+            system=_CHATBOT_SYSTEM,
+        )
     except Exception:
         LOGS.info(f"**ERROR:**`{format_exc()}`")
+        return None
+    if not reply or reply.startswith(("Error", "⚠️")):
+        LOGS.info(f"Chatbot: {reply}")
+        return None
+    return reply
 
 def check_filename(filroid):
     if os.path.exists(filroid):
@@ -647,29 +688,39 @@ def make_html_telegraph(title, html=""):
 
 async def Carbon(
     code,
-    base_url="https://carbonara.solopov.dev/api/cook",
+    base_url=None,
     file_name="ultroid",
     download=False,
     rayso=False,
     **kwargs,
 ):
+    from .. import udB
+
+    base_url = base_url or udB.get_key("CARBON_API") or "https://carbonara.solopov.dev/api/cook"
     if rayso:
-        base_url = "https://rayso-api-desvhu-33.koyeb.app/generate"
+        base_url = udB.get_key("RAYSO_API") or "https://rayso-api-desvhu-33.koyeb.app/generate"
         kwargs["text"] = code
         kwargs["theme"] = kwargs.get("theme", "breeze")
         kwargs["darkMode"] = kwargs.get("darkMode", True)
         kwargs["title"] = kwargs.get("title", "Ultroid")
     else:
         kwargs["code"] = code
-    con = await async_searcher(base_url, post=True, json=kwargs, re_content=True)
+    try:
+        con = await async_searcher(base_url, post=True, json=kwargs, re_content=True)
+    except Exception as er:
+        con = str(er).encode()
+    if not con.startswith((b"\x89PNG", b"\xff\xd8", b"RIFF")):
+        if rayso:
+            # rayso service is unofficial and often down: fall back to carbon.
+            return await Carbon(code, file_name=file_name, download=download)
+        try:
+            return json_parser(con.decode())
+        except Exception:
+            return {"error": con[:300].decode(errors="ignore") or "Carbon API is down."}
     if not download:
         file = BytesIO(con)
         file.name = file_name + ".jpg"
     else:
-        try:
-            return json_parser(con.decode())
-        except Exception:
-            pass
         file = file_name + ".jpg"
         with open(file, "wb") as f:
             f.write(con)

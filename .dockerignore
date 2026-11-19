@@ -1,0 +1,9 @@
+.git
+.github
+.env
+*.session
+*.session-journal
+venv/
+**/__pycache__/
+resources/auth/
+addons/.installed

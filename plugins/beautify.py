@@ -15,7 +15,7 @@ import random
 
 from telethon.utils import get_display_name
 from urllib.parse import urlencode
-from . import Carbon, ultroid_cmd, get_string, inline_mention
+from . import LOGS, Carbon, ultroid_cmd, get_string, inline_mention
 from secrets import token_hex
 
 _colorspath = "resources/colorlist.txt"
@@ -84,6 +84,8 @@ async def crbn(event):
         except IndexError:
             return await msg.eor(get_string("carbon_2"))
     xx = await Carbon(code=code, backgroundColor=match)
+    if isinstance(xx, dict):
+        return await msg.edit(f"`{xx}`")
     await msg.delete()
     await event.reply(
         f"Carbonised by {inline_mention(event.sender)}",
@@ -112,6 +114,7 @@ RaySoTheme = [
 @ultroid_cmd(pattern="rayso")
 async def pass_on(ult):
     try:
+        from playwright.async_api import TimeoutError as PlaywrightTimeout
         from playwright.async_api import async_playwright
     except ImportError:
         await ult.eor(
@@ -175,7 +178,7 @@ async def pass_on(ult):
                 async with page.expect_download() as download_info:
                     download = await download_info.value
                     await download.save_as(name)
-            except playwright._impl._errors.TimeoutError:
+            except PlaywrightTimeout:
                 LOGS.error("Timeout error: Selector not found within 60 seconds.")
                 await proc.eor("Failed to find the editor within 60 seconds.")
                 return

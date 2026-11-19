@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
+# Ultroid installer: installs system packages + python requirements.
+#
+#   bash installer.sh                 # inside this repo: just installs deps
+#   bash installer.sh --dir=/path     # clone the repo there first (if missing)
+#
+# Options: --dir=PATH  --branch=NAME  --env-file=FILE  --no-root
+# Env:     REPO (git url to clone, default: your fork)
 
-REPO="https://github.com/TeamUltroid/Ultroid.git"
+REPO="${REPO:-https://github.com/Ownermood/Ultroid.git}"
+BRANCH="${BRANCH:-main}"
 CURRENT_DIR="$(pwd)"
 ENV_FILE_PATH=".env"
 DIR="/root/TeamUltroid"
 
 while [ $# -gt 0 ]; do
     case "$1" in
-    --dir=*)
-        DIR="${1#*=}" || DIR="/root/TeamUltroid"
-        ;;
-    --branch=*)
-        BRANCH="${1#*=}" || BRANCH="main"
-        ;;
-    --env-file=*)
-        ENV_FILE_PATH="${1#*=}" || ENV_FILE_PATH=".env"
-        ;;
-    --no-root)
-        NO_ROOT=true
-        ;;
+    --dir=*) DIR="${1#*=}" ;;
+    --branch=*) BRANCH="${1#*=}" ;;
+    --env-file=*) ENV_FILE_PATH="${1#*=}" ;;
+    --no-root) NO_ROOT=true ;;
     *)
         echo "Unknown parameter passed: $1"
         exit 1
@@ -27,215 +27,128 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-check_dependencies() {
-    # check if debian
-    echo "Checking dependencies..."
-    # read file with root access
-    if ! [[ $(ls -l "/etc/sudoers" | cut -d " " -f1) =~ "r" ]]; then
-        # check dependencies if installed
-        echo -e "Root access not found. Checking if dependencies are installed." >&2
-        if ! [ -x "$(command -v python3)" ] || ! [ -x "$(command -v python)" ]; then
-            echo -e "Python3 isn't installed. Please install python3.10 or higher to run this bot." >&2
-            exit 1
-        fi
-        if [ $(python3 -c "import sys; print(sys.version_info[1])") -lt 10 ] || [ $(python -c "import sys; print(sys.version_info[1])") -lt 10 ]; then
-            echo -e "Python 3.10 or higher is required to run this bot." >&2
-            exit 1
-        fi
-        # check if any of ffmpeg, mediainfo, neofetch, git is not installed
-        if ! command -v ffmpeg &>/dev/null || ! command -v mediainfo &>/dev/null || ! command -v neofetch &>/dev/null || ! command -v git &>/dev/null; then
-            echo -e "Some dependencies aren't installed. Please install ffmpeg, mediainfo, neofetch and git to run this bot." >&2
-            exit 1
-        fi
-    fi
-    if [ -x "$(command -v apt-get)" ]; then
-        echo -e "Installing dependencies..."
-        # check if any of ffmpeg, mediainfo, neofetch, git is not installed via dpkg
-        if dpkg -l | grep -q ffmpeg || dpkg -l | grep -q mediainfo || dpkg -l | grep -q neofetch || dpkg -l | grep -q git; then
-            sudo apt-get -qq -o=Dpkg::Use-Pty=0 update
-            sudo apt-get install -qq -o=Dpkg::Use-Pty=0 python3 python3-pip ffmpeg mediainfo neofetch git -y
-        fi
-    elif [ -x "$(command -v pacman)" ]; then
-        echo -e "Installing dependencies..."
-        if pacman -Q | grep -q ffmpeg || pacman -Q | grep -q mediainfo || pacman -Q | grep -q neofetch || pacman -Q | grep -q git; then
-            sudo pacman -Sy python python-pip git ffmpeg mediainfo neofetch --noconfirm
-        fi
+SUDO=""
+if [ "$(id -u)" -ne 0 ] && [ -z "$NO_ROOT" ] && command -v sudo &>/dev/null; then
+    SUDO="sudo"
+fi
+
+install_system_packages() {
+    echo "Installing system packages..."
+    if command -v apt-get &>/dev/null && { [ "$(id -u)" -eq 0 ] || [ -n "$SUDO" ]; }; then
+        $SUDO apt-get -qq update
+        $SUDO apt-get install -qq -y --no-install-recommends \
+            python3 python3-pip git ffmpeg mediainfo curl
+        $SUDO apt-get install -qq -y neofetch 2>/dev/null || true
+    elif command -v pacman &>/dev/null && { [ "$(id -u)" -eq 0 ] || [ -n "$SUDO" ]; }; then
+        $SUDO pacman -Sy --noconfirm python python-pip git ffmpeg mediainfo curl
+    elif command -v pkg &>/dev/null; then
+        # Termux
+        pkg install -y python git ffmpeg mediainfo
     else
-        echo -e "Unknown OS. Checking if dependecies are installed" >&2
-        if ! [ -x "$(command -v python3)" ] || ! [ -x "$(command -v python)" ]; then
-            echo -e "Python3 isn't installed. Please install python3.10 or higher to run this bot." >&2
-            exit 1
-        fi
-        if [ $(python3 -c "import sys; print(sys.version_info[1])") -lt 10 ] || [ $(python -c "import sys; print(sys.version_info[1])") -lt 10 ]; then
-            echo -e "Python 3.10 or higher is required to run this bot." >&2
-            exit 1
-        fi
-        if ! command -v ffmpeg &>/dev/null || ! command -v mediainfo &>/dev/null || ! command -v neofetch &>/dev/null || ! command -v git &>/dev/null; then
-            echo -e "Some dependencies aren't installed. Please install ffmpeg, mediainfo, neofetch and git to run this bot." >&2
-            exit 1
-        fi
+        for tool in python3 git ffmpeg; do
+            command -v "$tool" &>/dev/null || echo "WARNING: '$tool' is not installed."
+        done
     fi
 }
 
 check_python() {
-    # check if python is installed
     if ! command -v python3 &>/dev/null; then
-        echo -e "Python3 isn't installed. Please install python3.10 or higher to run this bot."
-        exit 1
-    elif ! command -v python &>/dev/null; then
-        echo -e "Python3 isn't installed. Please install python3.10 or higher to run this bot."
+        echo "Python 3.10 or higher is required."
         exit 1
     fi
-    if [ $(python3 -c "import sys; print(sys.version_info[1])") -lt 10 ]; then
-        echo -e "Python 3.10 or higher is required to run this bot."
+    if [ "$(python3 -c 'import sys; print(sys.version_info >= (3, 10))')" != "True" ]; then
+        echo "Python 3.10 or higher is required."
         exit 1
-    elif [ $(python -c "import sys; print(sys.version_info[1])") -lt 3 ]; then
-        if [ $(python -c "import sys; print(sys.version_info[1])") -lt 10 ]; then
-            echo -e "Python 3.10 or higher is required to run this bot."
-            exit 1
-        fi
     fi
 }
 
-clone_repo() {
-    # check if pyultroid, startup, plugins folders exist
-    cd $DIR
-    if [ -d $DIR ]; then
-        if [ -d $DIR/.git ]; then
-            echo -e "Updating Ultroid ${BRANCH}... "
-            cd $DIR
-            git pull
-            currentbranch="$(git rev-parse --abbrev-ref HEAD)"
-            if [ ! $BRANCH ]; then
-                export BRANCH=$currentbranch
-            fi
-            case $currentbranch in
-            $BRANCH)
-                # do nothing
-                ;;
-            *)
-                echo -e "Switching to branch ${BRANCH}... "
-                echo -e $currentbranch
-                git checkout $BRANCH
-                ;;
-            esac
-        else
-            rm -rf $DIR
-            exit 1
-        fi
-        if [ -d "addons" ]; then
-            cd addons
-            git pull
+get_repo() {
+    # Already inside the repo (git clone or downloaded zip): use it as is.
+    if [ -d "$CURRENT_DIR/pyUltroid" ] && [ -d "$CURRENT_DIR/plugins" ]; then
+        DIR="$CURRENT_DIR"
+        if [ -d "$DIR/.git" ]; then
+            echo "Updating Ultroid..."
+            git -C "$DIR" pull -q || echo "git pull failed, continuing with local code."
         fi
         return
-    else
-        if [ ! $BRANCH ]; then
-            export BRANCH="main"
-        fi
-        mkdir -p $DIR
-        echo -e "Cloning Ultroid ${BRANCH}... "
-        git clone -b $BRANCH $REPO $DIR
     fi
+    if [ -d "$DIR/.git" ]; then
+        echo "Updating Ultroid in $DIR..."
+        git -C "$DIR" pull -q
+    elif [ -d "$DIR/pyUltroid" ]; then
+        echo "Using existing Ultroid in $DIR"
+    else
+        echo "Cloning $REPO ($BRANCH) into $DIR..."
+        mkdir -p "$(dirname "$DIR")"
+        git clone -q -b "$BRANCH" "$REPO" "$DIR" || exit 1
+    fi
+}
+
+pip_install_file() {
+    # install a requirements file line by line, so one broken optional
+    # package does not stop the rest from installing
+    [ -f "$1" ] || return
+    tr -d '\r' <"$1" | grep -vE '^\s*(#|$)' | while read -r pkg; do
+        python3 -m pip install -q --no-cache-dir "$pkg" || echo "  skipped: $pkg"
+    done
 }
 
 install_requirements() {
-    pip3 install -q --upgrade pip
-    echo -e "\n\nInstalling requirements... "
-    pip3 install -q --no-cache-dir -r $DIR/requirements.txt
-    pip3 install -q -r $DIR/resources/startup/optional-requirements.txt
+    cd "$DIR" || exit 1
+    PIP_FLAGS=""
+    python3 -m pip install -q --upgrade pip 2>/dev/null || PIP_FLAGS="--break-system-packages"
+    export PIP_BREAK_SYSTEM_PACKAGES=1
+    echo "Installing requirements..."
+    python3 -m pip install -q --no-cache-dir $PIP_FLAGS -r requirements.txt || exit 1
+    echo "Installing optional requirements..."
+    pip_install_file resources/startup/optional-requirements.txt
+    echo "Installing addons requirements..."
+    pip_install_file addons/addons.txt
 }
 
-railways_dep() {
-    if [ $RAILWAY_STATIC_URL ]; then
-        echo -e "Installing YouTube dependency... "
-        pip3 install -q yt-dlp
+install_db_requirements() {
+    if [ -n "$MONGO_URI" ]; then
+        python3 -m pip install -q "pymongo[srv]"
+    elif [ -n "$DATABASE_URL" ]; then
+        python3 -m pip install -q psycopg2-binary
+    elif [ -n "$REDIS_URI" ] || [ -n "$REDISHOST" ]; then
+        python3 -m pip install -q redis hiredis
     fi
 }
 
 misc_install() {
-    if [ $SETUP_PLAYWRIGHT ]
-    then
-        echo -e "Installing playwright."
-        pip3 install playwright
-        playwright install
+    if [ -n "$SETUP_PLAYWRIGHT" ]; then
+        python3 -m pip install -q playwright && python3 -m playwright install --with-deps chromium
     fi
-    if [ $OKTETO_TOKEN ]; then
-        echo -e "Installing Okteto-CLI... "
-        curl https://get.okteto.com -sSfL | sh
-    elif [ $VCBOT ]; then
-        if [ -d $DIR/vcbot ]; then
-            cd $DIR/vcbot
-            git pull
+    if [ -n "$VCBOT" ]; then
+        if [ -d "$DIR/vcbot/.git" ]; then
+            git -C "$DIR/vcbot" pull -q
         else
-            echo -e "Cloning VCBOT.."
-            git clone https://github.com/TeamUltroid/VcBot $DIR/vcbot
+            git clone -q https://github.com/TeamUltroid/VcBot "$DIR/vcbot"
         fi
-        pip3 install pytgcalls==3.0.0.dev23 && pip3 install av -q --no-binary av
-    fi
-}
-
-dep_install() {
-    echo -e "\n\nInstalling DB Requirement..."
-    if [ $MONGO_URI ]; then
-        echo -e "   Installing MongoDB Requirements..."
-        pip3 install -q pymongo[srv]
-    elif [ $DATABASE_URL ]; then
-        echo -e "   Installing PostgreSQL Requirements..."
-        pip3 install -q psycopg2-binary
-    elif [ $REDIS_URI ]; then
-        echo -e "   Installing Redis Requirements..."
-        pip3 install -q redis hiredis
+        python3 -m pip install -q "py-tgcalls" av
     fi
 }
 
 main() {
-    echo -e "Starting Ultroid Setup..."
-    if [ -d "pyUltroid" ] && [ -d "resources" ] && [ -d "plugins" ]; then
-        DIR=$CURRENT_DIR
-    fi
-    if [ -f $ENV_FILE_PATH ]
-    then
+    echo "Starting Ultroid setup..."
+    if [ -f "$ENV_FILE_PATH" ]; then
         set -a
-        source <(cat $ENV_FILE_PATH | sed -e '/^#/d;/^\s*$/d' -e "s/'/'\\\''/g" -e "s/=\(.*\)/='\1'/g")
+        # shellcheck disable=SC1090
+        source <(tr -d '\r' <"$ENV_FILE_PATH" | sed -e '/^\s*#/d;/^\s*$/d')
         set +a
-        cp $ENV_FILE_PATH .env
     fi
-    (check_dependencies)
-    (check_python)
-    (clone_repo)
-    (install_requirements)
-    (railways_dep)
-    (dep_install)
-    (misc_install)
-    echo -e "\n\nSetup Completed."
+    install_system_packages
+    check_python
+    get_repo
+    if [ -f "$ENV_FILE_PATH" ] && [ "$(realpath "$ENV_FILE_PATH")" != "$(realpath "$DIR/.env" 2>/dev/null)" ]; then
+        cp "$ENV_FILE_PATH" "$DIR/.env"
+    fi
+    install_requirements
+    install_db_requirements
+    misc_install
+    echo ""
+    echo "Setup completed. Start the bot with:  cd $DIR && bash startup"
 }
 
-if [ $NO_ROOT ]; then
-    echo -e "Running with non root"
-    main
-    return 0
-elif [ -t 0 ]; then
-    unameOut="$(uname -s)"
-    case "${unameOut}" in
-        Linux*)     machine=Linux;;
-        Darwin*)    machine=Mac;;
-        CYGWIN*)    machine=Cygwin;;
-        MINGW*)     machine=MinGw;;
-        *)          machine="UNKNOWN:${unameOut}"
-    esac
-    if machine != "Linux"; then
-        echo -e "This script is only for Linux. Please use the Windows installer."
-        exit 1
-    fi
-    # check if sudo is installed
-    if ! command -v sudo &>/dev/null; then
-        echo -e "Sudo isn't installed. Please install sudo to run this bot."
-        exit 1
-    fi
-    sudo echo "Sudo permission granted."
-    main
-else
-    echo "Not an interactive terminal, skipping sudo."
-    # run main function
-    main
-fi
+main

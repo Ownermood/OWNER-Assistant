@@ -153,16 +153,12 @@ async def hbd(event):
         name = ultroid_bot.me.first_name
     zn = pytz.timezone("Asia/Kolkata")
     abhi = dt.now(zn)
-    kk = match.split("/")
-    p = kk[0]
-    r = kk[1]
-    s = kk[2]
-    day = int(p)
-    month = r
     try:
         jn = dt.strptime(match, "%d/%m/%Y")
     except BaseException:
         return await event.eor(get_string("spcltool_6"))
+    day = jn.day
+    month = f"{jn.month:02d}"
     jnm = zn.localize(jn)
     zinda = abhi - jnm
     barsh = (zinda.total_seconds()) / (365.242 * 24 * 3600)
@@ -177,10 +173,14 @@ async def hbd(event):
     mi = int(pehl)
     sec = (pehl - mi) * 60
     slive = int(sec)
-    y = int(s) + saal + 1
-    m = int(r)
-    brth = dt(y, m, day)
-    cm = dt(abhi.year, brth.month, brth.day)
+    y = jn.year + saal + 1
+    m = jn.month
+    try:
+        brth = dt(y, m, day)
+        cm = dt(abhi.year, brth.month, brth.day)
+    except ValueError:  # 29 Feb in a non-leap year
+        brth = dt(y, m, 28)
+        cm = dt(abhi.year, m, 28)
     ish = (cm - abhi.today()).days + 1
     dan = ish
     if dan == 0:
@@ -214,17 +214,6 @@ async def hbd(event):
         sign = "Scorpio" if (day < 22) else "Sagittarius"
     elif month == "12":
         sign = "Sagittarius" if (day < 22) else "Capricorn"
-    json = await async_searcher(
-        f"https://aztro.sameerkumar.website/?sign={sign}&day=today",
-        post=True,
-        re_json=True,
-    )
-    dd = json.get("current_date")
-    ds = json.get("description")
-    lt = json.get("lucky_time")
-    md = json.get("mood")
-    cl = json.get("color")
-    ln = json.get("lucky_number")
     await event.delete()
     await event.client.send_message(
         event.chat_id,
@@ -238,15 +227,6 @@ Lived -:  {saal}yr, {mahina}m, {din}d, {ghanta}hr, {mi}min, {slive}sec
 Birthday -: {hp}
 
 Zodiac -: {sign}
-
-**Horoscope On {dd} -**
-
-`{ds}`
-
-    Lucky Time :-        {lt}
-    Lucky Number :-   {ln}
-    Lucky Color :-        {cl}
-    Mood :-                   {md}
     """,
         reply_to=event.reply_to_msg_id,
     )

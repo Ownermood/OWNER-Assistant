@@ -204,15 +204,18 @@ async def unsplashsearch(query, limit=None, shuf=True):
 
 async def get_random_user_data():
     base_url = "https://randomuser.me/api/"
-    cc = await async_searcher(
-        "https://random-data-api.com/api/business_credit_card/random_card", re_json=True
-    )
-    card = (
-        "**CARD_ID:** "
-        + str(cc["credit_card_number"])
-        + f" {cc['credit_card_expiry_date']}\n"
-        + f"**C-ID :** {cc['id']}"
-    )
+    try:
+        cc = await async_searcher(
+            "https://random-data-api.com/api/v2/credit_cards", re_json=True
+        )
+        card = (
+            "**CARD_ID:** "
+            + str(cc["credit_card_number"])
+            + f" {cc['credit_card_expiry_date']}\n"
+            + f"**C-ID :** {cc['id']}"
+        )
+    except Exception:
+        card = "N/A"
     data_ = (await async_searcher(base_url, re_json=True))["results"][0]
     _g = data_["gender"]
     gender = "🤵🏻‍♂" if _g == "male" else "🤵🏻‍♀"
@@ -256,18 +259,12 @@ async def get_random_user_data():
 async def get_synonyms_or_antonyms(word, type_of_words):
     if type_of_words not in ["synonyms", "antonyms"]:
         return "Dude! Please give a corrent type of words you want."
-    s = await async_searcher(
-        f"https://tuna.thesaurus.com/pageData/{word}", re_json=True
+    # thesaurus.com's old JSON API is gone; Datamuse is free and keyless.
+    rel = "rel_syn" if type_of_words == "synonyms" else "rel_ant"
+    data = await async_searcher(
+        "https://api.datamuse.com/words", params={rel: word, "max": 30}, re_json=True
     )
-    li_1 = [
-        y
-        for x in [
-            s["data"]["definitionData"]["definitions"][0][type_of_words],
-            s["data"]["definitionData"]["definitions"][1][type_of_words],
-        ]
-        for y in x
-    ]
-    return [y["term"] for y in li_1]
+    return [item["word"] for item in data if item.get("word")]
 
 
 # Quotly

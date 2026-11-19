@@ -22,6 +22,7 @@
     Convert replied image into html.
 """
 
+import asyncio
 import os
 from datetime import datetime as dt
 
@@ -62,18 +63,24 @@ async def pinterest(e):
     m = e.pattern_match.group(1).strip()
     if not m:
         return await e.eor("`Give pinterest link.`", time=3)
-    soup = await async_searcher(
-        "https://www.expertstool.com/download-pinterest-video/",
-        data={"url": m},
-        post=True,
-    )
+    msg = await e.eor(get_string("com_1"))
     try:
-        _soup = bs(soup, "html.parser").find("table").tbody.find_all("tr")
-    except BaseException:
-        return await e.eor("`Wrong link or private pin.`", time=5)
-    file = _soup[1] if len(_soup) > 1 else _soup[0]
-    file = file.td.a["href"]
+        from yt_dlp import YoutubeDL
+
+        def _get():
+            with YoutubeDL({"quiet": True, "outtmpl": "resources/downloads/%(id)s.%(ext)s"}) as ydl:
+                info = ydl.extract_info(m, download=True)
+                if info.get("entries"):
+                    info = info["entries"][0]
+                return ydl.prepare_filename(info)
+
+        file = await asyncio.to_thread(_get)
+    except Exception as er:
+        return await msg.edit(f"`Wrong link or private pin.`\n`{er}`")
     await e.client.send_file(e.chat_id, file, caption=f"Pin:- {m}")
+    await msg.delete()
+    if os.path.exists(file):
+        os.remove(file)
 
 
 @ultroid_cmd(pattern="gadget( (.*)|$)")

@@ -22,6 +22,8 @@
 ----
 
 # Deploy
+> 🚀 **Sabse aasaan tarika: [SETUP.md](./SETUP.md) padho.** Sirf `SESSION` chahiye, addons isi repo mein hain.
+
 - [Heroku](#deploy-to-heroku)
 - [Okteto](#deploy-to-okteto)
 - [Local Machine](#deploy-locally)
@@ -41,14 +43,14 @@ Get the [Necessary Variables](#Necessary-Variables) and then click the button be
 <summary>Deploy To Heroku</summary>
 <p>
 <br>
-<a href="https://heroku.com/deploy">
+<a href="https://heroku.com/deploy?template=https://github.com/Ownermood/Ultroid">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
 </a>
 </p>
 ## Deploy to Okteto
 Get the [Necessary Variables](#Necessary-Variables) and then click the button below!
 
-[![Develop on Okteto](https://okteto.com/develop-okteto.svg)](https://cloud.okteto.com/deploy?repository=https://github.com/TeamUltroid/Ultroid)
+[![Develop on Okteto](https://okteto.com/develop-okteto.svg)](https://cloud.okteto.com/deploy?repository=https://github.com/Ownermood/Ultroid)
 
 ## Deploy Locally
 - [Traditional Method](#local-deploy---traditional-method)
@@ -63,7 +65,7 @@ Get the [Necessary Variables](#Necessary-Variables) and then click the button be
 ### Local Deploy - Traditional Method
 - Get your [Necessary Variables](#Necessary-Variables)
 - Clone the repository:    
-`git clone https://github.com/TeamUltroid/Ultroid.git`
+`git clone https://github.com/Ownermood/Ultroid.git`
 - Go to the cloned folder:    
 `cd Ultroid`
 - Create a virtual env:      

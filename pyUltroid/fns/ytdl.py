@@ -12,11 +12,6 @@ import time
 
 from telethon import Button
 
-try:
-    from youtubesearchpython import Playlist, VideosSearch
-except ImportError:
-    Playlist, VideosSearch = None, None
-
 from yt_dlp import YoutubeDL
 
 from .. import LOGS, udB
@@ -42,12 +37,56 @@ async def ytdl_progress(k, start_time, event):
                 LOGS.error(f"ytdl_progress: {ex}")
 
 
-def get_yt_link(query):
-    search = VideosSearch(query, limit=1).result()
+def _format_count(num):
+    if not num:
+        return "N/A"
+    for unit in ("", "K", "M", "B"):
+        if abs(num) < 1000:
+            return f"{num:.0f}{unit}" if unit == "" else f"{num:.1f}{unit}"
+        num /= 1000
+    return f"{num:.1f}T"
+
+
+def yt_search(query, limit=10):
+    """Search YouTube with yt-dlp (no API key, no extra library)."""
+    opts = {
+        "quiet": True,
+        "no_warnings": True,
+        "skip_download": True,
+        "extract_flat": "in_playlist",
+    }
     try:
-        return search["result"][0]["link"]
-    except IndexError:
-        return
+        info = YoutubeDL(opts).extract_info(f"ytsearch{limit}:{query}", download=False)
+    except Exception as er:
+        LOGS.info(f"yt_search: {er}")
+        return []
+    results = []
+    for entry in info.get("entries") or []:
+        if not entry or not entry.get("id"):
+            continue
+        duration = entry.get("duration")
+        results.append(
+            {
+                "id": entry["id"],
+                "link": f"https://www.youtube.com/watch?v={entry['id']}",
+                "title": entry.get("title") or "Untitled",
+                "duration": time.strftime(
+                    "%H:%M:%S" if duration and duration >= 3600 else "%M:%S",
+                    time.gmtime(duration),
+                )
+                if duration
+                else "Live/Unknown",
+                "views": _format_count(entry.get("view_count")),
+                "channel": entry.get("channel") or entry.get("uploader") or "Unknown",
+                "description": entry.get("description") or "",
+            }
+        )
+    return results
+
+
+def get_yt_link(query):
+    search = yt_search(query, limit=1)
+    return search[0]["link"] if search else None
 
 
 async def download_yt(event, link, ytd):
@@ -262,8 +301,15 @@ def get_videos_link(url):
     if not regex:
         return to_return
     playlist_id = regex.group(1)
-    videos = Playlist(playlist_id)
-    for vid in videos.videos:
-        link = re.search(r"\?v=([(\w+)\-]*)", vid["link"]).group(1)
-        to_return.append(f"https://youtube.com/watch?v={link}")
+    opts = {"quiet": True, "skip_download": True, "extract_flat": "in_playlist"}
+    try:
+        info = YoutubeDL(opts).extract_info(
+            f"https://www.youtube.com/playlist?list={playlist_id}", download=False
+        )
+    except Exception as er:
+        LOGS.info(f"get_videos_link: {er}")
+        return to_return
+    for vid in info.get("entries") or []:
+        if vid and vid.get("id"):
+            to_return.append(f"https://youtube.com/watch?v={vid['id']}")
     return to_return
