@@ -5,28 +5,14 @@
 # This file is a part of < https://github.com/TeamUltroid/Ultroid/ >
 # PLease read the GNU Affero General Public License in <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
-clear
-echo -e "\e[1m"
-echo "  _    _ _ _             _     _ "
-echo " | |  | | | |           (_)   | |"
-echo " | |  | | | |_ _ __ ___  _  __| |"
-echo " | |  | | | __| '__/ _ \| |/ _  |"
-echo " | |__| | | |_| | | (_) | | (_| |"
-echo "  \____/|_|\__|_|  \___/|_|\__,_|"
-echo -e "\e[0m"
-sec=5
-spinner=(⣻ ⢿ ⡿ ⣟ ⣯ ⣷)
-while [ $sec -gt 0 ]; do
-    echo -ne "\e[33m ${spinner[sec]} Starting dependency installation in $sec seconds...\r"
-    sleep 1
-    sec=$(($sec - 1))
-done
-echo -e "\e[1;32mInstalling Dependencies ---------------------------\e[0m\n" # Don't Remove Dashes / Fix it
-apt-get update
-apt-get upgrade -y
-pkg upgrade -y
-pkg install python wget -y
-wget https://raw.githubusercontent.com/TeamUltroid/ultroid/main/resources/session/ssgen.py
-pip uninstall telethon -y && install telethon
-clear
+# Generates a Telethon string session using the local ssgen.py.
+# Does not upgrade your system and does not download code from anywhere.
+cd "$(dirname "$0")" || exit 1
+
+if ! python3 -c "import telethon" 2>/dev/null; then
+    echo "Installing Telethon..."
+    python3 -m pip install -q -U telethon 2>/dev/null \
+        || python3 -m pip install -q -U --break-system-packages telethon
+fi
+
 python3 ssgen.py
