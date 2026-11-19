@@ -23,6 +23,30 @@ from telethon.tl.types import InputPhoto, MessageEntityMentionName
 
 from . import *
 
+def _normalise_avatar(path):
+    """Return (path, is_video) with a file Telegram accepts for a profile picture.
+
+    The downloaded avatar can be a JPEG, PNG/WebP, or an MP4 (animated avatar),
+    and its file name extension isn't reliable, so check the real bytes.
+    """
+    with open(path, "rb") as f:
+        head = f.read(12)
+    if head[4:8] == b"ftyp":
+        if not path.lower().endswith(".mp4"):
+            new = os.path.splitext(path)[0] + ".mp4"
+            os.replace(path, new)
+            path = new
+        return path, True
+    if head.startswith(b"\xff\xd8") and path.lower().endswith((".jpg", ".jpeg")):
+        return path, False
+    from PIL import Image
+
+    new = os.path.splitext(path)[0] + "_dp.jpg"
+    Image.open(path).convert("RGB").save(new, "JPEG", quality=95)
+    os.remove(path)
+    return new, False
+
+
 BACKUP_KEY = "CLONE_BACKUP"
 
 
@@ -76,18 +100,33 @@ async def _(event):
     await event.client(
         UpdateProfileRequest(first_name=first_name, last_name=last_name, about=about)
     )
-    profile_pic = await event.client.download_profile_photo(user.id)
+    note = ""
+    try:
+        profile_pic = await event.client.download_profile_photo(user.id)
+    except Exception:
+        profile_pic = None
     if profile_pic:
         try:
+            profile_pic, is_video = _normalise_avatar(profile_pic)
             pfile = await event.client.upload_file(profile_pic)
-            res = await event.client(UploadProfilePhotoRequest(file=pfile))
+            # Animated (video) profile pictures must be sent as `video=`.
+            if is_video:
+                req = UploadProfilePhotoRequest(video=pfile)
+            else:
+                req = UploadProfilePhotoRequest(file=pfile)
+            res = await event.client(req)
             backup["photos"].append([res.photo.id, res.photo.access_hash])
             udB.set_key(BACKUP_KEY, backup)
+        except Exception as er:
+            note = f"\n\n`Name/bio cloned, but the profile picture could not be copied: {er}`"
         finally:
-            os.remove(profile_pic)
+            if os.path.exists(profile_pic):
+                os.remove(profile_pic)
     await eve.delete()
     await event.client.send_message(
-        event.chat_id, f"I am {first_name} from now...", reply_to=event.reply_to_msg_id
+        event.chat_id,
+        f"I am {first_name} from now...{note}",
+        reply_to=event.reply_to_msg_id,
     )
 
 

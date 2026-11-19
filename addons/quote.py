@@ -124,10 +124,17 @@ async def process(msg, user, client, reply, replied=None):
     color = random.choice(COLORS)
     async for photo in client.iter_profile_photos(user, limit=1):
         yes = True
+    paste = None
     if yes:
-        pfp = await client.download_profile_photo(user)
-        paste = Image.open(pfp)
-        os.remove(pfp)
+        try:
+            pfp = await client.download_profile_photo(user)
+            paste = Image.open(pfp)
+            paste.load()
+            os.remove(pfp)
+        except Exception:
+            # e.g. an animated (video) avatar Pillow can't open
+            paste = None
+    if paste:
         paste.thumbnail((105, 105))
 
         # Mask
