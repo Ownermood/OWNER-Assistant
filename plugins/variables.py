@@ -22,7 +22,7 @@
 
 import os
 
-from . import eor, get_string, udB, ultroid_cmd, HNDLR
+from . import eor, get_string, mask_secret, udB, ultroid_cmd, HNDLR
 
 
 @ultroid_cmd(pattern="get($| (.*))", fullsudo=True)
@@ -44,14 +44,14 @@ async def get_var(event):
         if val is not None:
             c += 1
             await x.edit(
-                f"**Variable** - `{varname}`\n**Value**: `{val}`\n**Type**: Redis Key."
+                f"**Variable** - `{varname}`\n**Value**: `{mask_secret(varname, val)}`\n**Type**: Redis Key."
             )
         # try env vars
         val = os.getenv(varname)
         if val is not None:
             c += 1
             await x.edit(
-                f"**Variable** - `{varname}`\n**Value**: `{val}`\n**Type**: Env Var."
+                f"**Variable** - `{varname}`\n**Value**: `{mask_secret(varname, val)}`\n**Type**: Env Var."
             )
 
         if c == 0:
@@ -76,7 +76,7 @@ async def get_var(event):
     elif opt == "db":
         val = udB.get(varname)
         if val is not None:
-            await x.edit(f"**Key** - `{varname}`\n**Value**: `{val}`")
+            await x.edit(f"**Key** - `{varname}`\n**Value**: `{mask_secret(varname, val)}`")
         else:
             await eor(x, "No such key!", time=5)
 

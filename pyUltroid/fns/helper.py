@@ -680,3 +680,18 @@ def call_back():
         cleanup_cache()
     except Exception:
         pass
+
+
+_SECRET_WORDS = (
+    "KEY", "TOKEN", "SESSION", "PASS", "SECRET", "HASH", "URI", "URL", "COOKIE", "AUTH",
+)
+
+
+def mask_secret(name, value):
+    """Hide secret values (API keys, tokens, sessions...) when showing them in chat."""
+    if value is None:
+        return value
+    text = str(value)
+    if not any(word in str(name).upper() for word in _SECRET_WORDS) or len(text) < 8:
+        return text
+    return f"{text[:4]}{'*' * 8}{text[-2:]}"
