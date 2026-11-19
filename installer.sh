@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ultroid installer: installs system packages + python requirements.
+# OWNER Assistant installer: installs system packages + python requirements.
 #
 #   bash installer.sh                 # inside this repo: just installs deps
 #   bash installer.sh --dir=/path     # clone the repo there first (if missing)
@@ -11,7 +11,7 @@ REPO="${REPO:-https://github.com/Ownermood/Ultroid.git}"
 BRANCH="${BRANCH:-main}"
 CURRENT_DIR="$(pwd)"
 ENV_FILE_PATH=".env"
-DIR="/root/TeamUltroid"
+DIR="/root/OWNER-Assistant"
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -67,16 +67,16 @@ get_repo() {
     if [ -d "$CURRENT_DIR/pyUltroid" ] && [ -d "$CURRENT_DIR/plugins" ]; then
         DIR="$CURRENT_DIR"
         if [ -d "$DIR/.git" ]; then
-            echo "Updating Ultroid..."
+            echo "Updating OWNER Assistant..."
             git -C "$DIR" pull -q || echo "git pull failed, continuing with local code."
         fi
         return
     fi
     if [ -d "$DIR/.git" ]; then
-        echo "Updating Ultroid in $DIR..."
+        echo "Updating OWNER Assistant in $DIR..."
         git -C "$DIR" pull -q
     elif [ -d "$DIR/pyUltroid" ]; then
-        echo "Using existing Ultroid in $DIR"
+        echo "Using existing OWNER Assistant in $DIR"
     else
         echo "Cloning $REPO ($BRANCH) into $DIR..."
         mkdir -p "$(dirname "$DIR")"
@@ -143,7 +143,7 @@ misc_install() {
 }
 
 main() {
-    echo "Starting Ultroid setup..."
+    echo "Starting OWNER Assistant setup..."
     if [ -f "$ENV_FILE_PATH" ]; then
         set -a
         # shellcheck disable=SC1090

@@ -37,7 +37,7 @@ async def original(event):
         res = await async_searcher(
             LRCLIB,
             params={"q": noob},
-            headers={"User-Agent": "Ultroid (https://github.com/TeamUltroid/Ultroid)"},
+            headers={"User-Agent": "OWNER-Assistant"},
             re_json=True,
         )
     except Exception as er:

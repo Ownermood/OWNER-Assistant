@@ -16,21 +16,11 @@ STRINGS = {
 • Here, are the Some Basic stuff from, where you can Know, about its Usage.""",
     2: f"""🎉** About {BOT_NAME}**
 
-🧿 {BOT_NAME} is Pluggable and powerful Telethon Userbot, made in Python from Scratch. It is Aimed to Increase Security along with Addition of Other Useful Features.
+🧿 {BOT_NAME} is Pluggable and powerful Telethon Userbot, made in Python from Scratch. It is Aimed to Increase Security along with Addition of Other Useful Features.""",
+    3: """**💡• Setup Guide •**
 
-❣ Based on **Ultroid** by @TeamUltroid""",
-    3: """**💡• FAQs •**
-
--> [Username Tracker](https://t.me/UltroidUpdates/24)
--> [Keeping Custom Addons Repo](https://t.me/UltroidUpdates/28)
--> [Disabling Deploy message](https://t.me/UltroidUpdates/27)
--> [Setting up TimeZone](https://t.me/UltroidUpdates/22)
--> [About Inline PmPermit](https://t.me/UltroidUpdates/21)
--> [About Dual Mode](https://t.me/UltroidUpdates/18)
--> [Custom Thumbnail](https://t.me/UltroidUpdates/13)
--> [About FullSudo](https://t.me/UltroidUpdates/11)
--> [Setting Up PmBot](https://t.me/UltroidUpdates/2)
--> [Also Check](https://t.me/UltroidUpdates/14)
+-> Everything about setup, keys and updates is in SETUP.md of your repo:
+   {REPO_URL}/blob/main/SETUP.md
 
 **• Updates**
   - Your repo: {REPO_URL}""".format(REPO_URL=REPO_URL),

@@ -31,7 +31,7 @@ async def _(event):
         as_document = False
     elif input_str == "file":
         as_document = True
-    xx = await event.eor("`Calculating ur Ultroid Server Speed. Please wait!`")
+    xx = await event.eor("`Calculating your Server Speed. Please wait!`")
     start = datetime.now()
     def _run():
         st = speedtest.Speedtest(secure=True)

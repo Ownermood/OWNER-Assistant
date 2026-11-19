@@ -17,24 +17,20 @@ from telethon.tl.types import InputWebDocument
 from .. import LOGS, asst, udB, ultroid_bot
 from ..fns.admins import admin_check
 from . import append_or_update, owner_and_sudos
+from ..branding import BOT_NAME, BRAND_IMAGES, REPO_URL
 
 OWNER = ultroid_bot.full_name
 
 MSG = f"""
-**Ultroid - UserBot**
+**OWNER Assistant**
 ➖➖➖➖➖➖➖➖➖➖
 **Owner**: [{OWNER}](tg://user?id={ultroid_bot.uid})
-**Support**: @TeamUltroid
 ➖➖➖➖➖➖➖➖➖➖
 """
 
 IN_BTTS = [
     [
-        Button.url(
-            "Repository",
-            url="https://github.com/TeamUltroid/Ultroid",
-        ),
-        Button.url("Support", url="https://t.me/UltroidSupportChat"),
+        Button.url("Repository", url=REPO_URL),
     ]
 ]
 
@@ -98,12 +94,12 @@ def in_pattern(pattern=None, owner=False, **kwargs):
             if owner and event.sender_id not in owner_and_sudos():
                 res = [
                     await event.builder.article(
-                        title="Ultroid Userbot",
-                        url="https://t.me/TeamUltroid",
-                        description="(c) TeamUltroid",
+                        title=BOT_NAME,
+                        url=REPO_URL,
+                        description=f"(c) {OWNER}",
                         text=MSG,
                         thumb=InputWebDocument(
-                            "https://graph.org/file/dde85d441fa051a0d7d1d.jpg",
+                            BRAND_IMAGES[0],
                             0,
                             "image/jpeg",
                             [],
