@@ -15,7 +15,7 @@
 import os, pygments
 from pygments.formatters import ImageFormatter
 from pygments.lexers import Python3Lexer
-from . import ultroid_cmd, check_filename
+from . import check_filename, read_text_file, ultroid_cmd
 
 
 @ultroid_cmd(pattern="ncode$")
@@ -27,8 +27,10 @@ async def coder_print(event):
         a = await event.client.download_media(
             await event.get_reply_message(), check_filename("ncode.txt")
         )
-        with open(a, "r", errors="ignore") as s:
-            c = s.read()
+        c = read_text_file(a)
+        if c is None:
+            os.remove(a)
+            return await event.eor("`Reply to a text or code file, not a photo/PDF.`", time=8)
     else:
         a = None
         c = msg.text

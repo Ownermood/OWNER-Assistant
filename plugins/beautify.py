@@ -15,7 +15,7 @@ import random
 
 from telethon.utils import get_display_name
 from urllib.parse import urlencode
-from . import LOGS, Carbon, ultroid_cmd, get_string, inline_mention
+from . import LOGS, Carbon, ultroid_cmd, get_string, inline_mention, read_text_file
 from secrets import token_hex
 
 _colorspath = "resources/colorlist.txt"
@@ -36,13 +36,16 @@ async def cr_bn(event):
     col = random.choice(all_col) if te[0] == "r" else "White"
     if event.reply_to_msg_id:
         temp = await event.get_reply_message()
-        if temp.media:
+        if temp.document and not (temp.photo or temp.sticker or temp.video or temp.audio):
             b = await event.client.download_media(temp)
-            with open(b) as a:
-                code = a.read()
+            code = read_text_file(b)
             os.remove(b)
+            if code is None:
+                return await event.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
         else:
             code = temp.message
+        if not code:
+            return await event.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
     else:
         try:
             code = event.text.split(" ", maxsplit=1)[1]
@@ -69,13 +72,16 @@ async def crbn(event):
     msg = await event.eor(get_string("com_1"))
     if event.reply_to_msg_id:
         temp = await event.get_reply_message()
-        if temp.media:
+        if temp.document and not (temp.photo or temp.sticker or temp.video or temp.audio):
             b = await event.client.download_media(temp)
-            with open(b) as a:
-                code = a.read()
+            code = read_text_file(b)
             os.remove(b)
+            if code is None:
+                return await event.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
         else:
             code = temp.message
+        if not code:
+            return await event.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
     else:
         try:
             match = match.split(" ", maxsplit=1)

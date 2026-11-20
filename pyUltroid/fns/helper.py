@@ -696,3 +696,28 @@ def mask_secret(name, value):
     if not any(word in str(name).upper() for word in _SECRET_WORDS) or len(text) < 8:
         return text
     return f"{text[:4]}{'*' * 8}{text[-2:]}"
+
+
+def read_text_file(path, limit=2 * 1024 * 1024):
+    """Read a downloaded file as text; None if it is binary (photo, pdf...)."""
+    try:
+        with open(path, "rb") as f:
+            data = f.read(limit)
+    except OSError:
+        return None
+    if data.startswith((b"\xff\xfe", b"\xfe\xff")):
+        encodings = ("utf-16",)
+    elif b"\x00" in data[:4096]:
+        return None
+    else:
+        encodings = ("utf-8-sig", "cp1252")
+    for enc in encodings:
+        try:
+            text = data.decode(enc)
+        except UnicodeDecodeError:
+            continue
+        # cp1252 decodes almost anything: reject if it looks like binary
+        if enc == "cp1252" and sum(ch.isprintable() or ch in "\r\n\t" for ch in text) < 0.95 * len(text):
+            return None
+        return text
+    return None
