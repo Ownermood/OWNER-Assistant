@@ -159,7 +159,13 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   applies to guests. Earlier the switch only affected the userbot's `.` commands,
   so friends still saw "private bot" — that was the bug the owner hit.
   `manager/fun.py` duplicates love.py's ASCII art on purpose (love.py can't be
-  imported outside the userbot); change both if you change a drawing. Also #35: manager persists panel ids in
+  imported outside the userbot); change both if you change a drawing.
+  #38: the guest Fun Zone has 16 items (animations, joke, quote, 8-ball, dice,
+  truth/dare, fortune, compliment, fake hack, matrix, rate) - all offline, all
+  bot-side. The owner asked for "full access" for friends; DANGEROUS commands
+  (.eval .bash .setdb .get .logout .restart .shutdown .addsudo) are deliberately
+  NEVER exposed to guests - they would hand over the VPS and the owner's whole
+  account. Say this plainly if asked again. Also #35: manager persists panel ids in
   the store so a restart deletes the old 'Manager online' panel instead of
   stacking a new one.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
