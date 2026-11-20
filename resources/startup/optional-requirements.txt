@@ -28,5 +28,6 @@ twikit
 tabulate
 telegraph
 tgcrypto
-yt-dlp
+yt-dlp[default]
+deno
 # -------------------------------------------------------#

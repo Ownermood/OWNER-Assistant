@@ -47,6 +47,58 @@ def _format_count(num):
     return f"{num:.1f}T"
 
 
+YT_COOKIE_FILE = "resources/auth/yt_cookies.txt"
+_BOT_CHECK = ("confirm you’re not a bot", "confirm you're not a bot", "sign in to confirm")
+
+
+def _cookie_file():
+    """Write the cookies saved with .ytcookies (kept in the DB) to a file for yt-dlp."""
+    data = udB.get_key("YT_COOKIES")
+    if not data:
+        return None
+    try:
+        os.makedirs(os.path.dirname(YT_COOKIE_FILE), exist_ok=True)
+        if not os.path.exists(YT_COOKIE_FILE):
+            with open(YT_COOKIE_FILE, "w") as f:
+                f.write(str(data))
+            os.chmod(YT_COOKIE_FILE, 0o600)
+    except OSError as er:
+        LOGS.error(f"yt cookies: {er}")
+        return None
+    return YT_COOKIE_FILE
+
+
+def ytdl_opts(opts=None):
+    """Common yt-dlp options: adds the YouTube cookies saved with .ytcookies.
+
+    (yt-dlp finds the `deno` JS runtime on PATH by itself.)
+    """
+    opts = dict(opts or {})
+    cookie = _cookie_file()
+    if cookie and "cookiefile" not in opts:
+        opts["cookiefile"] = cookie
+    return opts
+
+
+def yt_error_text(er):
+    """Short, useful message for a yt-dlp error."""
+    text = str(er)
+    if any(x in text.lower() for x in _BOT_CHECK):
+        if udB.get_key("YT_COOKIES"):
+            return (
+                "**YouTube blocked this request** (\"not a bot\" check) even with your cookies.\n"
+                "Cookies may be expired: export fresh ones and send `.ytcookies` again."
+            )
+        return (
+            "**YouTube blocked this server** (\"Sign in to confirm you're not a bot\").\n"
+            "Fix: export YouTube cookies (cookies.txt) from a browser where you are logged in "
+            "(use a spare Google account), send the file here, reply to it with `.ytcookies`.\n"
+            "Help: `.help youtube`"
+        )
+    text = re.sub(r"\x1b\[[0-9;]*m", "", text)
+    return f"`{text[:900]}`"
+
+
 def yt_search(query, limit=10):
     """Search YouTube with yt-dlp (no API key, no extra library)."""
     opts = {
@@ -56,7 +108,7 @@ def yt_search(query, limit=10):
         "extract_flat": "in_playlist",
     }
     try:
-        info = YoutubeDL(opts).extract_info(f"ytsearch{limit}:{query}", download=False)
+        info = YoutubeDL(ytdl_opts(opts)).extract_info(f"ytsearch{limit}:{query}", download=False)
     except Exception as er:
         LOGS.info(f"yt_search: {er}")
         return []
@@ -270,14 +322,14 @@ async def dler(event, url, opts: dict = {}, download=False):
     await event.edit("`Getting Data...`")
     if "quiet" not in opts:
         opts["quiet"] = True
-    opts["username"] = udB.get_key("YT_USERNAME")
-    opts["password"] = udB.get_key("YT_PASSWORD")
+    opts.update(ytdl_opts(opts))
     if download:
         await ytdownload(url, opts)
     try:
         return await extract_info(url, opts)
     except Exception as e:
-        await event.edit(f"{type(e)}: {e}")
+        LOGS.info(f"ytdl: {e}")
+        await event.edit(yt_error_text(e))
         return
 
 
@@ -303,7 +355,7 @@ def get_videos_link(url):
     playlist_id = regex.group(1)
     opts = {"quiet": True, "skip_download": True, "extract_flat": "in_playlist"}
     try:
-        info = YoutubeDL(opts).extract_info(
+        info = YoutubeDL(ytdl_opts(opts)).extract_info(
             f"https://www.youtube.com/playlist?list={playlist_id}", download=False
         )
     except Exception as er:

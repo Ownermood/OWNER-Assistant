@@ -219,6 +219,7 @@ Telegram mein **Saved Messages** mein bhejo, phir message **delete** karo. Resta
 | `AuthKeyDuplicated` / session expired | Same session do jagah chal raha tha → naya session banao |
 | Gemini `503 high demand` | Google busy — bot khud ek baar retry karta hai; 1 min baad try |
 | Gemini `404 model not available` | `.setdb GEMINI_MODEL <jo error mein bataya>` |
+| YouTube: `Sign in to confirm you're not a bot` | YouTube VPS ka IP block karta hai. Laptop/PC browser mein **spare Google account** se YouTube login → "Get cookies.txt LOCALLY" extension se `cookies.txt` export → Telegram mein bhejo → reply `.ytcookies`. Cookies expire hon to dobara |
 | `.carbon` "text or code file" | Photo/PDF nahi, text/code file ya text message par reply karo |
 | Koi bhi crash | Log group ka **Error Report** Claude ko bhejo (secrets hata ke) |
 

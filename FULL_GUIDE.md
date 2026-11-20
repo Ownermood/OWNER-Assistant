@@ -11,7 +11,7 @@
 5. [API keys (optional)](#5-api-keys-optional)
 6. [Safety rules](#6-safety-rules)
 7. [Problem aaye to](#7-problem-aaye-to)
-8. Every command — official plugins (~447 entries total)
+8. Every command — official plugins (~448 entries total)
 9. Every command — extra addons
 10. For Claude / developers (technical handoff)
 
@@ -219,6 +219,7 @@ Telegram mein **Saved Messages** mein bhejo, phir message **delete** karo. Resta
 | `AuthKeyDuplicated` / session expired | Same session do jagah chal raha tha → naya session banao |
 | Gemini `503 high demand` | Google busy — bot khud ek baar retry karta hai; 1 min baad try |
 | Gemini `404 model not available` | `.setdb GEMINI_MODEL <jo error mein bataya>` |
+| YouTube: `Sign in to confirm you're not a bot` | YouTube VPS ka IP block karta hai. Laptop/PC browser mein **spare Google account** se YouTube login → "Get cookies.txt LOCALLY" extension se `cookies.txt` export → Telegram mein bhejo → reply `.ytcookies`. Cookies expire hon to dobara |
 | `.carbon` "text or code file" | Photo/PDF nahi, text/code file ya text message par reply karo |
 | Koi bhi crash | Log group ka **Error Report** Claude ko bhejo (secrets hata ke) |
 
@@ -499,6 +500,7 @@ Telegram mein **Saved Messages** mein bhejo, phir message **delete** karo. Resta
 - `.ytv <(youtube/any) link>` — Download video  from the link.
 - `.ytsa <(youtube) search query>` — Search and download audio from youtube.
 - `.ytsv <(youtube) search query>` — Search and download video from youtube.
+- `.ytcookies <reply to cookies.txt>` — Fix "Sign in to confirm you're not a bot". Export YouTube cookies (cookies.txt, Netscape format) from a browser logged in to a spare Google account, send the file, reply to it with this command. `.ytcookies` = status · `.ytcookies del` = remove.
 
 **downloadupload**
 
@@ -1191,6 +1193,10 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
 - AI defaults: `gemini-flash-latest`, `claude-opus-5-5`, `gpt-5-mini`,
   `deepseek-chat`; on 404 "model retired" the provider's suggested model is
   used once; 429/5xx are retried once.
+- YouTube on the VPS needs cookies ("not a bot" check): `.ytcookies` saves a
+  cookies.txt in the DB (`YT_COOKIES`); every yt-dlp call goes through
+  `ytdl_opts()` in `pyUltroid/fns/ytdl.py`. `deno` + `yt-dlp[default]` are
+  installed, and `startup` upgrades yt-dlp on each boot.
 - Secrets shown in chat are masked (`mask_secret`) in `.setdb` / `.get`.
 
 ### What's already done (PRs #1–#20 on `main`)
