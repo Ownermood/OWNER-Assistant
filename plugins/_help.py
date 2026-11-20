@@ -20,22 +20,21 @@ from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IM
 
 _main_help_menu = [
     [
-        Button.inline(get_string("help_4"), data="uh_Official_", style="primary"),
-        Button.inline(get_string("help_5"), data="uh_Addons_", style="primary"),
+        Button.inline(get_string("help_4"), data="uh_Official_"),
+        Button.inline(get_string("help_5"), data="uh_Addons_"),
     ],
     [
         Button.inline(get_string("help_6"), data="uh_VCBot_"),
         Button.inline(get_string("help_7"), data="inlone"),
     ],
     [
-        Button.inline(get_string("help_8"), data="ownr", style="success"),
+        Button.inline(get_string("help_8"), data="ownr"),
         Button.url(
             get_string("help_9"),
             url=f"https://t.me/{asst.me.username}?start=set",
-            style="success",
         ),
     ],
-    [Button.inline(get_string("help_10"), data="close", style="danger")],
+    [Button.inline(get_string("help_10"), data="close")],
 ]
 
 

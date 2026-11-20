@@ -46,4 +46,4 @@ def assistant_buttons(text="🤖 Assistant"):
         return None
     if not uname:
         return None
-    return [[Button.url(text, f"https://t.me/{uname}", style="primary")]]
+    return [[Button.url(text, f"https://t.me/{uname}")]]
