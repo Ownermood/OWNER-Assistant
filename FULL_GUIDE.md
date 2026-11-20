@@ -818,7 +818,7 @@ Telegram mein **Saved Messages** mein bhejo, phir message **delete** karo. Resta
 **pemoji**
 
 - `.pemoji` (reply to a message that has premium emojis) — Save those premium emojis. After this, the bot's messages (alive, ping, help, ...) use them automatically.
-- `.pemoji pack <t.me/addemoji/... link or pack name>` — Save a whole premium emoji pack at once.
+- `.pemoji pack <link1> <link2> ...` — Save whole premium emoji packs - many at once (up to 25). Put links on new lines or with spaces, or reply to a message that has the links. If two packs have the same emoji, the LAST pack wins.
 - `.pemoji` — Status + list of saved emojis.
 - `.pemoji del <emoji>`  /  `.pemoji clear` — Remove one / all saved emojis.
 - `.pemoji on`  /  `.pemoji off` — Turn the automatic premium emojis on or off.
