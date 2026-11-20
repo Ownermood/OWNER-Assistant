@@ -30,7 +30,11 @@ from telethon.errors import FloodWaitError, MessageNotModifiedError
 
 from . import ultroid_cmd
 
-DELAY = 1.3
+DELAY = 1.3  # seconds between frames (private chats)
+GROUP_DELAY = 1.8  # groups have stricter edit limits
+
+# Own random generator: never touch the global one other commands use.
+_rng = random.Random()
 
 # ------------------------------------------------------------------ #
 #  Drawings ("•" = dot). Shown inside ``` so every character lines up.
@@ -130,8 +134,13 @@ def code(lines, title="", footer=""):
     return out
 
 
-async def play(msg, frames, delay=DELAY):
-    """Edit one message frame by frame, surviving Telegram flood limits."""
+async def play(msg, frames, delay=None, event=None):
+    """Edit one message frame by frame, surviving Telegram flood limits.
+
+    Stops quietly if the message is deleted or can't be edited anymore.
+    """
+    if delay is None:
+        delay = GROUP_DELAY if event is not None and not event.is_private else DELAY
     last = None
     for frame in frames:
         if frame == last:
@@ -144,6 +153,8 @@ async def play(msg, frames, delay=DELAY):
                 await asyncio.sleep(fw.seconds + 1)
             except MessageNotModifiedError:
                 break
+            except Exception:
+                return  # message deleted / no rights: just stop
         last = frame
         await asyncio.sleep(delay)
 
@@ -175,11 +186,11 @@ def emoji_art(art, fill="❤️", empty="🤍", size=(11, 13), sparkle=0):
         for c, ch in enumerate(row):
             if ch != " ":
                 grid[top + r][left + c] = fill
-    random.seed(sparkle)
+    rnd = random.Random(sparkle)
     for _ in range(sparkle):
-        r, c = random.randrange(rows), random.randrange(cols)
+        r, c = rnd.randrange(rows), rnd.randrange(cols)
         if grid[r][c] == empty:
-            grid[r][c] = random.choice(["✨", "💫"])
+            grid[r][c] = rnd.choice(["✨", "💫"])
     return "\n".join("".join(row) for row in grid)
 
 
@@ -203,9 +214,9 @@ def scene(boy_x, boy=BOY, hearts=0, width=24, girl=GIRL):
         for i, ch in enumerate(girl[r]):
             rows[r][girl_x + i] = ch
     sky = [" "] * width
-    random.seed(hearts)
+    rnd = random.Random(hearts)
     for _ in range(hearts):
-        sky[random.randint(boy_x + 2, girl_x + 1)] = random.choice(FLOAT)
+        sky[rnd.randint(boy_x + 2, girl_x + 1)] = rnd.choice(FLOAT)
     return ["".join(sky)] + ["".join(r) for r in rows] + ["‾" * width]
 
 
@@ -240,7 +251,7 @@ def heartbeat(title, beats=2):
 async def propose(event):
     name = await _target_name(event)
     msg = await event.eor("💌")
-    lines = random.sample(LINES, 3)
+    lines = _rng.sample(LINES, 3)
     f = []
 
     # 1. intro
@@ -292,7 +303,7 @@ async def propose(event):
         f"[ **YES** 💖 ]    [ **OF COURSE YES** 😍 ]\n\n"
         f"{it('No is not an option, sorry 😌')}"
     )
-    await play(msg, f)
+    await play(msg, f, event=event)
 
 
 @ultroid_cmd(pattern="love( (.*)|$)")
@@ -311,7 +322,7 @@ async def love(event):
     final_heart = emoji_art(HEART, "❤️", sparkle=6)
     f.append(f"{final_heart}\n\n💞 **{name}** 💞")
     f.append(f"{final_heart}\n\n💞 **{name}** 💞\n{it('You have my heart. Handle with care')} ❤️")
-    await play(msg, f)
+    await play(msg, f, event=event)
 
 
 @ultroid_cmd(pattern="rose( (.*)|$)")
@@ -325,7 +336,7 @@ async def rose(event):
         f.append(code(step, cap))
     f.append(code(ROSE, f"🌹 **For you, {name}**"))
     f.append(code(ROSE, f"🌹 **For you, {name}**", it("A rose for the prettiest smile I know ❤️")))
-    await play(msg, f)
+    await play(msg, f, event=event)
 
 
 @ultroid_cmd(pattern="hearts$")
@@ -338,13 +349,13 @@ async def hearts(event):
     for _ in range(16):
         drops = [(r + 1, c, h) for r, c, h in drops if r + 1 < height]
         for _ in range(2):
-            drops.append((0, random.randrange(width), random.choice(pool)))
+            drops.append((0, _rng.randrange(width), _rng.choice(pool)))
         grid = [["▫️"] * width for _ in range(height)]
         for r, c, h in drops:
             grid[r][c] = h
         frames.append("💕 **It's raining hearts** 💕\n\n" + "\n".join("".join(row) for row in grid))
     frames.append("💕 **...and they all landed on you** 💕\n\n" + emoji_art(HEART, "💖", sparkle=5))
-    await play(msg, frames, delay=1.1)
+    await play(msg, frames, event=event)
 
 
 @ultroid_cmd(pattern="lovecalc( (.*)|$)")
@@ -369,4 +380,4 @@ async def lovecalc(event):
     else:
         verdict = "Hmm... great friends for now 😅 (just for fun!)"
     frames.append(head + f"`{bar(pct)}` **{pct}%**\n\n{verdict}")
-    await play(msg, frames, delay=1.0)
+    await play(msg, frames, event=event)
