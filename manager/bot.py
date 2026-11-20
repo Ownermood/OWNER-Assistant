@@ -14,7 +14,7 @@ from telethon import Button, TelegramClient, errors, events
 from telethon.sessions import StringSession
 from telethon.tl.functions.channels import GetParticipantRequest
 
-from . import emoji
+from . import emoji, fun
 
 
 # ----------------------------------------------------------------- config
@@ -236,6 +236,7 @@ class Manager:
         self.panels = {int(k): v for k, v in (self.store.data.get("panels") or {}).items()}
         self.kb_msg = None  # "share phone" keyboard message during login
         self.join_cache = {}
+        self.playing = {}  # chat -> an animation is running
         self.join_problem = None
         # Premium (custom) emoji on BUTTON ICONS only - message text keeps
         # plain emojis (premium everywhere looked bad). Turns itself off if
@@ -324,11 +325,33 @@ class Manager:
         lines = [f"**Status:** {line}", f"👤 {self.account_text()}"]
         if st == "running" and self.runner.started:
             lines.append(f"⏳ {fmt_uptime(time.time() - self.runner.started)}")
-        lines.append("🔓 Fun animations: **PUBLIC**" if self.fun_public()
-                     else "🔒 Fun animations: **private**")
+        lines.append("")
+        lines.append("✅ **FUN MODE: ON** — friends can use the bot"
+                     if self.fun_public() else
+                     "⛔ **FUN MODE: OFF** — only you can use the bot")
         if self.join_problem:
             lines.append(f"⚠️ {self.join_problem}")
         return "\n".join(lines)
+
+    async def send_panel(self, chat, text, buttons=None, event=None):
+        """show() for guests / the join gate - guest chats are not persisted."""
+        if chat == OWNER_ID:
+            return await self.show(chat, text, buttons, event)
+        try:
+            if isinstance(event, events.CallbackQuery.Event):
+                try:
+                    return await event.edit(text, buttons=buttons, link_preview=False)
+                except errors.MessageNotModifiedError:
+                    return
+                except errors.MessageIdInvalidError:
+                    pass
+            old = self.panels.get(chat)
+            msg = await self.bot.send_message(chat, text, buttons=buttons, link_preview=False)
+            self.panels[chat] = msg.id
+            if old and old != msg.id:
+                await self.drop(chat, old)
+        except errors.RPCError as er:
+            log("send_panel:", er)
 
     def _save_panels(self):
         self.store.data["panels"] = {str(k): v for k, v in self.panels.items()}
@@ -339,11 +362,14 @@ class Manager:
         return os.path.join(DATA_DIR, "fun_mode.json")
 
     def fun_public(self):
+        """Fun mode. Default is ON - the owner turns it off when they want."""
         try:
             with open(self._fun_file(), encoding="utf-8") as f:
-                return bool(json.load(f).get("public"))
+                return bool(json.load(f).get("public", True))
+        except FileNotFoundError:
+            return True
         except Exception:
-            return False
+            return True
 
     def set_fun_public(self, value):
         try:
@@ -363,9 +389,9 @@ class Manager:
             rows.append([self.btn("▶️", "Run", "m:run")])
         rows.append([self.btn("📜", "Logs", "m:logs"), self.btn("⚙️", "Settings", "m:settings")])
         if self.fun_public():
-            rows.append([self.btn("🔓", "Fun: PUBLIC → make private", "m:fun_off")])
+            rows.append([self.btn("⛔", "Turn fun mode OFF (only me)", "m:fun_off")])
         else:
-            rows.append([self.btn("🔒", "Fun: PRIVATE → make public", "m:fun_on")])
+            rows.append([self.btn("✅", "Turn fun mode ON (friends)", "m:fun_on")])
         if st != "logged_out":
             rows.append([self.btn("🔐", "Login again", "m:login"), self.btn("🚪", "Logout", "m:logout")])
         rows.append([self.btn("🔃", "Refresh", "m:menu")])
@@ -496,22 +522,86 @@ class Manager:
             text = f"⚙️ Setup: put this in your `.env` and restart:\n\n`OWNER_ID={event.sender_id}`"
             return await (event.answer("OWNER_ID not set", alert=True) if cb else event.reply(text)) and False
         if event.sender_id != OWNER_ID:
+            # Guests: the fun animations only, and only while fun mode is ON.
+            # They never reach login / logout / settings / logs.
+            if self.fun_public() and (cb or event.is_private):
+                if not await self.is_member(event.sender_id):
+                    await self.join_gate(event, cb)
+                    return False
+                await self.guest(event, cb)
+                return False
             if cb:
-                await event.answer("🔒 This is a private bot.", alert=True)
+                await event.answer("🔒 This bot is private right now.", alert=True)
             elif event.is_private:
-                await event.reply("🔒 This is a private bot.")
+                await event.reply("🔒 This bot is private right now.")
             return False
         if not await self.is_member(event.sender_id):
-            if not cb:
-                await self.clean(event)
-            elif event.data == b"m:joined":
-                await event.answer("You haven't joined yet.", alert=True)
-            await self.show(event.chat_id,
-                            f"📢 **Join {FORCE_JOIN} to use this bot.**\n\nJoin, then tap **I've joined**.",
-                            [[self.btn("📢", "Join channel", url=JOIN_URL)],
-                             [self.btn("✅", "I've joined", "m:joined")]], event if cb else None)
+            await self.join_gate(event, cb)
             return False
         return True
+
+    async def join_gate(self, event, cb):
+        if not cb:
+            await self.clean(event)
+        elif event.data == b"m:joined":
+            await event.answer("You haven't joined yet.", alert=True)
+        await self.send_panel(event.chat_id,
+                              f"📢 **Join {FORCE_JOIN} to use this bot.**\n\n"
+                              "Join, then tap **I\'ve joined**.",
+                              [[self.btn("📢", "Join channel", url=JOIN_URL)],
+                               [self.btn("✅", "I\'ve joined", "m:joined")]],
+                              event if cb else None)
+
+    # ---------------------------------------------------------------- guests
+    async def guest(self, event, cb):
+        """Everything a non-owner can do: play an animation. Nothing else."""
+        chat = event.chat_id
+        data = event.data.decode() if cb else ""
+        kind = data[6:] if data.startswith("m:fun_") and data[6:] in fun.MENU else ""
+        if kind:
+            await event.answer("💞 Playing…")
+            return await self.play(chat, kind, event)
+        if not cb:
+            await self.clean(event)
+        rows, row = [], []
+        for key, (em, label) in fun.MENU.items():
+            row.append(self.btn(em, label, f"m:fun_{key}"))
+            if len(row) == 2:
+                rows.append(row)
+                row = []
+        if row:
+            rows.append(row)
+        name = (getattr(event, "sender", None) and getattr(event.sender, "first_name", None)) or "you"
+        await self.send_panel(chat, f"💞 **Fun zone**\n\nHey {name}! Pick an animation 👇",
+                              rows, event if cb else None)
+
+    async def play(self, chat, kind, event):
+        """Send one message and edit it frame by frame (bot-side, flood safe)."""
+        if self.playing.get(chat):
+            return
+        self.playing[chat] = True
+        try:
+            who = (getattr(event, "sender", None) and getattr(event.sender, "first_name", None)) or "Someone"
+            frames = fun.build(kind, name=who, who=who)
+            if not frames:
+                return
+            msg = await self.bot.send_message(chat, frames[0], link_preview=False)
+            for frame in frames[1:]:
+                await asyncio.sleep(1.2)
+                try:
+                    await msg.edit(frame, link_preview=False)
+                except errors.MessageNotModifiedError:
+                    continue
+                except errors.FloodWaitError as fw:
+                    await asyncio.sleep(min(fw.seconds, 30) + 1)
+                except errors.RPCError:
+                    break
+            try:
+                await msg.edit(buttons=[[self.btn("💞", "Play again", "m:fun_menu")]])
+            except Exception:
+                pass
+        finally:
+            self.playing[chat] = False
 
     # ------------------------------------------------------------ login
     async def cancel_login(self):
@@ -718,9 +808,10 @@ class Manager:
             elif action in ("fun_on", "fun_off"):
                 on = action == "fun_on"
                 self.set_fun_public(on)
-                note = ("🔓 **Fun mode: PUBLIC** — anyone can use the love animations now."
+                note = ("✅ **FUN MODE IS ON** — anyone who opens this bot can play the "
+                        "animations. Your login / settings stay yours only."
                         if on else
-                        "🔒 **Fun mode: PRIVATE** — only you (and your `.funuser` list).")
+                        "⛔ **FUN MODE IS OFF** — nobody else can use this bot now.")
                 await self.view_menu(chat, event, note=note)
             elif action == "close":
                 await self.drop(chat, event.message_id)

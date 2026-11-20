@@ -1257,7 +1257,14 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   for the fun commands — DB-less flag in `data/fun_mode.json` (shared by the
   userbot and the manager, same container/cwd); `.funmode [public|private]`
   on the userbot, and a toggle button on the manager menu. Gate: owner/sudo OR
-  fun_public() OR sender in FUN_USERS. Also #35: manager persists panel ids in
+  fun_public() OR sender in FUN_USERS. **#37: fun mode now defaults to ON and
+  also opens the MANAGER BOT to guests** — a non-owner who DMs it gets a
+  fun-only menu (`manager/fun.py`, bot-side animations it plays by editing its
+  own message) and can never reach login/logout/logs/settings. Force join still
+  applies to guests. Earlier the switch only affected the userbot's `.` commands,
+  so friends still saw "private bot" — that was the bug the owner hit.
+  `manager/fun.py` duplicates love.py's ASCII art on purpose (love.py can't be
+  imported outside the userbot); change both if you change a drawing. Also #35: manager persists panel ids in
   the store so a restart deletes the old 'Manager online' panel instead of
   stacking a new one.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
