@@ -4,21 +4,21 @@
 """
 ✘ Commands Available -
 
-• `{i}propose <naam>` (ya kisi ke message ka reply)
-    Lamba proposal animation 💍 — ladka, ring, dots se gulaab,
-    dil aur aakhir mein "Will you be mine?"
+• `{i}propose <name>` (or reply to someone)
+    A long, flirty proposal story 💍 — walk-up, ring, a dot-by-dot rose,
+    a beating heart, pick-up lines and the big question.
 
-• `{i}love <naam>`
-    Dots se dil banta hai, laal hota hai, dhadakta hai aur naam aata hai.
+• `{i}love <name>`
+    A heart drawn dot by dot that comes alive and beats for them ❤️
 
-• `{i}rose <naam>`
-    Dot-by-dot gulaab khilta hai 🌹
+• `{i}rose <name>`
+    A rose that blooms dot by dot 🌹
 
 • `{i}hearts`
-    Dilon ki baarish 💕
+    It's raining hearts 💕
 
-• `{i}lovecalc <naam1> <naam2>`
-    Love meter 💘
+• `{i}lovecalc <name1> <name2>`
+    The (totally scientific) love meter 💘
 """
 
 import asyncio
@@ -50,6 +50,16 @@ HEART = [
     "      •      ",
 ]
 
+SMALL_HEART = [
+    " ••   •• ",
+    "•••• ••••",
+    "•••••••••",
+    " ••••••• ",
+    "  •••••  ",
+    "   •••   ",
+    "    •    ",
+]
+
 ROSE = [
     "     ,•••,     ",
     "   •••• ••••   ",
@@ -73,6 +83,17 @@ BOY_KNEEL_RING = ["  ●  ✦", " /|\\◎ ", " /_   "]
 
 FLOAT = ["♥", "♡", "❥", "♥"]
 
+LINES = [
+    "Are you a magician? Every time I look at you, everyone else disappears ✨",
+    "I'd pick you in every lifetime, in every universe 🌌",
+    "You're my favourite notification 📲",
+    "I tried to stop thinking about you... my heart said no 💓",
+    "If kisses were snowflakes, I'd send you a blizzard ❄️",
+    "You had me at hello. Honestly, even before that 😌",
+    "My heart has been on silent mode... until you called 📞",
+    "I'm not a photographer, but I can picture us together 📸",
+]
+
 
 # ------------------------------------------------------------------ #
 #  Helpers
@@ -81,7 +102,7 @@ FLOAT = ["♥", "♡", "❥", "♥"]
 
 def _clean(name):
     name = re.sub(r"[*_`\[\]~|]", "", name or "").strip()
-    return name[:32] or "Jaan"
+    return name[:32] or "Beautiful"
 
 
 async def _target_name(event):
@@ -93,13 +114,17 @@ async def _target_name(event):
         sender = await reply.get_sender()
         if sender is not None:
             return _clean(getattr(sender, "first_name", None) or getattr(sender, "title", ""))
-    return "Jaan"
+    return "Beautiful"
+
+
+def it(text):
+    """Italic in Telegram markdown (double underscores)."""
+    return f"__{text}__"
 
 
 def code(lines, title="", footer=""):
-    body = "\n".join(lines)
     out = f"{title}\n" if title else ""
-    out += f"```\n{body}\n```"
+    out += "```\n" + "\n".join(lines) + "\n```"
     if footer:
         out += f"\n{footer}"
     return out
@@ -123,11 +148,9 @@ async def play(msg, frames, delay=DELAY):
         await asyncio.sleep(delay)
 
 
-def reveal(art, steps, order="rows", reverse=False):
-    """Frames that draw `art` gradually (dot by dot)."""
+def reveal(art, steps, reverse=False):
+    """Frames that draw `art` gradually, dot by dot."""
     cells = [(r, c) for r, row in enumerate(art) for c, ch in enumerate(row) if ch != " "]
-    if order == "rows":
-        cells.sort(key=lambda rc: (rc[0], rc[1]))
     if reverse:
         cells.reverse()
     frames = []
@@ -142,16 +165,31 @@ def reveal(art, steps, order="rows", reverse=False):
     return frames
 
 
-def emoji_heart(fill="❤️", empty="🤍", rows_filled=None):
-    """Heart made of emoji; `rows_filled` fills from the bottom up."""
+def emoji_art(art, fill="❤️", empty="🤍", size=(11, 13), sparkle=0):
+    """Draw `art` with emoji, centred on a fixed-size canvas."""
+    rows, cols = size
+    top = (rows - len(art)) // 2
+    left = (cols - len(art[0])) // 2
+    grid = [[empty] * cols for _ in range(rows)]
+    for r, row in enumerate(art):
+        for c, ch in enumerate(row):
+            if ch != " ":
+                grid[top + r][left + c] = fill
+    random.seed(sparkle)
+    for _ in range(sparkle):
+        r, c = random.randrange(rows), random.randrange(cols)
+        if grid[r][c] == empty:
+            grid[r][c] = random.choice(["✨", "💫"])
+    return "\n".join("".join(row) for row in grid)
+
+
+def heart_fill(level, fill="❤️"):
+    """Big heart filling up from the bottom (level 0..11 rows)."""
     n = len(HEART)
-    lines = []
-    for r, row in enumerate(HEART):
-        filled = rows_filled is None or r >= n - rows_filled
-        lines.append(
-            "".join((fill if filled else "💗") if ch != " " else empty for ch in row)
-        )
-    return "\n".join(lines)
+    return "\n".join(
+        "".join("🤍" if ch == " " else (fill if r >= n - level else "🖤") for ch in row)
+        for r, row in enumerate(HEART)
+    )
 
 
 def scene(boy_x, boy=BOY, hearts=0, width=24, girl=GIRL):
@@ -176,6 +214,23 @@ def bar(pct, width=12):
     return "▰" * full + "▱" * (width - full)
 
 
+def typewriter(prefix, text, steps=3):
+    words = text.split()
+    return [
+        prefix + " ".join(words[: max(1, round(len(words) * i / steps))])
+        for i in range(1, steps + 1)
+    ]
+
+
+def heartbeat(title, beats=2):
+    """Small heart / big heart / small heart... like a real heartbeat."""
+    frames = []
+    for b in range(beats):
+        frames.append(f"{title}\n\n{emoji_art(SMALL_HEART, '💗', sparkle=b)}")
+        frames.append(f"{title}\n\n{emoji_art(HEART, '❤️', sparkle=3 + b)}")
+    return frames
+
+
 # ------------------------------------------------------------------ #
 #  Commands
 # ------------------------------------------------------------------ #
@@ -185,100 +240,110 @@ def bar(pct, width=12):
 async def propose(event):
     name = await _target_name(event)
     msg = await event.eor("💌")
-    frames = []
+    lines = random.sample(LINES, 3)
+    f = []
 
     # 1. intro
-    for p in (0, 20, 45, 70, 100):
-        frames.append(f"💌 **Ek special message aa raha hai...**\n\n`{bar(p)}` {p}%")
-    frames.append("🌙 _Ek shaam... ek ladka... aur ek baat jo kab se dil mein thi..._")
+    for p in (0, 35, 70, 100):
+        f.append(f"📩 **Incoming: a very important message...**\n\n`{bar(p)}` {p}%")
+    f.append(f"🌙 {it('Somewhere between hello and right now...')}")
+    f.append(f"🌙 {it('Somewhere between hello and right now...')}\n💘 **I fell for you, {name}.**")
 
-    # 2. boy walks towards the girl
-    for x in (0, 3, 6, 9, 12):
-        frames.append(code(scene(x), "🚶 _Dheere dheere qadam badhte hain..._"))
-    frames.append(code(scene(13), "💓 _Dil ki dhadkan tez ho gayi..._"))
-
-    # 3. kneels and shows the ring
-    frames.append(code(scene(13, BOY_KNEEL), "🧎 _Ghutno par baith kar..._"))
-    frames.append(code(scene(13, BOY_KNEEL_RING, hearts=1), "💍 _Ek chhota sa ring box khula..._"))
-    frames.append(code(scene(13, BOY_KNEEL_RING, hearts=3), "✨ _Ring chamak rahi hai..._"))
-    frames.append(code(scene(13, BOY_KNEEL_RING, hearts=4, girl=GIRL_HAPPY), "😳 _Wo hairaan... phir muskura di..._"))
-    frames.append(code(scene(13, BOY_KNEEL_RING, hearts=7, girl=GIRL_HAPPY), "💞 _Hawa mein pyaar hi pyaar..._"))
-
-    # 4. a rose grows dot by dot (stem first, then the flower)
-    for step in reveal(ROSE, 7, reverse=True):
-        frames.append(code(step, f"🌹 _Ye phool sirf tumhare liye, {name}..._"))
-
-    # 5. a heart is drawn dot by dot, then fills with colour
-    for step in reveal(HEART, 6):
-        frames.append(code(step, "💗 _Aur mera dil..._"))
-    for k in (3, 6, 9, 11):
-        frames.append(f"💗 _...jo sirf tumhare liye dhadakta hai_\n\n{emoji_heart(rows_filled=k)}")
-    for fill in ("💖", "❤️", "💗", "❤️"):
-        frames.append(f"💓 _dhak... dhak..._\n\n{emoji_heart(fill)}")
-
-    # 6. the words
-    words = [
-        f"**{name}**,",
-        "tum meri muskaan ho 😊",
-        "meri har dua mein tum ho 🤲",
-        "aur har sapne mein bhi ✨",
+    # 2. the walk-up
+    captions = [
+        "🚶 Walking up to you like it's the scariest exam of my life 😅",
+        "🚶 Okay... act cool, act cool...",
+        "💓 Heart rate: 200 bpm. Totally normal.",
+        "🙈 Almost there...",
     ]
-    for i in range(1, len(words) + 1):
-        frames.append("💌\n\n" + "\n".join(words[:i]))
+    for x, cap in zip((0, 4, 8, 12), captions):
+        f.append(code(scene(x), cap))
+
+    # 3. the ring
+    f.append(code(scene(13, BOY_KNEEL), "🧎 Down on one knee..."))
+    f.append(code(scene(13, BOY_KNEEL_RING, hearts=1), "💍 The tiniest box, for the biggest question"))
+    f.append(code(scene(13, BOY_KNEEL_RING, hearts=4, girl=GIRL_HAPPY), "😳 Wait... is that a smile? 🥹"))
+    f.append(code(scene(13, BOY_KNEEL_RING, hearts=7, girl=GIRL_HAPPY), "💞 The air is literally full of love rn"))
+
+    # 4. a rose, dot by dot (stem first)
+    rose_caps = ["🌱 First, something for you...", "🌿 Growing...", "🌿 Growing...", "🌷 Almost...",
+                 "🌹 Blooming...", "🌹 Roses are red..."]
+    for step, cap in zip(reveal(ROSE, 6, reverse=True), rose_caps):
+        f.append(code(step, cap))
+    f.append(code(ROSE, f"🌹 Roses are red, but none of them are as pretty as you, **{name}**."))
+
+    # 5. the heart: drawn dot by dot, comes alive, beats
+    for step, cap in zip(reveal(HEART, 4), ["✍️ Now let me draw my heart...", "✍️ dot...", "✍️ dot... dot...", "✍️ done."]):
+        f.append(code(step, cap))
+    f.append(f"🎨 {it('Adding some colour...')}\n\n{heart_fill(5)}")
+    f.append(f"❤️ {it('It only beats for you.')}\n\n{heart_fill(11)}")
+    f += heartbeat("💓 **lub-dub... lub-dub...**", beats=2)
+
+    # 6. three flirty lines, typed out
+    for i, line in enumerate(lines, 1):
+        f += typewriter(f"💬 **#{i}**\n\n", line)
 
     # 7. the question
-    frames.append(f"{emoji_heart()}\n\n💍 **Will you be mine, {name}?** 💍")
-    frames.append(
-        f"{emoji_heart()}\n\n💍 **Will you be mine, {name}?** 💍\n\n"
-        "_Option sirf do hain: **Haan** ya **Haan** 😌❤️_"
+    final_heart = emoji_art(HEART, "❤️", sparkle=6)
+    f.append(f"{final_heart}\n\n💍 **{name},**")
+    f.append(f"{final_heart}\n\n💍 **{name}, will you be mine?** 💍")
+    f.append(
+        f"{final_heart}\n\n💍 **{name}, will you be mine?** 💍\n\n"
+        f"[ **YES** 💖 ]    [ **OF COURSE YES** 😍 ]\n\n"
+        f"{it('No is not an option, sorry 😌')}"
     )
-    await play(msg, frames)
+    await play(msg, f)
 
 
 @ultroid_cmd(pattern="love( (.*)|$)")
 async def love(event):
     name = await _target_name(event)
     msg = await event.eor("❤️")
-    frames = ["💘 _Dil banane ki taiyari..._"]
-    for step in reveal(HEART, 7):
-        frames.append(code(step, "✍️ _Dot... dot... dil..._"))
-    for k in (2, 4, 6, 8, 10, 11):
-        frames.append(f"❤️ _Rang bhar rahe hain..._\n\n{emoji_heart(rows_filled=k)}")
-    for fill in ("💖", "❤️", "💗", "❤️"):
-        frames.append(f"💓\n\n{emoji_heart(fill)}")
-    frames.append(f"{emoji_heart()}\n\n💞 **{name}** 💞")
-    frames.append(f"{emoji_heart()}\n\n💞 **{name}** 💞\n_Is dil mein sirf tum ho_ ❤️")
-    await play(msg, frames)
+    f = []
+    for p in (0, 40, 80, 100):
+        f.append(f"💘 **Loading love.exe**\n\n`{bar(p)}` {p}%")
+    for step, cap in zip(reveal(HEART, 5), ["✍️ Drawing...", "✍️ Drawing...", "✍️ Drawing...", "✍️ Almost...", "✍️ Done."]):
+        f.append(code(step, cap))
+    f.append(f"🎨 {it('Filling it with feelings...')}\n\n{heart_fill(4, '💗')}")
+    f.append(f"🎨 {it('A little more...')}\n\n{heart_fill(8, '💖')}")
+    f.append(f"❤️ {it('Full.')}\n\n{heart_fill(11)}")
+    f += heartbeat("💓 **lub-dub... lub-dub...**", beats=3)
+    final_heart = emoji_art(HEART, "❤️", sparkle=6)
+    f.append(f"{final_heart}\n\n💞 **{name}** 💞")
+    f.append(f"{final_heart}\n\n💞 **{name}** 💞\n{it('You have my heart. Handle with care')} ❤️")
+    await play(msg, f)
 
 
 @ultroid_cmd(pattern="rose( (.*)|$)")
 async def rose(event):
     name = await _target_name(event)
     msg = await event.eor("🌱")
-    frames = ["🌱 _Ek beej..._"]
-    for step in reveal(ROSE, 10, reverse=True):
-        frames.append(code(step, "🌿 _Dheere dheere khil raha hai..._"))
-    frames.append(code(ROSE, "🌹 _Khil gaya!_"))
-    frames.append(code(ROSE, f"🌹 **{name} ke liye** 🌹", "_Ek gulaab, dher saara pyaar_ ❤️"))
-    await play(msg, frames)
+    caps = ["🌱 Planting a little seed...", "🌱 Watering it with love...", "🌿 Growing...", "🌿 Growing...",
+            "🌿 Leaves!", "🌷 A bud...", "🌷 Opening...", "🌹 Blooming...", "🌹 Blooming...", "🌹 Almost..."]
+    f = [f"🌱 {it('Wait for it...')}"]
+    for step, cap in zip(reveal(ROSE, 10, reverse=True), caps):
+        f.append(code(step, cap))
+    f.append(code(ROSE, f"🌹 **For you, {name}**"))
+    f.append(code(ROSE, f"🌹 **For you, {name}**", it("A rose for the prettiest smile I know ❤️")))
+    await play(msg, f)
 
 
 @ultroid_cmd(pattern="hearts$")
 async def hearts(event):
     msg = await event.eor("💕")
-    width, height = 14, 8
+    width, height = 12, 8
     drops = []
     frames = []
     pool = ["❤️", "💖", "💗", "💕", "💘", "💞"]
-    for t in range(16):
+    for _ in range(16):
         drops = [(r + 1, c, h) for r, c, h in drops if r + 1 < height]
         for _ in range(2):
             drops.append((0, random.randrange(width), random.choice(pool)))
         grid = [["▫️"] * width for _ in range(height)]
         for r, c, h in drops:
             grid[r][c] = h
-        frames.append("💕 **Dilon ki baarish** 💕\n\n" + "\n".join("".join(row) for row in grid))
-    frames.append("💕 **Dilon ki baarish** 💕\n\n" + emoji_heart("💖"))
+        frames.append("💕 **It's raining hearts** 💕\n\n" + "\n".join("".join(row) for row in grid))
+    frames.append("💕 **...and they all landed on you** 💕\n\n" + emoji_art(HEART, "💖", sparkle=5))
     await play(msg, frames, delay=1.1)
 
 
@@ -286,21 +351,22 @@ async def hearts(event):
 async def lovecalc(event):
     names = event.pattern_match.group(1).strip().split()
     if len(names) < 2:
-        return await event.eor("`Do naam do: .lovecalc Rahul Priya`")
+        return await event.eor("`Give two names: .lovecalc Romeo Juliet`")
     a, b = _clean(names[0]), _clean(" ".join(names[1:]))
     seed = "|".join(sorted([a.lower(), b.lower()]))
     pct = 40 + int(hashlib.md5(seed.encode()).hexdigest(), 16) % 61
     msg = await event.eor("💘")
-    frames = [f"💘 **Love Meter**\n\n{a} ➕ {b}\n\n_Dilon ko scan kar rahe hain..._"]
+    head = f"💘 **Love Meter**\n\n**{a}** ➕ **{b}**\n\n"
+    frames = [head + it("Scanning both hearts...")]
     for p in range(0, pct + 1, max(1, pct // 8)):
-        frames.append(f"💘 **Love Meter**\n\n{a} ➕ {b}\n\n`{bar(p)}` **{p}%**")
+        frames.append(head + f"`{bar(p)}` **{p}%**")
     if pct >= 90:
-        verdict = "Made for each other! 💍 Shaadi ka card kab aa raha hai? 😄"
+        verdict = "Made for each other 💍 When's the wedding?"
     elif pct >= 75:
-        verdict = "Kamaal ki jodi! ❤️ Thoda aur time do, perfect ho jaoge."
+        verdict = "Serious chemistry ❤️ Someone make the first move already!"
     elif pct >= 60:
-        verdict = "Spark hai! ✨ Dosti se shuru karo."
+        verdict = "There's a spark ✨ Coffee date, maybe?"
     else:
-        verdict = "Hmm... dosti hi theek hai 😅 (sirf mazaak hai!)"
-    frames.append(f"💘 **Love Meter**\n\n{a} ➕ {b}\n\n`{bar(pct)}` **{pct}%**\n\n{verdict}")
+        verdict = "Hmm... great friends for now 😅 (just for fun!)"
+    frames.append(head + f"`{bar(pct)}` **{pct}%**\n\n{verdict}")
     await play(msg, frames, delay=1.0)
