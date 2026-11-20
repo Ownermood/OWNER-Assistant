@@ -64,7 +64,7 @@ class Var:
     VC_SESSION = _str("VC_SESSION")
     ADDONS = _bool("ADDONS", True)
     # repo used by .update / installer (your own fork)
-    UPSTREAM_REPO = _str("UPSTREAM_REPO", "https://github.com/Ownermood/Ultroid")
+    UPSTREAM_REPO = _str("UPSTREAM_REPO", "https://github.com/Ownermood/OWNER-Assistant")
     UPSTREAM_BRANCH = _str("UPSTREAM_BRANCH", "main")
     VCBOT = _bool("VCBOT", False)
     # for railway

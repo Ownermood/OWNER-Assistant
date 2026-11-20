@@ -1,7 +1,7 @@
 {
     "name": "OWNER Assistant",
     "description": "Personal Telegram assistant (userbot).",
-    "logo": "https://raw.githubusercontent.com/Ownermood/Ultroid/main/resources/extras/owner_assistant_1.jpg",
+    "logo": "https://raw.githubusercontent.com/Ownermood/OWNER-Assistant/main/resources/extras/owner_assistant_1.jpg",
     "keywords": [
         "Telethon",
         "telegram",
@@ -9,8 +9,8 @@
         "python",
         "owner-assistant"
     ],
-    "repository": "https://github.com/Ownermood/Ultroid",
-    "success_url": "https://github.com/Ownermood/Ultroid",
+    "repository": "https://github.com/Ownermood/OWNER-Assistant",
+    "success_url": "https://github.com/Ownermood/OWNER-Assistant",
     "stack": "container",
     "env": {
         "SESSION": {

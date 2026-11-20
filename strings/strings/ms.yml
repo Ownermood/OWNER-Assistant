@@ -134,9 +134,9 @@ autopic_4: "AUTOPIC tidak digunakan !!"
 autopic_5: "AUTOPIC Berhenti!"
 
 # inline
-inline_1: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n**ᴍᴇɴᴜ ʙᴀɴᴛᴜᴀɴ ᴅᴀʀɪᴘᴀᴅᴀ {}.\n\nPʟᴜɢɪɴs ~ {}**"
-inline_2: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n**ᴍᴇɴᴜ ʙᴀɴᴛᴜᴀɴ ᴅᴀʀɪᴘᴀᴅᴀ {}.\n\nAᴅᴅᴏɴs ~ {}**"
-inline_3: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/Ultroid)\n\n**ᴍᴇɴᴜ ʙᴀɴᴛᴜᴀɴ ᴅᴀʀɪᴘᴀᴅᴀ {}.\n\nAᴅᴅᴏɴs ~ {}\n\nBuat **`.setdb ADDONS True`** ᴅᴀɴ ʀᴇsᴛᴀʀᴛ ᴜɴᴛᴜᴋ ᴍᴇɴᴅᴀᴘᴀᴛ ᴀᴅᴅᴏɴs..**"
+inline_1: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**ᴍᴇɴᴜ ʙᴀɴᴛᴜᴀɴ ᴅᴀʀɪᴘᴀᴅᴀ {}.\n\nPʟᴜɢɪɴs ~ {}**"
+inline_2: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**ᴍᴇɴᴜ ʙᴀɴᴛᴜᴀɴ ᴅᴀʀɪᴘᴀᴅᴀ {}.\n\nAᴅᴅᴏɴs ~ {}**"
+inline_3: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**ᴍᴇɴᴜ ʙᴀɴᴛᴜᴀɴ ᴅᴀʀɪᴘᴀᴅᴀ {}.\n\nAᴅᴅᴏɴs ~ {}\n\nBuat **`.setdb ADDONS True`** ᴅᴀɴ ʀᴇsᴛᴀʀᴛ ᴜɴᴛᴜᴋ ᴍᴇɴᴅᴀᴘᴀᴛ ᴀᴅᴅᴏɴs..**"
 inline_4: "** Bᴏᴛ {}\n\nᴍᴇɴᴜ ᴜᴛᴀᴍᴀ\n\nPʟᴜɢɪɴs ~ {}\nAᴅᴅᴏɴs ~ {}\nᴊᴜᴍʟᴀʜ ᴘᴇʀɪɴᴛᴀʜ ~ {}**"
 inline_5: "**Mᴇɴᴜ ᴛᴇʟᴀʜ ᴅɪᴛᴜᴛᴜᴘ**"
 inline_6: "**Menu Bantuan Voice Chat untuk {}**\n**Perintah yang ada:** `{}`\n\nOWNER Assistant"

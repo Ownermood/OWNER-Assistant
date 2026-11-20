@@ -17,7 +17,7 @@ Pura step-by-step guide: **[SETUP.md](./SETUP.md)** (Docker / VPS / Termux / Her
 **Sabse aasaan (VPS + Docker):**
 
 ```bash
-git clone https://github.com/Ownermood/Ultroid && cd Ultroid
+git clone https://github.com/Ownermood/OWNER-Assistant && cd OWNER-Assistant
 ```
 
 ```bash
