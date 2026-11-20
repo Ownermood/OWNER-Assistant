@@ -29,18 +29,13 @@ from pyUltroid.fns.tools import (
 )
 
 from . import *
-from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, assistant_buttons, brand_url
 from . import _ult_cache
 
-SUP_BUTTONS = [
-    [
-        Button.url("• Repo •", url=REPO_URL),
-    ],
-]
 
 ofox = "https://graph.org/file/231f0049fcd722824f13b.jpg"
 gugirl = "https://graph.org/file/0df54ae4541abca96aa11.jpg"
-ultpic = "https://graph.org/file/4136aa1650bc9d4109cc5.jpg"
+ultpic = brand_url("avatar")
 
 apis = [
     "QUl6YVN5QXlEQnNZM1dSdEI1WVBDNmFCX3c4SkF5NlpkWE5jNkZV",
@@ -167,10 +162,10 @@ async def repo(e):
             description="Userbot | Telethon",
             thumb=wb(ultpic, 0, "image/jpeg", []),
             text=f"• **{BOT_NAME_CAPS}** •",
-            buttons=SUP_BUTTONS,
+            buttons=assistant_buttons(),
         ),
     ]
-    await e.answer(res, switch_pm=f"{BOT_NAME} Repo.", switch_pm_param="start")
+    await e.answer(res, switch_pm=f"{BOT_NAME}", switch_pm_param="start")
 
 
 @in_pattern("go", owner=True)
@@ -554,7 +549,6 @@ async def inline_tl(ult):
                 await ult.builder.article(
                     title="How to Use?",
                     description="Tl Searcher",
-                    url=REPO_URL,
                     text=text,
                 )
             ],
@@ -577,7 +571,6 @@ async def inline_tl(ult):
                 await ult.builder.article(
                     title=key.__name__,
                     description=tyyp,
-                    url=REPO_URL,
                     text=text[:4000],
                 )
             )

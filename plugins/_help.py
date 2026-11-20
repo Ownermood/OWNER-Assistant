@@ -16,24 +16,26 @@ from pyUltroid.dB._core import HELP, LIST
 from pyUltroid.fns.tools import cmd_regex_replace
 
 from . import HNDLR, LOGS, OWNER_NAME, asst, get_string, inline_pic, udB, ultroid_cmd
-from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES
 
 _main_help_menu = [
     [
-        Button.inline(get_string("help_4"), data="uh_Official_"),
-        Button.inline(get_string("help_5"), data="uh_Addons_"),
+        Button.inline(get_string("help_4"), data="uh_Official_", style="primary"),
+        Button.inline(get_string("help_5"), data="uh_Addons_", style="primary"),
     ],
     [
         Button.inline(get_string("help_6"), data="uh_VCBot_"),
         Button.inline(get_string("help_7"), data="inlone"),
     ],
     [
-        Button.inline(get_string("help_8"), data="ownr"),
+        Button.inline(get_string("help_8"), data="ownr", style="success"),
         Button.url(
-            get_string("help_9"), url=f"https://t.me/{asst.me.username}?start=set"
+            get_string("help_9"),
+            url=f"https://t.me/{asst.me.username}?start=set",
+            style="success",
         ),
     ],
-    [Button.inline(get_string("help_10"), data="close")],
+    [Button.inline(get_string("help_10"), data="close", style="danger")],
 ]
 
 
@@ -124,7 +126,7 @@ async def _help(ult):
                     len(HELP["Addons"] if "Addons" in HELP else []),
                     cmd,
                 ),
-                file=inline_pic(),
+                file=inline_pic(local=True),
                 buttons=_main_help_menu,
             )
         except BotResponseTimeoutError:

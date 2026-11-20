@@ -41,7 +41,8 @@ file before changing anything.
 | Path | What |
 |---|---|
 | `pyUltroid/` | Core (package name kept on purpose, see "Don't") |
-| `pyUltroid/branding.py` | Bot name, repo link, banner images — change branding here |
+| `pyUltroid/branding.py` | Bot name, banners (`brand_file()` local / `brand_url()` web), `assistant_buttons()` — change branding here |
+| `pyUltroid/fns/pemoji.py` + `plugins/pemoji.py` | Premium (custom) emoji: saved map + auto-upgrade of every sent/edited message |
 | `pyUltroid/configs.py` | Env config; empty values are tolerated |
 | `pyUltroid/fns/ai.py` | Shared AI client (Gemini/OpenAI/Claude/DeepSeek): streaming, retries, retired-model fallback |
 | `pyUltroid/fns/helper.py` | Helpers incl. `KEEP_SAFE`, `call_back`, `mask_secret`, `read_text_file` |
@@ -52,7 +53,7 @@ file before changing anything.
 | `addons/` | Extra plugins bundled in this repo (53), incl. `addons/love.py` |
 | `telethonpatch/` | Vendored Telethon-Patch (GPLv3), fixed for Telethon 1.46 |
 | `strings/strings/*.yml` | All texts/help (25 languages; `en.yml` is the source) |
-| `resources/extras/owner_assistant_*.jpg` | Banners + avatar |
+| `resources/extras/owner_assistant_*.jpg` | Banners (1,2,3, alive, help, start, deploy, pm), avatar, thumb. Re-create with `dev/make_banners.py` |
 | `dev/` | Checks + boot test (see below) |
 | `SETUP.md`, `OWNER_GUIDE.md` | Owner-facing docs (Hinglish) |
 
@@ -66,11 +67,11 @@ python3 -m venv /tmp/venv && /tmp/venv/bin/pip install -q -r requirements.txt py
 bash dev/check_all.sh /tmp/venv/bin/python
 ```
 
-`dev/check_all.sh` runs: compile (SyntaxWarning = error), undefined names
+`dev/check_all.sh` copies only **git-tracked** files (`git add` new files first!) and runs: compile (SyntaxWarning = error), undefined names
 across star-imports, relative imports, Telethon names exist in the installed
 Telethon, command regex clashes, and a **boot test** that starts the real bot
 with a fake Telegram client and loads every plugin. Healthy output today:
-`commands registered: 367 | help sections: {'Official': 77, 'Addons': 53}`
+`commands registered: 369 | help sections: {'Official': 78, 'Addons': 53}`
 and no errors except "No DB requirement fullfilled" and network (graph.org)
 errors. For behaviour (animations, BotFather flow, SangMata, AI) earlier
 sessions wrote small fake-object tests — do the same for anything you change.
@@ -106,6 +107,19 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   `ytdl_opts()` in `pyUltroid/fns/ytdl.py`. `deno` + `yt-dlp[default]` are
   installed, and `startup` upgrades yt-dlp on each boot.
 - Secrets shown in chat are masked (`mask_secret`) in `.setdb` / `.get`.
+- **Repo link is never shown** in the bot (owner asked "repo expose nah"):
+  no Repo/Support buttons; `assistant_buttons()` (opens the assistant bot) replaced them.
+  `REPO_URL` stays only for internal use (raw image URLs, updater). README keeps
+  the AGPL credits.
+- Send pictures with `brand_file(name)` (local file, survives a private repo);
+  use `brand_url(name)` only where Telegram needs a URL (inline thumbs/InputWebDocument).
+- Premium emoji: `pe.install(client)` wraps `client._parse_message_text`, so every
+  send/edit gets `MessageEntityCustomEmoji` for emojis saved in DB `PREMIUM_EMOJI`
+  ({emoji: document_id}). Userbot: only if `me.premium` and not `PREMIUM_EMOJI_OFF`.
+  Assistant bot: only if `PREMIUM_EMOJI_BOT` (Telegram may refuse custom emoji for
+  bots without a Fragment username / Premium owner — unverified). Never hard-code
+  emoji IDs we haven't seen; the owner saves them with `.pemoji` / `.pemoji pack`.
+- Buttons use colours (`style="primary|success|danger"`) in help/start/settings.
 
 ## What's already done (PRs #1–#20 on `main`)
 
@@ -116,7 +130,12 @@ FloodWait-safe BotFather autobot; log group not recreated on restart; AI
 rewrite; secret masking; `.clone` avatar types; SangMata `.sg` by id;
 full rebrand to OWNER Assistant + `.botpic`; love animations
 (`.propose .love .rose .hearts .lovecalc`, English, flirty, long, flood-safe);
-`.carbon/.paste/.open/.ncode` safe on binary files.
+`.carbon/.paste/.open/.ncode` safe on binary files; `.wspr` fixes (#24–#26).
+Full A–Z rebrand pass (#27): repo/support links removed everywhere (25 languages,
+incl. translated "Ultroid" words), new banners (alive/help/start/deploy/pm) +
+upload thumbnail, log-channel photo replaced once (`OA_LOGPIC`), old Ultroid
+images deleted, `.ultroid` → `.intro`, file names (logs/zip/updates) renamed,
+premium emoji system (`.pemoji`), coloured buttons.
 
 ## Roadmap the owner agreed to (not started)
 
@@ -136,12 +155,11 @@ Order suggested to them: **A → B → C → D**.
   `.panic`, `.security` report, `.privacy strict`, `.autologout`, scam-link
   guard, login-code-leak guard, `.backup`); Group-Help-style `/` commands on the
   assistant bot (captcha, rules, report, staff, anti-link/forward/raid, warn
-  limits, purge, slowmode, approve); remaining "Ultroid" bits (`.ultroid`
-  command name, `ultroid.log` file name); `.hack/.kill/.type` flood-safety;
+  limits, purge, slowmode, approve); `.hack/.kill/.type` flood-safety;
   non-blocking `requests` calls in youtube/imagetools/imdb/tools.
 
 Open questions to the owner: links to their other bots; do they have
-Telegram Premium; help language (Hinglish or English); group commands with
+Telegram Premium (needed for `.pemoji`); help language (Hinglish or English); group commands with
 `/` (assistant bot, admins can use) or `.` (owner only).
 
 ## Never do

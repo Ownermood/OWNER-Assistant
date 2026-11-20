@@ -74,6 +74,11 @@ if isinstance(udB.get_key("PMPERMIT"), (int, str)):
 keym = KeyManager("PMPERMIT", cast=list)
 Logm = KeyManager("LOGUSERS", cast=list)
 PMPIC = udB.get_key("PMPIC")
+PMPIC_FILE = PMPIC
+if PMPIC is None:  # default OWNER Assistant banner (.setdb PMPIC False = no picture)
+    from pyUltroid.branding import brand_file, brand_url
+
+    PMPIC, PMPIC_FILE = brand_url("pm"), brand_file("pm")
 LOG_CHANNEL = udB.get_key("LOG_CHANNEL")
 UND = get_string("pmperm_1")
 UNS = get_string("pmperm_2")
@@ -281,7 +286,7 @@ if udB.get_key("PMSETTING"):
                     elif PMPIC:
                         _to_delete[user.id] = await ultroid_bot.send_file(
                             user.id,
-                            PMPIC,
+                            PMPIC_FILE,
                             caption=message_,
                         )
                     else:
@@ -316,7 +321,7 @@ if udB.get_key("PMSETTING"):
                     elif PMPIC:
                         _to_delete[user.id] = await ultroid_bot.send_file(
                             user.id,
-                            PMPIC,
+                            PMPIC_FILE,
                             caption=message_,
                         )
                     else:
@@ -351,7 +356,7 @@ if udB.get_key("PMSETTING"):
                 elif PMPIC:
                     _to_delete[user.id] = await ultroid_bot.send_file(
                         user.id,
-                        PMPIC,
+                        PMPIC_FILE,
                         caption=message_,
                     )
                 else:

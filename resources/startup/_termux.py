@@ -180,17 +180,15 @@ clear()
 
 print(
     f"""
-{Fore.BLACK}{Back.WHITE} _____________ 
- ▄▄   ▄▄ ▄▄▄     ▄▄▄▄▄▄▄ ▄▄▄▄▄▄   ▄▄▄▄▄▄▄ ▄▄▄ ▄▄▄▄▄▄  
-█  █ █  █   █   █       █   ▄  █ █       █   █      █ 
-█  █ █  █   █   █▄     ▄█  █ █ █ █   ▄   █   █  ▄    █
-█  █▄█  █   █     █   █ █   █▄▄█▄█  █ █  █   █ █ █   █
-█       █   █▄▄▄  █   █ █    ▄▄  █  █▄█  █   █ █▄█   █
-█       █       █ █   █ █   █  █ █       █   █       █
-█▄▄▄▄▄▄▄█▄▄▄▄▄▄▄█ █▄▄▄█ █▄▄▄█  █▄█▄▄▄▄▄▄▄█▄▄▄█▄▄▄▄▄▄█ 
+{Fore.MAGENTA}  ___  __        __ _   _  _____  ____
+ / _ \\ \\ \\      / /| \\ | || ____||  _ \\
+| | | | \\ \\ /\\ / / |  \\| ||  _|  | |_) |
+| |_| |  \\ V  V /  | |\\  || |___ |  _ <
+ \\___/    \\_/\\_/   |_| \\_||_____||_| \\_\\
+          A S S I S T A N T
 {Style.RESET_ALL}
-{Fore.GREEN}- ULTROID Termux Installation -
-  The Main Aim of this script is to deploy Ultroid with basic requirements and save your phone resources.
+{Fore.GREEN}- OWNER Assistant Termux Installation -
+  The Main Aim of this script is to deploy OWNER Assistant with basic requirements and save your phone resources.
 {Fore.RESET}
 
 {COPYRIGHT}

@@ -32,7 +32,7 @@ from . import (
     start_time,
     udB,
 )
-from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, assistant_buttons
 from ._help import _main_help_menu
 
 # ================================================#
@@ -49,11 +49,6 @@ upage = 0
 
 # --------------------BUTTONS--------------------#
 
-SUP_BUTTONS = [
-    [
-        Button.url("• Repo •", url=REPO_URL),
-    ],
-]
 
 # --------------------BUTTONS--------------------#
 
@@ -70,7 +65,7 @@ async def inline_alive(o):
             type="photo",
             text=MSG,
             include_media=True,
-            buttons=SUP_BUTTONS,
+            buttons=assistant_buttons(),
             title=BOT_NAME,
             description="Personal Telegram Assistant",
             url=TLINK,
@@ -100,7 +95,7 @@ async def inline_handler(event):
     )
     if inline_pic():
         result = await event.builder.photo(
-            file=inline_pic(),
+            file=inline_pic(local=True),
             link_preview=False,
             text=text,
             buttons=_main_help_menu,
@@ -242,17 +237,17 @@ async def _(event):
     changelog_str = changelog + "\n\n" + get_string("inline_8")
     if len(changelog_str) > 1024:
         await event.edit(get_string("upd_4"))
-        with open("ultroid_updates.txt", "w+") as file:
+        with open("updates.txt", "w+") as file:
             file.write(tl_chnglog)
         await event.edit(
             get_string("upd_5"),
-            file="ultroid_updates.txt",
+            file="updates.txt",
             buttons=[
                 [Button.inline("• Uᴘᴅᴀᴛᴇ Nᴏᴡ •", data="updatenow")],
                 [Button.inline("« Bᴀᴄᴋ", data="ownr")],
             ],
         )
-        remove("ultroid_updates.txt")
+        remove("updates.txt")
     else:
         await event.edit(
             changelog_str,

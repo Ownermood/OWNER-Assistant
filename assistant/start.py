@@ -18,7 +18,7 @@ from pyUltroid.fns.helper import inline_mention
 from strings import get_string
 
 from . import *
-from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, brand_file
 
 Owner_info_msg = udB.get_key("BOT_INFO_START")
 custom_info = True
@@ -30,7 +30,7 @@ if Owner_info_msg is None:
 
 **Message Forwards** - {udB.get_key("PMBOT")}
 
-**{BOT_NAME} [v{ultroid_version}]({REPO_URL})**
+**{BOT_NAME} v{ultroid_version}**
 """
 
 
@@ -47,16 +47,16 @@ _settings = [
         Button.inline("Features", data="cbs_otvars"),
         Button.inline("VC Song Bot", data="cbs_vcb"),
     ],
-    [Button.inline("« Back", data="mainmenu")],
+    [Button.inline("« Back", data="mainmenu", style="danger")],
 ]
 
 _start = [
     [
         Button.inline("Language 🌐", data="lang"),
-        Button.inline("Settings ⚙️", data="setter"),
+        Button.inline("Settings ⚙️", data="setter", style="primary"),
     ],
     [
-        Button.inline("Sᴛᴀᴛs ✨", data="stat"),
+        Button.inline("Sᴛᴀᴛs ✨", data="stat", style="success"),
         Button.inline("Bʀᴏᴀᴅᴄᴀsᴛ 📻", data="bcast"),
     ],
     [Button.inline("TɪᴍᴇZᴏɴᴇ 🌎", data="tz")],
@@ -83,6 +83,13 @@ async def closet(lol):
         await lol.delete()
     except MessageDeleteForbiddenError:
         await lol.answer("MESSAGE_TOO_OLD", alert=True)
+
+
+def _start_media():
+    media = udB.get_key("STARTMEDIA")
+    if media is None:
+        return brand_file("start")
+    return media or None
 
 
 @asst_cmd(pattern="start( (.*)|$)", forwards=False, func=lambda x: not x.is_group)
@@ -115,16 +122,16 @@ async def ultroid(event):
                 ok = "You can contact my master using this bot!!\n\nSend your Message, I will Deliver it To Master."
             await event.reply(
                 f"Hey there {mention}, this is {BOT_NAME} of {me}!\n\n{ok}",
-                file=udB.get_key("STARTMEDIA"),
-                buttons=[Button.inline("Info.", data="ownerinfo")]
+                file=_start_media(),
+                buttons=[Button.inline("Info.", data="ownerinfo", style="primary")]
                 if Owner_info_msg
                 else None,
             )
         else:
             await event.reply(
                 udB.get_key("STARTMSG").format(me=me, mention=mention),
-                file=udB.get_key("STARTMEDIA"),
-                buttons=[Button.inline("Info.", data="ownerinfo")]
+                file=_start_media(),
+                buttons=[Button.inline("Info.", data="ownerinfo", style="primary")]
                 if Owner_info_msg
                 else None,
             )

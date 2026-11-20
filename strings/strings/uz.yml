@@ -116,8 +116,8 @@ autopic_4: "AUTOPIC ishlatilmadi !!"
 autopic_5: "AUTOPIC to'xtatildi!"
 
 # mos ravishda
-inline_1: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**Hᴇʟᴘ Mᴇɴᴜ Og {}.\n\nPʟᴜɢɪɪɴs ~"
-inline_2: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**Hᴇʟᴘ Mᴇɴᴜ Og {}.\n\nAᴅᴅᴏɴs ~ {}**ɴs"
+inline_1: "**Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ**\n\n**Hᴇʟᴘ Mᴇɴᴜ Og {}.\n\nPʟᴜɢɪɪɴs ~"
+inline_2: "**Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ**\n\n**Hᴇʟᴘ Mᴇɴᴜ Og {}.\n\nAᴅᴅᴏɴs ~ {}**ɴs"
 inline_3: "[Uʟᴛʀᴏ_ULDODUPRANK) \ N \ N \ {\ NAYS ~ n \ Naᴅᴅᴏɴs ~ \ nd \ ndᴏ ** \ ndᴏ  ɢᴇᴛ ᴀᴅᴅᴏɴs.**"
 inline_4: "** Bᴏᴛ Og {}\n\nMᴀɪɴ Mᴇɴᴜ\n\nPʟᴜɢɪɴs ~ {}\nAᴅᴅᴏɴs ~ {}\nTᴏᴛᴀʟ Cᴏᴛᴀʟ Cᴏᴍɴs ~}ᴏᴍ"
 inline_5: "**Mᴇɴᴜ Hᴀs Bᴇᴇɴ Cʟᴏsᴇᴅ**"
@@ -177,7 +177,7 @@ bd_8: "`O'chirish...`"
 bd_9: "Kanal allaqachon ma'lumotlar bazasidan o'chirilgan."
 
 # kalkulyator
-calc_1: "• Ultraroid Inline Kalkulyator •"
+calc_1: "• OWNER Assistant Inline Kalkulyator •"
 calc_2: "Kalkulyatorni yana oching"
 
 # kanalni buzish
@@ -565,7 +565,7 @@ help_instagram: "-\n\n• {i} Instadl <Instagram url> `\n  Instagram Media ... `
 help_fakeaction: "-\n\n• {i} ftaping <vaqt / sek-da> `'\n    'Joriy suhbatda soxta yozishni ko'rsating.'\n\n• {i} Facyo <vaqt / sek-da>\n    'Joriy suhbatda soxta yozish harakatlarini ko'rsating.'\n\n• {i} fkideo <vaqt / sek-da>\n    'Joriy suhbatda soxta video harakatlarini ko'rsating', -\n\n• {i} fgame <vaqt / sek-da> `\n    'Joriy suhbatda soxta o'yin o'ynashni ko'rsating.'\n\n• {i} fsticker <vaqt / sek-da>\n    'Joriy suhbatda soxta stikerni tanlang'.\n\n• {i} bo'shashish <vaqt / sek-da>\n    'Joriy suhbatda soxta joylashish harakatlarini ko'rsating.'\n\n• {i} fcontact <vaqt / sekis> `` '\n    'Joriy suhbatda soxta aloqalarni tanlang'.\n\n• {i} aşınma <vaqt / sekis> `'\n    'Joriy suhbatda soxta video xabarlar harakatlarini ko'rsating.\n\n• {i} ffoto <vaqt / sek-da> `\n    'Joriy suhbatda soxta fotosuratni ko'rsating', - deb\n\n• {i} fdokument <vaqt / sek-da>\n    'Joriy suhbatda soxta yuborish hujjatini ko'rsating', -"
 help_converter: "-\n\n• {i} ceterver <gif / img / stiker / veb-> `'\n    Uni GIF / Image / veb-sayt / normal stikerga aylantirish uchun OAVga javob bering.\n\n• {i} doc <FileneMeemext>\n    Matn MSG-ga javob bering faylda saqlang.\n\n• {i} ochilgan\n    Matnni ochish uchun faylga javob bering.\n\n• {i} 0 kengayish bilan <fayl nomini o'zgartiring\n    Faylni qayta nomlang\n\n• {i} eskiz <Rasm / Thumbnail Fayl> `'ga javob bering\n    Faylingizni shaxsiy eskizingiz bilan yuklang."
 help_autoban: "• {i} Autokick <on / Off>\n    yoqish - yoqish.\n    o'chirish - o'chirish.\n    Guruhdan avtomatik ravishda yangi foydalanuvchilar boshlanadi.\n\n• {i} cban '\n    AutoBanning ishlatilgan chatda kanal sifatida yuborilishini yoqish / o'chirish.\n\n• {i} addwl <foydalanuvchi nomi> `\n   Kanal kanaliga kanal qo'shing.\n\n• {i} repwl <foydalanuvchi nomi> `'\n   Kanalban oqellik kanalidan kanalni olib tashlang.\n\n• {i} №} Ro'yxatwl ': Barcha oqelistlar kanallarini sanab bering."
-help_button: "-\n\n• «{i} tugmasini bosing <tugmachasini bosing\n   Siz rasmga ham javob berishingiz mumkin\n\nFormat: - {i} tugmasi Hey u erda!@UseLtridid 😎.\n[OWNER Assistant |T.Me/TuOWNER Assistant SOCSUPport |T.Me/sutidsupportchatchat |bir xil]\n[Menycrido |t.me/teamtroid] `'"
+help_button: " -\n\n• `{i}button <text with button format>`\n   Create a message with buttons. You can reply to a picture too.\n\nFormat:- `{i}button Hey There! 😎\n[Google | https://google.com][YouTube | https://youtube.com | same]\n[Instagram | https://instagram.com]`\n"
 help_videotools: "-\n\n• {i} namunalari <sekundlardagi davomiyligi> `'\n   Videoning qisqa namunasini yaratadi ..\n\n• {i} vshototlar <kadrlar soni> `'\n   Videoning skrinshotini yaratadi ..\n\n• {i} VTRIM <START Vaqt, - <oxirgi vaqt> soniyada\n    Uzoq vaqt davomida videoni ekinzor .."
 help_words: "-\n\n• {i} ma'nosi <Word> `\n    So'zning ma'nosini oling.\n\n• {i} sinonimi <Word> `\n    Barcha sinonimlarni oling.\n\n• {i é} Anymon <Word> `\n    Barcha antonimlarni oling.\n\n• {i} UD <Word> `\n    Urbancancadan so'zni rad etish."
 help_core: "-\n\n• {i} <plaginga javob bering\n    Plaginni o'rnatish uchun,\n  `{i} o'rnatish f`\n    Majburlash uchun.\n\n• {i} o'chirish <plagin nomi> `'\n    Tushirish va plaginni olib tashlash.\n\n• {i} yuklang <plagin nomi> `'\n    Yuklab olingan norasmiy plaginni yuklash uchun.\n\n• {i} Yuklash <plagin nomi> `'\n    Norasmiy plaginni tushirish.\n\n• {i} yordami <plagin nomi> `'\n    Har bir plagin uchun sizga yordam menyusini ko'rsatadi.\n\n• {i} getaddondonlar <kod> `lov\n    Ushbu xom havolani yuklash plaginlarini yuklang."
