@@ -208,13 +208,13 @@ async def _botfather_reply(conv, text):
 
 async def _create_assistant_bot(client):
     who = client.me
-    name = f"{who.first_name}'s Bot"[:64]
+    name = "OWNER Assistant"
     usernames = []
     if who.username:
         usernames.append(f"{who.username}_bot"[:32])
     uid = str(who.id)
-    usernames.append(f"ultroid_{uid[-6:]}_bot")
-    usernames += [f"ultroid_{uid[-5:]}{randint(10, 999)}_bot" for _ in range(3)]
+    usernames.append(f"owner_assistant_{uid[-6:]}_bot")
+    usernames += [f"owner_asst_{uid[-5:]}{randint(10, 999)}_bot" for _ in range(3)]
 
     bf = "BotFather"
     await client(UnblockRequest(bf))

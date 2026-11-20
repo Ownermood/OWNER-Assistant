@@ -7,3 +7,6 @@ venv/
 **/__pycache__/
 resources/auth/
 addons/.installed
+
+# OWNER Manager session store
+data/
