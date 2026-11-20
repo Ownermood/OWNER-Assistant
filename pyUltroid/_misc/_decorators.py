@@ -37,6 +37,8 @@ from telethon.utils import get_display_name
 from pyUltroid.exceptions import DependencyMissingError
 from strings import get_string
 
+from ..fns.funcmds import is_fun_command
+
 from .. import *
 from .. import _ignore_eval
 from ..dB import DEVLIST
@@ -82,6 +84,17 @@ def fun_public():
         return False
 
 
+_CMD_NAME = re.compile(r"[a-zA-Z0-9_]+")
+
+
+def cmd_name(pattern):
+    """'propose( (.*)|$)' -> 'propose'"""
+    if not pattern:
+        return ""
+    m = _CMD_NAME.match(str(pattern))
+    return m.group(0).lower() if m else ""
+
+
 def fun_users():
     """User ids allowed to run fun=True commands (set by .funuser)."""
     data = udB.get_key("FUN_USERS")
@@ -98,6 +111,7 @@ def ultroid_cmd(
     only_devs = kwargs.get("only_devs", False)
     func = kwargs.get("func", lambda e: not e.via_bot_id)
     fun = kwargs.get("fun", False)
+    _name = cmd_name(pattern)
 
     def decor(dec):
         async def wrapp(ult):
@@ -122,7 +136,11 @@ def ultroid_cmd(
                 if ult.sender_id not in owner_and_sudos():
                     # Allow a whitelisted "fun user" to run ONLY fun=True
                     # commands (e.g. love animations). Nothing else.
-                    if not (fun and (fun_public() or ult.sender_id in fun_users())):
+                    _open = fun_public()
+                    if not (
+                        (fun and (_open or ult.sender_id in fun_users()))
+                        or (_open and is_fun_command(_name))
+                    ):
                         return
                 elif ult.sender_id in _ignore_eval:
                     return await eod(
