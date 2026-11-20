@@ -18,12 +18,70 @@
 
 • `{i}ytsv <(youtube) search query>`
    Search and download video from youtube.
+
+• `{i}ytcookies <reply to cookies.txt>`
+   Fix "Sign in to confirm you're not a bot". Export YouTube cookies
+   (cookies.txt, Netscape format) from a browser logged in to a spare
+   Google account, send the file, reply to it with this command.
+   `{i}ytcookies` = status · `{i}ytcookies del` = remove.
 """
 import asyncio
+import os
 
-from pyUltroid.fns.ytdl import download_yt, get_yt_link
+from pyUltroid.fns.helper import read_text_file
+from pyUltroid.fns.ytdl import YT_COOKIE_FILE, download_yt, get_yt_link
 
-from . import get_string, requests, ultroid_cmd
+from . import get_string, requests, udB, ultroid_cmd
+
+
+def _clear_cookie_file():
+    try:
+        os.remove(YT_COOKIE_FILE)
+    except OSError:
+        pass
+
+
+@ultroid_cmd(pattern="ytcookies( (.*)|$)")
+async def yt_cookies(event):
+    arg = event.pattern_match.group(1).strip().lower()
+    if arg in ("del", "delete", "remove", "off"):
+        udB.del_key("YT_COOKIES")
+        _clear_cookie_file()
+        return await event.eor("`YouTube cookies removed.`", time=5)
+    reply = await event.get_reply_message()
+    if not (reply and reply.file):
+        status = "saved ✅" if udB.get_key("YT_COOKIES") else "not set ❌"
+        return await event.eor(
+            f"**YouTube cookies:** {status}\n\n"
+            "Reply to a `cookies.txt` file with `.ytcookies` to save them.\n"
+            "`.ytcookies del` removes them. Help: `.help youtube`"
+        )
+    if (reply.file.size or 0) > 1024 * 1024:
+        return await event.eor("`File too big — send only the YouTube cookies.txt.`", time=8)
+    msg = await event.eor("`Checking cookies...`")
+    path = await reply.download_media("resources/downloads/")
+    text = read_text_file(path) if path else None
+    if path and os.path.exists(path):
+        os.remove(path)
+    lines = [l for l in (text or "").splitlines() if l.strip() and not l.startswith("#")]
+    good = [l for l in lines if l.count("\t") >= 6 and ("youtube.com" in l or "google.com" in l)]
+    if not good:
+        return await msg.edit(
+            "`This is not a YouTube cookies.txt (Netscape format).`\n"
+            "Export it from youtube.com with a cookies.txt extension."
+        )
+    if not text.lstrip().startswith("# "):
+        text = "# Netscape HTTP Cookie File\n" + text
+    udB.set_key("YT_COOKIES", text)
+    _clear_cookie_file()
+    try:
+        await reply.delete()
+    except Exception:
+        pass
+    await msg.edit(
+        f"`YouTube cookies saved ✅ ({len(good)} cookies).`\n"
+        "The cookies file was deleted from this chat for safety. Try `.ytsa` again."
+    )
 
 
 @ultroid_cmd(

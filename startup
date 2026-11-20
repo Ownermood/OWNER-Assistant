@@ -15,4 +15,6 @@ echo "
         A S S I S T A N T
 "
 if [ -f .env ] ; then set -o allexport; source <(tr -d '\r' < .env | sed -e '/^\s*#/d;/^\s*$/d'); set +o allexport ; fi
+# YouTube changes often: keep the downloader fresh (skipped quietly if offline)
+timeout 120 python3 -m pip install -q -U "yt-dlp[default]" >/dev/null 2>&1 || true
 if [ $SESSION1 ] ; then python3 multi_client.py ; else python3 -m pyUltroid ; fi

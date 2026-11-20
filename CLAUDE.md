@@ -101,6 +101,10 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
 - AI defaults: `gemini-flash-latest`, `claude-opus-5-5`, `gpt-5-mini`,
   `deepseek-chat`; on 404 "model retired" the provider's suggested model is
   used once; 429/5xx are retried once.
+- YouTube on the VPS needs cookies ("not a bot" check): `.ytcookies` saves a
+  cookies.txt in the DB (`YT_COOKIES`); every yt-dlp call goes through
+  `ytdl_opts()` in `pyUltroid/fns/ytdl.py`. `deno` + `yt-dlp[default]` are
+  installed, and `startup` upgrades yt-dlp on each boot.
 - Secrets shown in chat are masked (`mask_secret`) in `.setdb` / `.get`.
 
 ## What's already done (PRs #1–#20 on `main`)
