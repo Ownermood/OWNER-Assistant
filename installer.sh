@@ -7,7 +7,7 @@
 # Options: --dir=PATH  --branch=NAME  --env-file=FILE  --no-root
 # Env:     REPO (git url to clone, default: your fork)
 
-REPO="${REPO:-https://github.com/Ownermood/Ultroid.git}"
+REPO="${REPO:-https://github.com/Ownermood/OWNER-Assistant.git}"
 BRANCH="${BRANCH:-main}"
 CURRENT_DIR="$(pwd)"
 ENV_FILE_PATH=".env"

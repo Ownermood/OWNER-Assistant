@@ -35,11 +35,11 @@ Wahi dono `.env` mein bhi daal do (bot ke liye optional hain, par apne wale safe
 Database (Redis) apne aap chalu ho jaata hai.
 
 ```bash
-git clone https://github.com/Ownermood/Ultroid
+git clone https://github.com/Ownermood/OWNER-Assistant
 ```
 
 ```bash
-cd Ultroid && cp .env.sample .env
+cd OWNER-Assistant && cp .env.sample .env
 ```
 
 `.env` kholo aur `SESSION=` bharo, phir:
@@ -55,11 +55,11 @@ Logs dekhne ke liye: `docker compose logs -f ultroid`
 ## Tarika 2: Bina Docker (VPS / PC / Termux)
 
 ```bash
-git clone https://github.com/Ownermood/Ultroid
+git clone https://github.com/Ownermood/OWNER-Assistant
 ```
 
 ```bash
-cd Ultroid && cp .env.sample .env
+cd OWNER-Assistant && cp .env.sample .env
 ```
 
 `.env` mein `SESSION=` bharo, phir:
@@ -81,7 +81,7 @@ Database na diya to data ek local file mein save hota hai. VPS/PC ke liye ye the
 [Termux](https://f-droid.org/packages/com.termux/) **F-Droid se** install karo (Play Store wala purana hai), phir:
 
 ```bash
-pkg install -y git && git clone https://github.com/Ownermood/Ultroid && cd Ultroid
+pkg install -y git && git clone https://github.com/Ownermood/OWNER-Assistant && cd OWNER-Assistant
 ```
 
 ```bash
@@ -103,7 +103,7 @@ termux-wake-lock && bash startup
 ```
 
 - Phone ki **Battery optimization** Termux ke liye band karo, warna Android bot ko band kar dega.
-- Termux band karoge / phone restart hoga to bot ruk jaayega; wapas `cd Ultroid && bash startup`.
+- Termux band karoge / phone restart hoga to bot ruk jaayega; wapas `cd OWNER-Assistant && bash startup`.
 - Kuch heavy commands (video compress, kuch image tools) phone par slow ya band ho sakte hain.
 
 ---
@@ -157,6 +157,13 @@ AI model badalna ho: `.setdb GEMINI_MODEL gemini-pro-latest` (aise hi `OPENAI_MO
 kyunki code image ke andar build hota hai):
 
 ```bash
+cd ~/OWNER-Assistant && git pull && docker compose up -d --build
+```
+
+(Pehle se `~/Ultroid` folder mein install hai to `cd ~/Ultroid` use karo, wo bhi chalega.)
+
+```bash
+# same command, purane folder ke liye
 cd ~/Ultroid && git pull && docker compose up -d --build
 ```
 

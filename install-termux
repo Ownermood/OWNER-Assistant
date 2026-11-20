@@ -6,7 +6,7 @@
 # PLease read the GNU Affero General Public License in <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 # Termux installer:  bash install-termux
-REPO="${REPO:-https://github.com/Ownermood/Ultroid}"
+REPO="${REPO:-https://github.com/Ownermood/OWNER-Assistant}"
 
 echo "Installing Termux packages (this takes a while the first time)..."
 pkg update -y && pkg upgrade -y
@@ -17,10 +17,12 @@ pkg install -y python git ffmpeg mediainfo clang make binutils \
 pkg install -y opencv-python 2>/dev/null || echo "opencv not available, a few image commands will be off."
 
 if [ ! -d "resources" ] || [ ! -d "pyUltroid" ]; then
-    if [ -d "Ultroid/pyUltroid" ]; then
+    if [ -d "OWNER-Assistant/pyUltroid" ]; then
+        cd OWNER-Assistant || exit 1
+    elif [ -d "Ultroid/pyUltroid" ]; then
         cd Ultroid || exit 1
     else
-        git clone "$REPO" Ultroid && cd Ultroid || exit 1
+        git clone "$REPO" OWNER-Assistant && cd OWNER-Assistant || exit 1
     fi
 fi
 

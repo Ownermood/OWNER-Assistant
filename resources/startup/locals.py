@@ -28,10 +28,13 @@ def start():
     print(f"{a}\n\n")
     print("Welcome to OWNER Assistant, lets start setting up!\n\n")
     print("Cloning the repository...\n\n")
-    os.system("rm -rf Ultroid")
-    os.system("git clone https://github.com/Ownermood/Ultroid")
+    folder = "OWNER-Assistant"
+    if os.path.isdir(os.path.join(folder, ".git")):
+        os.system(f"git -C {folder} pull")
+    else:
+        os.system(f"git clone https://github.com/Ownermood/OWNER-Assistant {folder}")
     print("\n\nDone")
-    os.chdir("Ultroid")
+    os.chdir(folder)
     clear_screen()
     print(a)
     print("\n\nLet's start!\n")
