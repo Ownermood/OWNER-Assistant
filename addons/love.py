@@ -34,8 +34,8 @@ from . import ultroid_cmd
 
 # Telegram limits how often one account may edit messages. Too many edits
 # in a row => FloodWait (minutes), during which *no* command can edit.
-DELAY = 2.5  # seconds between frames (private chats)
-GROUP_DELAY = 3.0  # groups are stricter
+DELAY = 3.0  # seconds between frames (private chats) ~20 edits/min
+GROUP_DELAY = 3.5  # groups are stricter
 _STATE = {"busy": False, "cooldown_until": 0.0}
 
 # Own random generator: never touch the global one other commands use.
@@ -266,6 +266,14 @@ def bar(pct, width=12):
     return "▰" * full + "▱" * (width - full)
 
 
+def typewriter(prefix, text, steps=3):
+    words = text.split()
+    return [
+        prefix + " ".join(words[: max(1, round(len(words) * i / steps))])
+        for i in range(1, steps + 1)
+    ]
+
+
 def heartbeat(title, beats=2):
     """Small heart / big heart / small heart... like a real heartbeat."""
     frames = []
@@ -283,44 +291,55 @@ def heartbeat(title, beats=2):
 @ultroid_cmd(pattern="propose( (.*)|$)")
 async def propose(event):
     name = await _target_name(event)
-    msg = await _start(event, "📩")
+    msg = await _start(event, "💌")
     if not msg:
         return
-    lines = _rng.sample(LINES, 2)
+    lines = _rng.sample(LINES, 3)
     f = []
 
     # 1. intro
-    f.append(f"📩 **Incoming: a very important message...**\n\n`{bar(50)}` 50%")
+    for p in (0, 35, 70, 100):
+        f.append(f"📩 **Incoming: a very important message...**\n\n`{bar(p)}` {p}%")
+    f.append(f"🌙 {it('Somewhere between hello and right now...')}")
     f.append(f"🌙 {it('Somewhere between hello and right now...')}\n💘 **I fell for you, {name}.**")
 
     # 2. the walk-up
-    f.append(code(scene(0), "🚶 Walking up to you like it's the scariest exam of my life 😅"))
-    f.append(code(scene(6), "💓 Heart rate: 200 bpm. Totally normal."))
-    f.append(code(scene(12), "🙈 Okay... act cool, act cool..."))
+    captions = [
+        "🚶 Walking up to you like it's the scariest exam of my life 😅",
+        "🚶 Okay... act cool, act cool...",
+        "💓 Heart rate: 200 bpm. Totally normal.",
+        "🙈 Almost there...",
+    ]
+    for x, cap in zip((0, 4, 8, 12), captions):
+        f.append(code(scene(x), cap))
 
     # 3. the ring
     f.append(code(scene(13, BOY_KNEEL), "🧎 Down on one knee..."))
-    f.append(code(scene(13, BOY_KNEEL_RING, hearts=2), "💍 The tiniest box, for the biggest question"))
-    f.append(code(scene(13, BOY_KNEEL_RING, hearts=7, girl=GIRL_HAPPY), "😳 Wait... is that a smile? 🥹"))
+    f.append(code(scene(13, BOY_KNEEL_RING, hearts=1), "💍 The tiniest box, for the biggest question"))
+    f.append(code(scene(13, BOY_KNEEL_RING, hearts=4, girl=GIRL_HAPPY), "😳 Wait... is that a smile? 🥹"))
+    f.append(code(scene(13, BOY_KNEEL_RING, hearts=7, girl=GIRL_HAPPY), "💞 The air is literally full of love rn"))
 
     # 4. a rose, dot by dot (stem first)
-    for step, cap in zip(reveal(ROSE, 3, reverse=True), ["🌱 First, something for you...", "🌿 Growing...", "🌷 Blooming..."]):
+    rose_caps = ["🌱 First, something for you...", "🌿 Growing...", "🌿 Growing...", "🌷 Almost...",
+                 "🌹 Blooming...", "🌹 Roses are red..."]
+    for step, cap in zip(reveal(ROSE, 6, reverse=True), rose_caps):
         f.append(code(step, cap))
     f.append(code(ROSE, f"🌹 Roses are red, but none of them are as pretty as you, **{name}**."))
 
     # 5. the heart: drawn dot by dot, comes alive, beats
-    f.append(code(reveal(HEART, 2)[0], "✍️ Now let me draw my heart..."))
-    f.append(code(HEART, "✍️ dot... by... dot..."))
-    f.append(f"🎨 {it('Adding some colour...')}\n\n{heart_fill(6)}")
+    for step, cap in zip(reveal(HEART, 4), ["✍️ Now let me draw my heart...", "✍️ dot...", "✍️ dot... dot...", "✍️ done."]):
+        f.append(code(step, cap))
+    f.append(f"🎨 {it('Adding some colour...')}\n\n{heart_fill(5)}")
     f.append(f"❤️ {it('It only beats for you.')}\n\n{heart_fill(11)}")
-    f += heartbeat("💓 **lub-dub... lub-dub...**", beats=1)
+    f += heartbeat("💓 **lub-dub... lub-dub...**", beats=2)
 
-    # 6. two flirty lines
-    for k, line in enumerate(lines, 1):
-        f.append(f"💬 **#{k}**\n\n{line}")
+    # 6. three flirty lines, typed out
+    for i, line in enumerate(lines, 1):
+        f += typewriter(f"💬 **#{i}**\n\n", line)
 
     # 7. the question
     final_heart = emoji_art(HEART, "❤️", sparkle=6)
+    f.append(f"{final_heart}\n\n💍 **{name},**")
     f.append(f"{final_heart}\n\n💍 **{name}, will you be mine?** 💍")
     f.append(
         f"{final_heart}\n\n💍 **{name}, will you be mine?** 💍\n\n"
@@ -333,16 +352,20 @@ async def propose(event):
 @ultroid_cmd(pattern="love( (.*)|$)")
 async def love(event):
     name = await _target_name(event)
-    msg = await _start(event, "💘")
+    msg = await _start(event, "❤️")
     if not msg:
         return
-    f = [f"💘 **Loading love.exe**\n\n`{bar(60)}` 60%"]
-    for step, cap in zip(reveal(HEART, 3), ["✍️ Drawing...", "✍️ Almost...", "✍️ Done."]):
+    f = []
+    for p in (0, 40, 80, 100):
+        f.append(f"💘 **Loading love.exe**\n\n`{bar(p)}` {p}%")
+    for step, cap in zip(reveal(HEART, 5), ["✍️ Drawing...", "✍️ Drawing...", "✍️ Drawing...", "✍️ Almost...", "✍️ Done."]):
         f.append(code(step, cap))
-    f.append(f"🎨 {it('Filling it with feelings...')}\n\n{heart_fill(5, '💖')}")
+    f.append(f"🎨 {it('Filling it with feelings...')}\n\n{heart_fill(4, '💗')}")
+    f.append(f"🎨 {it('A little more...')}\n\n{heart_fill(8, '💖')}")
     f.append(f"❤️ {it('Full.')}\n\n{heart_fill(11)}")
-    f += heartbeat("💓 **lub-dub... lub-dub...**", beats=1)
+    f += heartbeat("💓 **lub-dub... lub-dub...**", beats=3)
     final_heart = emoji_art(HEART, "❤️", sparkle=6)
+    f.append(f"{final_heart}\n\n💞 **{name}** 💞")
     f.append(f"{final_heart}\n\n💞 **{name}** 💞\n{it('You have my heart. Handle with care')} ❤️")
     await play(msg, f, event=event)
 
@@ -353,10 +376,12 @@ async def rose(event):
     msg = await _start(event, "🌱")
     if not msg:
         return
-    caps = ["🌱 Planting a little seed...", "🌿 Growing...", "🌿 Leaves!", "🌷 A bud...", "🌹 Blooming..."]
-    f = []
-    for step, cap in zip(reveal(ROSE, 5, reverse=True), caps):
+    caps = ["🌱 Planting a little seed...", "🌱 Watering it with love...", "🌿 Growing...", "🌿 Growing...",
+            "🌿 Leaves!", "🌷 A bud...", "🌷 Opening...", "🌹 Blooming...", "🌹 Blooming...", "🌹 Almost..."]
+    f = [f"🌱 {it('Wait for it...')}"]
+    for step, cap in zip(reveal(ROSE, 10, reverse=True), caps):
         f.append(code(step, cap))
+    f.append(code(ROSE, f"🌹 **For you, {name}**"))
     f.append(code(ROSE, f"🌹 **For you, {name}**", it("A rose for the prettiest smile I know ❤️")))
     await play(msg, f, event=event)
 
@@ -370,10 +395,10 @@ async def hearts(event):
     drops = []
     frames = []
     pool = ["❤️", "💖", "💗", "💕", "💘", "💞"]
-    for _ in range(7):
-        drops = [(r + 2, c, h) for r, c, h in drops if r + 2 < height]
-        for _ in range(4):
-            drops.append((_rng.randrange(2), _rng.randrange(width), _rng.choice(pool)))
+    for _ in range(16):
+        drops = [(r + 1, c, h) for r, c, h in drops if r + 1 < height]
+        for _ in range(2):
+            drops.append((0, _rng.randrange(width), _rng.choice(pool)))
         grid = [["▫️"] * width for _ in range(height)]
         for r, c, h in drops:
             grid[r][c] = h
@@ -395,7 +420,7 @@ async def lovecalc(event):
         return
     head = f"💘 **Love Meter**\n\n**{a}** ➕ **{b}**\n\n"
     frames = [head + it("Scanning both hearts...")]
-    for p in (pct // 4, pct // 2, (3 * pct) // 4):
+    for p in range(0, pct + 1, max(1, pct // 8)):
         frames.append(head + f"`{bar(p)}` **{p}%**")
     if pct >= 90:
         verdict = "Made for each other 💍 When's the wedding?"
