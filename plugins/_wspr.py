@@ -158,11 +158,15 @@ async def _(e):
             )
         ],
     ]
-    us = logi.username or logi.first_name
+    if logi.username:
+        wtext = get_string("wspr_1").format(logi.username)
+    else:  # no username: show the plain name, without a wrong "@"
+        name = (logi.first_name or "someone").replace("`", "").replace("*", "").replace("_", "")
+        wtext = get_string("wspr_1").replace("@{}", "{}").format(name)
     sur = await e.builder.article(
         title=f"Whisper to {logi.first_name}",
         description=desc,
-        text=get_string("wspr_1").format(us),
+        text=wtext,
         buttons=button,
     )
     buddhhu.update({e.id: [logi.id, iuser, desc]})
