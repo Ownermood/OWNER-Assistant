@@ -47,16 +47,16 @@ _settings = [
         Button.inline("Features", data="cbs_otvars"),
         Button.inline("VC Song Bot", data="cbs_vcb"),
     ],
-    [Button.inline("« Back", data="mainmenu", style="danger")],
+    [Button.inline("« Back", data="mainmenu")],
 ]
 
 _start = [
     [
         Button.inline("Language 🌐", data="lang"),
-        Button.inline("Settings ⚙️", data="setter", style="primary"),
+        Button.inline("Settings ⚙️", data="setter"),
     ],
     [
-        Button.inline("Sᴛᴀᴛs ✨", data="stat", style="success"),
+        Button.inline("Sᴛᴀᴛs ✨", data="stat"),
         Button.inline("Bʀᴏᴀᴅᴄᴀsᴛ 📻", data="bcast"),
     ],
     [Button.inline("TɪᴍᴇZᴏɴᴇ 🌎", data="tz")],
@@ -123,7 +123,7 @@ async def ultroid(event):
             await event.reply(
                 f"Hey there {mention}, this is {BOT_NAME} of {me}!\n\n{ok}",
                 file=_start_media(),
-                buttons=[Button.inline("Info.", data="ownerinfo", style="primary")]
+                buttons=[Button.inline("Info.", data="ownerinfo")]
                 if Owner_info_msg
                 else None,
             )
@@ -131,7 +131,7 @@ async def ultroid(event):
             await event.reply(
                 udB.get_key("STARTMSG").format(me=me, mention=mention),
                 file=_start_media(),
-                buttons=[Button.inline("Info.", data="ownerinfo", style="primary")]
+                buttons=[Button.inline("Info.", data="ownerinfo")]
                 if Owner_info_msg
                 else None,
             )

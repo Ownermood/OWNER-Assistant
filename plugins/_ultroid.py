@@ -49,7 +49,7 @@ async def repify(e):
 
 @ultroid_cmd(pattern="intro$")
 async def useUltroid(rs):
-    button = Button.inline("Start >>", "initft_2", style="primary")
+    button = Button.inline("Start >>", "initft_2")
     msg = await asst.send_message(
         LOG_CHANNEL,
         ULTSTRING,

@@ -13,10 +13,7 @@ import time
 from telethon import Button, TelegramClient, errors, events
 from telethon.sessions import StringSession
 from telethon.tl.functions.channels import GetParticipantRequest
-from telethon.tl.functions.messages import GetStickerSetRequest
-from telethon.tl.types import DocumentAttributeCustomEmoji, InputStickerSetShortName
 
-from . import emoji
 
 # ----------------------------------------------------------------- config
 
@@ -204,8 +201,6 @@ if FORCE_JOIN.lower() in ("off", "false", "no", "0", "none"):
     FORCE_JOIN = ""
 FORCE_JOIN_ID = _int("FORCE_JOIN_ID", -1004443904846)
 JOIN_URL = f"https://t.me/{FORCE_JOIN.lstrip('@')}" if FORCE_JOIN.startswith("@") else FORCE_JOIN
-MAX_PACKS = 25
-PACK_RE = re.compile(r"(?:t\.me|telegram\.me)/(?:addemoji|addstickers)/(\w+)")
 
 HELP = """❓ **Help**
 
@@ -213,7 +208,7 @@ HELP = """❓ **Help**
 🚪 **Logout** – remove it, userbot stops
 ▶️ **Run** · ⏹ **Stop** · 🔄 **Restart** – control the userbot
 📜 **Logs** – see errors
-⚙️ **Settings** – premium emoji, extra vars
+⚙️ **Settings** – extra vars
 
 Commands also work: /login /logout /status /restart /logs /cancel
 `/setvar KEY value` · `/delvar KEY`
@@ -240,24 +235,15 @@ class Manager:
         self.kb_msg = None  # "share phone" keyboard message during login
         self.join_cache = {}
         self.join_problem = None
-        emoji.install(bot, self.emoji_map)
-
-    # ------------------------------------------------------------ emoji
-    def emoji_map(self):
-        if not self.store.data.get("emoji_on", True):
-            return {}
-        return self.store.data.get("emoji") or {}
 
     def btn(self, em, label, data=None, url=None):
-        """Button with a premium emoji icon when saved, else a normal emoji."""
-        icon = emoji.lookup(self.emoji_map(), em) if self.store.data.get("icons_on", True) else None
-        text = label if icon else f"{em} {label}"
+        text = f"{em} {label}"
         if url:
-            return Button.url(text, url, icon=icon)
-        return Button.inline(text, data.encode(), icon=icon)
+            return Button.url(text, url)
+        return Button.inline(text, data.encode())
 
     # ------------------------------------------------------------ the one panel
-    async def show(self, chat, text, buttons=None, event=None, _retry=True):
+    async def show(self, chat, text, buttons=None, event=None):
         """Edit the live panel (button press) or replace it (typed command / alert)."""
         try:
             if isinstance(event, events.CallbackQuery.Event):
@@ -274,13 +260,7 @@ class Manager:
             self.panels[chat] = msg.id
             if old and old != msg.id:
                 await self.drop(chat, old)
-        except errors.RPCError as er:
-            using = self.emoji_map() and (self.store.data.get("emoji_on", True))
-            if _retry and using:
-                # Telegram did not accept premium emojis from this bot: fall back.
-                self.store.data.update(emoji_on=False, icons_on=False, emoji_error=str(er)[:120])
-                self.store.save()
-                return await self.show(chat, text, buttons, event, _retry=False)
+        except errors.RPCError:
             raise
 
     async def drop(self, chat, *ids):
@@ -377,28 +357,8 @@ class Manager:
 
     async def view_settings(self, chat, event=None):
         await self.show(chat, "⚙️ **Settings**",
-                        [[self.btn("✨", "Premium emoji", "m:emoji")],
-                         [self.btn("🧩", "Extra vars", "m:vars"), self.btn("❓", "Help", "m:help")],
+                        [[self.btn("🧩", "Extra vars", "m:vars"), self.btn("❓", "Help", "m:help")],
                          [self.back()]], event)
-
-    async def view_emoji(self, chat, event=None, note=""):
-        data = self.store.data
-        mapping = data.get("emoji") or {}
-        shown = sorted({k for k in mapping if (k + "️") not in mapping})
-        on = data.get("emoji_on", True)
-        lines = ["✨ **Premium emoji**", ""]
-        if note:
-            lines += [note, ""]
-        lines.append(f"Saved: **{len(shown)}**  ·  {'✅ On' if on else '❌ Off'}")
-        if shown:
-            lines.append(" ".join(shown[:60]))
-        if data.get("emoji_error") and not on:
-            lines += ["", f"⚠️ Telegram refused premium emoji for this bot:\n`{data['emoji_error']}`"]
-        lines += ["", "**Add:** send or forward me a message with premium emojis,",
-                  "or send pack links (`t.me/addemoji/...`, up to 25)."]
-        toggle = self.btn("❌", "Turn off", "m:emoji_off") if on else self.btn("✅", "Turn on", "m:emoji_on")
-        rows = [[toggle, self.btn("🗑", "Clear", "m:emoji_clear")], [self.back("m:settings")]]
-        await self.show(chat, "\n".join(lines), rows, event)
 
     async def view_vars(self, chat, event=None, note=""):
         env = self.store.env
@@ -632,38 +592,6 @@ class Manager:
         await self.start_userbot(check=False)
         await self.view_menu(chat, note=f"✅ **Logged in as {self.account_text()}**")
 
-    # ------------------------------------------------------------ premium emoji input
-    async def save_emojis(self, event):
-        chat = event.chat_id
-        text = event.raw_text or ""
-        pairs = emoji.extract(event.message)
-        names = list(dict.fromkeys(PACK_RE.findall(text)))[:MAX_PACKS]
-        bad = []
-        for i, name in enumerate(names):
-            try:
-                res = await self.bot(GetStickerSetRequest(InputStickerSetShortName(name), hash=0))
-            except errors.FloodWaitError as fw:
-                bad.append(f"{name} (wait {fw.seconds}s)")
-                break
-            except errors.RPCError:
-                bad.append(f"{name} (not found)")
-                continue
-            got = [(a.alt.strip(), d.id) for d in res.documents for a in d.attributes
-                   if isinstance(a, DocumentAttributeCustomEmoji) and a.alt]
-            if not got:
-                bad.append(f"{name} (not an emoji pack)")
-            pairs += got
-            if i < len(names) - 1:
-                await asyncio.sleep(1)
-        data = self.store.data
-        mapping = data.setdefault("emoji", {})
-        n = emoji.add_pairs(mapping, pairs)
-        data.update(emoji_on=True, icons_on=True, emoji_error=None)
-        self.store.save()
-        note = f"✅ Saved {n} emoji(s)." + (f"\n❌ Skipped: {', '.join(bad)}" if bad else "")
-        note += "\nIf they still look normal here, Telegram doesn't allow premium emoji for this bot."
-        await self.view_emoji(chat, note=note)
-
     # ------------------------------------------------------------ wiring
     def register(self):
         bot = self.bot
@@ -684,8 +612,6 @@ class Manager:
             if self.login and not cmd:
                 return await self.login_step(event)
             await self.clean(event)
-            if not cmd and (emoji.extract(event.message) or PACK_RE.search(text)):
-                return await self.save_emojis(event)
             if cmd == "/login":
                 return await self.begin_login(chat)
             if cmd == "/logout":
@@ -697,8 +623,6 @@ class Manager:
                 return await self.view_logs(chat)
             if cmd == "/vars":
                 return await self.view_vars(chat)
-            if cmd in ("/emoji", "/pemoji"):
-                return await self.view_emoji(chat)
             if cmd == "/help":
                 return await self.show(chat, HELP, [[self.back()]])
             if cmd == "/setvar":
@@ -755,17 +679,6 @@ class Manager:
                 await self.show(chat, HELP, [[self.back("m:settings")]], event)
             elif action == "vars":
                 await self.view_vars(chat, event)
-            elif action == "emoji":
-                await self.view_emoji(chat, event)
-            elif action in ("emoji_on", "emoji_off"):
-                on = action == "emoji_on"
-                self.store.data.update(emoji_on=on, icons_on=on, emoji_error=None)
-                self.store.save()
-                await self.view_emoji(chat, event)
-            elif action == "emoji_clear":
-                self.store.data["emoji"] = {}
-                self.store.save()
-                await self.view_emoji(chat, event, note="🗑 Cleared.")
             try:
                 await event.answer(answer)
             except Exception:

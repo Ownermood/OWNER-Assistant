@@ -1156,7 +1156,9 @@ file before changing anything.
   delete owner's message + old panel, send new), no coloured buttons (owner
   asked), premium emoji via `manager/emoji.py` (text entities + button `icon=`;
   saved in `manager.json`; any RPCError while emojis are on → auto-off and
-  retry plain). Force join: `FORCE_JOIN` (default @VillanCommunity, `off` to
+  retry plain). #32: premium emoji removed from the manager (Telegram blocks
+  custom emoji for most bots) and all coloured buttons removed from the userbot
+  help/start/settings. Force join: `FORCE_JOIN` (default @VillanCommunity, `off` to
   disable) checked with `GetParticipantRequest` — fails OPEN with a warning if
   the bot isn't admin, so the owner is never locked out. Still owner-only.
 
@@ -1243,7 +1245,8 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   Assistant bot: only if `PREMIUM_EMOJI_BOT` (Telegram may refuse custom emoji for
   bots without a Fragment username / Premium owner — unverified). Never hard-code
   emoji IDs we haven't seen; the owner saves them with `.pemoji` / `.pemoji pack`.
-- Buttons use colours (`style="primary|success|danger"`) in help/start/settings.
+- Buttons are plain (no `style=` colours) everywhere — owner disliked the
+  coloured buttons (removed in #32). Keep new buttons plain.
 
 ### What's already done (PRs #1–#20 on `main`)
 
