@@ -422,9 +422,9 @@ async def ultdestroy(event):
     ult = await event.get_reply_message()
     if not (ult and ult.media and "animated" in mediainfo(ult.media)):
         return await event.eor(get_string("sts_2"))
-    await event.client.download_media(ult, "ultroid.tgs")
+    await event.client.download_media(ult, "sticker.tgs")
     xx = await event.eor(get_string("com_1"))
-    await bash("lottie_convert.py ultroid.tgs json.json")
+    await bash("lottie_convert.py sticker.tgs json.json")
     with open("json.json") as json:
         jsn = json.read()
     jsn = (
@@ -443,11 +443,11 @@ async def ultdestroy(event):
         .replace("[9]", "[110]")
     )
     open("json.json", "w").write(jsn)
-    file = await con.animated_sticker("json.json", "ultroid.tgs")
+    file = await con.animated_sticker("json.json", "sticker.tgs")
     if file:
         await event.client.send_file(
             event.chat_id,
-            file="ultroid.tgs",
+            file="sticker.tgs",
             force_document=False,
             reply_to=event.reply_to_msg_id,
         )

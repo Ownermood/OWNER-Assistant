@@ -8,7 +8,7 @@
 import re
 
 from . import *
-from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES
 
 STRINGS = {
     1: f"""🎇 **Thanks for Deploying {BOT_NAME}!**
@@ -19,17 +19,16 @@ STRINGS = {
 🧿 {BOT_NAME} is Pluggable and powerful Telethon Userbot, made in Python from Scratch. It is Aimed to Increase Security along with Addition of Other Useful Features.""",
     3: """**💡• Setup Guide •**
 
--> Everything about setup, keys and updates is in SETUP.md of your repo:
-   {REPO_URL}/blob/main/SETUP.md
+-> Everything about setup, keys and updates is in SETUP.md and OWNER_GUIDE.md (in the bot folder on your VPS).
 
-**• Updates**
-  - Your repo: {REPO_URL}""".format(REPO_URL=REPO_URL),
+**• Updates** (run on your VPS)
+  `cd ~/Ultroid && git pull && docker compose up -d --build`""",
     4: f"""• `To Know All Available Commands`
 
   - `{HNDLR}help`
   - `{HNDLR}cmds`""",
     5: f"""• **For Any Other Query or Suggestion**
-  - Open an issue on your repo: {REPO_URL}/issues
+  - Use `{HNDLR}help` or `{HNDLR}cmds` to see what every command does.
 
 • Thanks for Reaching till END.""",
 }

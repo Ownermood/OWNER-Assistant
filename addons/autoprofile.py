@@ -33,7 +33,7 @@ from . import *
 
 BIOS = [
     "Busy Today !",
-    "ULTROID USER",
+    "OWNER ASSISTANT USER",
     "Enjoying Life!",
     "Unique as Always!",
     "Sprinkling a bit of magic",

@@ -17,7 +17,7 @@ from telethon.tl.types import InputWebDocument
 from .. import LOGS, asst, udB, ultroid_bot
 from ..fns.admins import admin_check
 from . import append_or_update, owner_and_sudos
-from ..branding import BOT_NAME, BRAND_IMAGES, REPO_URL
+from ..branding import BOT_NAME, BRAND_IMAGES, assistant_buttons
 
 OWNER = ultroid_bot.full_name
 
@@ -28,11 +28,6 @@ MSG = f"""
 ➖➖➖➖➖➖➖➖➖➖
 """
 
-IN_BTTS = [
-    [
-        Button.url("Repository", url=REPO_URL),
-    ]
-]
 
 
 # decorator for assistant
@@ -95,7 +90,6 @@ def in_pattern(pattern=None, owner=False, **kwargs):
                 res = [
                     await event.builder.article(
                         title=BOT_NAME,
-                        url=REPO_URL,
                         description=f"(c) {OWNER}",
                         text=MSG,
                         thumb=InputWebDocument(
@@ -104,7 +98,7 @@ def in_pattern(pattern=None, owner=False, **kwargs):
                             "image/jpeg",
                             [],
                         ),
-                        buttons=IN_BTTS,
+                        buttons=assistant_buttons(),
                     )
                 ]
                 return await event.answer(

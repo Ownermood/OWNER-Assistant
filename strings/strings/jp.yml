@@ -120,9 +120,9 @@ autopic_4: "「AUTOPICは使用されていませんでした!!」"
 autopic_5: "「AUTOPICが停止しました！」"
 
 # inline
-inline_1: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**Hᴇʟᴘ Mᴇɴᴜ Oғ {}.\n\nPʟᴜɢɪɴs ~ {}**"
-inline_2: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**Hᴇʟᴘ Mᴇɴᴜ Oғ {}.\n\nAᴅᴅᴏɴs ~ {}**"
-inline_3: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**Hᴇʟᴘ Mᴇɴᴜ Oғ {}.\n\nAᴅᴅᴏɴs ~ {}\n\nDᴏ **`.setdb ADDONS True`** ᴀɴᴅ ʀᴇsᴛᴀʀᴛ ᴛᴏ ɢᴇᴛ ᴀᴅᴅᴏɴs.**"
+inline_1: "**Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ**\n\n**Hᴇʟᴘ Mᴇɴᴜ Oғ {}.\n\nPʟᴜɢɪɴs ~ {}**"
+inline_2: "**Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ**\n\n**Hᴇʟᴘ Mᴇɴᴜ Oғ {}.\n\nAᴅᴅᴏɴs ~ {}**"
+inline_3: "**Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ**\n\n**Hᴇʟᴘ Mᴇɴᴜ Oғ {}.\n\nAᴅᴅᴏɴs ~ {}\n\nDᴏ **`.setdb ADDONS True`** ᴀɴᴅ ʀᴇsᴛᴀʀᴛ ᴛᴏ ɢᴇᴛ ᴀᴅᴅᴏɴs.**"
 inline_4: "** Bᴏᴛ Oғ {}\n\nMᴀɪɴ Mᴇɴᴜ\n\nPʟᴜɢɪɴs ~ {}\nAᴅᴅᴏɴs ~ {}\nTᴏᴛᴀʟ Cᴏᴍᴍᴀɴᴅs ~ {}**"
 inline_5: "**Mᴇɴᴜ Hᴀs Bᴇᴇɴ Cʟᴏsᴇᴅ**"
 inline_6: "**Voice Chat Help Menu for {}**\n**Available Commands:** `{}`\n\nOWNER Assistant"
@@ -182,7 +182,7 @@ bd_8: "`削除しています... `"
 bd_9: "チャネルはすでにデータベースから削除されています。"
 
 # calculator
-calc_1: "•Ultroi​​dインライン計算機•"
+calc_1: "•OWNER Assistant•"
 calc_2: "「電卓をもう一度開く」"
 
 # channel hacks
@@ -210,7 +210,7 @@ chats_1: "`このチャットを削除できません `"
 chats_2: "`私は管理者ではありません `"
 chats_3: "＃Deleted \nDeleted {}"
 chats_4: "「あなたの[{}]（{}）グループはボスを作りました！」"
-chats_5: "「@ TeamUltroi​​dに参加」"
+chats_5: "Created with OWNER Assistant"
 chats_6: "「あなたの{}グループ/チャンネルはボスになりました！」"
 
 # clean action
@@ -291,10 +291,10 @@ sf_14: "SuperFBanが完了しました。\n合計フィード-{}。\n除外-{}�
 sf_15: "「Mass-UnFedBanを開始しています...」"
 sf_16: "SuperUnFBanが完了しました。\n合計フィード-{}。\n除外-{}。\n影響を受ける{}フィード。\n＃TB"
 sf_17: "`誰かのIDを教えてください、またはsomonesメッセージに返信して彼/彼女のfedstatを確認してください。` "
-sf_18: "「フィードのリスト{}は禁止されています。\n \nUltroi​​dを使用して収集されました。」"
+sf_18: "「フィードのリスト{}は禁止されています。\n \nOWNER Assistant。」"
 sf_19: "**エラー** \n`ブロックを解除` @ MissRose_Bot`そして再試行してください！ "
 sf_20: "`情報を抽出しています... `"
-sf_21: "\n \nUltroi​​dによって抽出されたFedInfo"
+sf_21: "\n \nOWNER Assistant"
 sf_22: "「ユーザーが指定されていません。」"
 sf_23: "**エラー** \n`ブロックを解除` @ MissRose_Bot`そして再試行してください！ "
 
@@ -326,8 +326,8 @@ ex_1: "`メッセージに返信..` "
 gdrive_1: "「 `Googleドライブで既に承認済みです` "
 gdrive_2: "[ここ]（https://console.developers.google.com/flows/enableapi?apiid=drive）にアクセスして、` GDRIVE_CLIENT_ID`と `GDRIVE_CLIENT_SECRET`を取得します\n\nGDRIVE_CLIENT_IDとGDRIVE_CLIENT_SECRETをこのように送信します。\n`GDRIVE_CLIENT_IDGDRIVE_CLIENT_SECRET`をスペースで区切って送信します。 "
 gdrive_3: "`間違ったクライアントID` "
-gdrive_4: "`問題が発生しました。`/ auth`をもう一度送信してください。\n同じことが発生した場合は、 `@ TheUltroi​​dに連絡してください。"
-gdrive_5: "`成功！\nUltroi​​dUserbotでGoogleドライブを使用する準備が整いました。` "
+gdrive_4: "`問題が発生しました。`/ auth`をもう一度送信してください。\n同じことが発生した場合は、 OWNER Assistant。"
+gdrive_5: "`成功！\nOWNER Assistant。` "
 gdrive_6: "` `{}`に移動して `` / auth.`を送信します。 "
 gdrive_7: "**ファイルをG-Driveに正常にアップロードしました: ** \n \n [{}]（{}）"
 
@@ -585,7 +585,7 @@ help_instagram: "-\n\n• `{i}instadl <Instagram Url>`\n  `Download Instagram Me
 help_fakeaction: "-\n\n• `{i}ftyping <time/in secs>`\n    `Show Fake Typing in current chat.`\n\n• `{i}faudio <time/in secs>`\n    `Show Fake Recording Action in current chat.`\n\n• `{i}fvideo <time/in secs>`\n    `Show Fake video action in current chat.`\n\n• `{i}fgame <time/in secs>`\n    `Show Fake Game Playing Action in current chat.`\n\n• `{i}fsticker <time/in secs>`\n    `Show Fake sticker choosing Action in current chat.`\n\n• `{i}flocation <time/in secs>`\n    `Show Fake location Action in current chat.`\n\n• `{i}fcontact <time/in secs>`\n    `Show Fake contact choosing Action in current chat.`\n\n• `{i}fround <time/in secs>`\n    `Show Fake video message action in current chat.`\n\n• `{i}fphoto <time/in secs>`\n    `Show Fake sending photo in current chat.`\n\n• `{i}fdocument <time/in secs>`\n    `Show Fake sending document in current chat.`"
 help_converter: "-\n\n• `{i}convert <gif/img/sticker/webm>`\n    Reply to media to convert it into gif / image / webm / normal sticker.\n\n• `{i}doc <filename.ext>`\n    Reply to a text msg to save it in a file.\n\n• `{i}open`\n    Reply to a file to reveal it's text.\n\n• `{i}rename <file name with extension>`\n    Rename the file\n\n• `{i}thumbnail <reply to image/thumbnail file>`\n    Upload Your file with your custom thumbnail."
 help_autoban: "• `{i}autokick <on/off>`\n    on - To enable.\n    off - To disable.\n    Automatically kick new joined users from the group.\n\n• `{i}cban`\n    Enable/Disable autobanning send as channel in used chat.\n\n• `{i}addwl <Username>`\n   Add Channel to channelban whitelist.\n\n• `{i}remwl <Username>`\n   Remove Channel from channelban whitelist.\n\n• `{i}listwl` : List all whitelist channels."
-help_button: "-\n\n• `{i}button <text with button format`\n   create button u can reply to pic also\n\nFormat:- `{i}button Hey There! OWNER Assistant 😎.\n[OWNER Assistant | https://github.com/Ownermood/OWNER Assistant][Support | https://github.com/Ownermood/OWNER Assistant | same]\n[TeamOWNER Assistant | https://github.com/Ownermood/OWNER Assistant]`"
+help_button: " -\n\n• `{i}button <text with button format>`\n   Create a message with buttons. You can reply to a picture too.\n\nFormat:- `{i}button Hey There! 😎\n[Google | https://google.com][YouTube | https://youtube.com | same]\n[Instagram | https://instagram.com]`\n"
 help_videotools: "-\n\n•`{i}sample <duration in seconds>`\n   Creates Short sample of video..\n\n• `{i}vshots <number of shots>`\n   Creates screenshot of video..\n\n• `{i}vtrim <start time> - <end time> in seconds`\n    Crop a Lengthy video.."
 help_words: "-\n\n• `{i}meaning <word>`\n    Get the meaning of the word.\n\n• `{i}synonym <word>`\n    Get all synonyms.\n\n• `{i}antonym <word>`\n    Get all antonyms.\n\n• `{i}ud <word>`\n    Fetch word defenition from urbandictionary."
 help_core: "-\n\n• `{i}install <reply to plugin>`\n    To install the plugin,\n  `{i}install f`\n    To force Install.\n\n• `{i}uninstall <plugin name>`\n    To unload and remove the plugin.\n\n• `{i}load <plugin name>`\n    To load unloaded unofficial plugin.\n\n• `{i}unload <plugin name>`\n    To unload unofficial plugin.\n\n• `{i}help <plugin name>`\n    Shows you a help menu (like this) for every plugin.\n\n• `{i}getaddons <raw link to code>`\n    Load Plugins from the given raw link."

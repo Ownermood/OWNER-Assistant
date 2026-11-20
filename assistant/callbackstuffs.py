@@ -30,7 +30,7 @@ from pyUltroid.fns.tools import Carbon, async_searcher, get_paste, telegraph_cli
 from pyUltroid.startup.loader import Loader
 
 from . import *
-from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES
 
 # --------------------------------------------------------------------#
 telegraph = telegraph_client()
@@ -246,7 +246,7 @@ TOKEN_FILE = "resources/auths/auth_token.txt"
 )
 async def send(eve):
     key, name = (eve.data_match.group(1)).decode("UTF-8").split("_")
-    thumb = "resources/extras/inline.jpg"
+    thumb = "resources/extras/owner_assistant_thumb.jpg"
     await eve.answer("■ Sending ■")
     data = f"uh_{key}_"
     index = None
@@ -357,14 +357,14 @@ async def changes(okk):
     if len(changelog_str) > 1024:
         await okk.edit(get_string("upd_4"))
         await asyncio.sleep(2)
-        with open("ultroid_updates.txt", "w+") as file:
+        with open("updates.txt", "w+") as file:
             file.write(tl_chnglog)
         await okk.edit(
             get_string("upd_5"),
-            file="ultroid_updates.txt",
+            file="updates.txt",
             buttons=button,
         )
-        remove("ultroid_updates.txt")
+        remove("updates.txt")
         return
     await okk.edit(
         changelog_str,

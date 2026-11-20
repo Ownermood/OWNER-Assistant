@@ -41,10 +41,14 @@ asst: UltroidClient
 LOG_CHANNEL = udB.get_key("LOG_CHANNEL")
 
 
-def inline_pic():
+def inline_pic(local=False):
+    """Help-menu picture. local=True gives a file from the bot folder
+    (works even if the GitHub repo is private)."""
     INLINE_PIC = udB.get_key("INLINE_PIC")
     if INLINE_PIC is None:
-        INLINE_PIC = choice(ULTROID_IMAGES)
+        from pyUltroid.branding import brand_file, brand_url
+
+        INLINE_PIC = brand_file("help") if local else brand_url("help")
     elif INLINE_PIC == False:
         INLINE_PIC = None
     return INLINE_PIC

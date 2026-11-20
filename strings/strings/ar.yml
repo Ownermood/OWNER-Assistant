@@ -79,11 +79,11 @@ autopic_2: "عذرا لايوجد نتائج للبحث لـ `{}`"
 autopic_3: " حصلت على بعض من النتائج   `{}` التي تتعلق في بحثك !\nجاري بدء تشغيل التلقائي !"
 
 # inline
-inline_1: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n\n**قائمه المساعدة {}.\n\n
+inline_1: "**Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ**\n\n\n**قائمه المساعدة {}.\n\n
 الأضافات ~ {}**"
-inline_2: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n**قائمه المساعدة {}.\n\n
+inline_2: "**Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ**\n\n**قائمه المساعدة {}.\n\n
 الاضافات ~ {}**"
-inline_3: "[Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ](https://github.com/Ownermood/OWNER-Assistant)\n\n\n**قائمه المساعدة {}.\n\n
+inline_3: "**Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ**\n\n\n**قائمه المساعدة {}.\n\n
 الاضافات ~ {}\n\n
 اذهب واضف  `الأضافات` متنوع مع القيمة.**"
 inline_4: "**  البـوت {}\n\n القـائمـه الرئـيسيـة \n\n الأضـافات ~ {}\n الأضـافات  ~ {}\n جـميع التعلـيقات ~ {}**"
@@ -276,7 +276,7 @@ asstcmd_2: "`ارسل الامر الذي تريد حذفه.`"
 asstcmd_3: "تم حذف الامر: `/{}`."
 asstcmd_4: "تم حفظ الامر : `/{}`."
 asstcmd_5: "لم يتم إيجاد اوامر"
-asstcmd_6: "**كل أوامر مساعد ألترويد**\n\n"
+asstcmd_6: "**كل أوامر مساعد OWNER Assistant**\n\n"
 act_1: "تم تفعيل خاصية التصحيح التلقائي"
 act_2: "تم تعطيل خاصية التصحيح التلقائي"
 autopic_4: "انت لم تكن تستخدم خاصية الصورة التلقائية !!"
@@ -301,7 +301,7 @@ blk_6: "لا يوجد كلمات محظورة هنا"
 bd_7: "تم الحذف من قاعدة البيانات"
 bd_8: "`جار الحذف...`"
 bd_9: "تم بالفعل حذف القناة من قاعدة البيانات. "
-calc_1: "• الآلة الحاسبة الخصة بألترويد •"
+calc_1: "• الآلة الحاسبة الخصة بOWNER Assistant •"
 calc_2: "فتح الآلة الحاسبة مجددا"
 cha_1: "قناة غير صحيحة"
 cha_2: "تم اضافة المصدر بنجاح"
@@ -547,7 +547,7 @@ help_instagram: "-\n\n• `{i} instadl <instagram url>`\n  `تنزيل Instagram
 help_fakeaction: "-\n\n• `{i} ftyping <time/in secs>` `\n    `` عرض مزيف في الدردشة الحالية.\n\n• `{i} faudio <time/in secs>` `\n    `عرض تسجيل مزيف في الدردشة الحالية.\n\n• `{i} fvideo <time/in secs>`\n    `عرض فيديو مزيف في الدردشة الحالية\n\n• `{i} fgame <time/in secs>` `\n    `` عرض لعبة لعب العمل في الدردشة الحالية.\n\n• `{i} fsticker <time/in secs>`\n    `عرض ملصق مزيف يختار الإجراء في الدردشة الحالية.\n\n• `{i} flocation <time/in secs>` `\n    `عرض موقع مزيف في الدردشة الحالية.\n\n• `{i} fcontact <time/in secs>`\n    'عرض جهة اتصال وهمية اختيار الإجراء في الدردشة الحالية.'\n\n• `{i} fround <Time/in Secs>` `\n    `عرض إجراء رسالة فيديو وهمية في الدردشة الحالية\n\n• `{i} fphoto <time/in secs>`\n    `عرض صورة إرسال مزيفة في الدردشة الحالية\n\n• `{i} fdocument <time/in secs>`\n    `عرض وثيقة إرسال مزيفة في الدردشة الحالية."
 help_converter: "-\n\n• `{i} تحويل <gif/img/sticker/webm>`\n    الرد على الوسائط لتحويله إلى GIF / Image / Webm / Normal Sticker.\n\n• `{i} doc <FileName.ext>`\n    الرد على نص MSG لحفظه في ملف.\n\n• `{i} open`\n    الرد على ملف للكشف عن نصه.\n\n• `{i} إعادة تسمية <اسم الملف مع الامتداد>`\n    إعادة تسمية الملف\n\n• `{i} thumbnail <الرد على ملف الصور/thumbnail>` `\n    قم بتحميل ملفك باستخدام الصورة المصغرة المخصصة."
 help_autoban: "• `{i} autokick <On/Off>`\n    على - لتمكين.\n    خارج - لتعطيل.\n    ركلة المستخدمين الجدد الذين انضموا تلقائيًا من المجموعة.\n\n• `{i} cban`\n    تمكين/تعطيل Autobanning إرسال كقناة في الدردشة المستخدمة.\n\n• `{i} addwl <username>`\n   أضف قناة إلى القائمة البيضاء Channelban.\n\n• `{i} remwl <username>`\n   إزالة القناة من القائمة البيضاء القناة.\n\n• `{i} listwl`: سرد جميع القنوات ذات القائمة البيضاء."
-help_button: "-\n\n• الزر `{i} <text مع زر التنسيق\n   إنشاء زر يمكنك الرد على الموافقة المسبقة عن علم أيضا\n\nالتنسيق:- `{i} زر مهلا هناك!usOWNER Assistant 😎.\n[OWNER Assistant |t.me/theOWNER Assistant. Budapsupport |t.me/OWNER Assistantsupportchat |نفس]\n[TeamOWNER Assistant |t.me/teamOWNER Assistant] `"
+help_button: " -\n\n• `{i}button <text with button format>`\n   Create a message with buttons. You can reply to a picture too.\n\nFormat:- `{i}button Hey There! 😎\n[Google | https://google.com][YouTube | https://youtube.com | same]\n[Instagram | https://instagram.com]`\n"
 help_videotools: "-\n\n• `{i} عينة <المدة في الثواني>`\n   يخلق عينة قصيرة من الفيديو ..\n\n• `{i} vshots <عدد الطلقات>`\n   يخلق لقطة شاشة للفيديو ..\n\n• `{i} vtrim <start time> - <وقت الانتهاء> في الثواني\n    اقتصاص فيديو طويل .."
 help_words: "-\n\n• `{i} يعني <word>`\n    احصل على معنى الكلمة.\n\n• `{i} مرادف <Word>`\n    احصل على جميع المرادفات.\n\n• `{i} antonym <word>`\n    الحصول على كل المتضادات.\n\n• `{i} ud <word>`\n    جلب الكلمة Defenition من urbandictionary."
 help_core: "-\n\n• `{i} تثبيت <الرد على البرنامج المساعد>`\n    لتثبيت البرنامج المساعد ،\n  `{i} تثبيت f`\n    لإجبار التثبيت.\n\n• `{i} إلغاء التثبيت <اسم البرنامج المساعد>`\n    لتفريغ وإزالة البرنامج المساعد.\n\n• `{i} تحميل <اسم البرنامج المساعد>`\n    لتحميل المكون الإضافي غير الرسمي.\n\n• `{i} إلغاء تحميل <اسم البرنامج المساعد>`\n    لتفريغ البرنامج المساعد غير الرسمي.\n\n• `{i} مساعدة <اسم البرنامج المساعد>`\n    يظهر لك قائمة مساعدة (مثل هذا) لكل مكون إضافي.\n\n• `{i} getAddons <Raw Link to Code>`\n    تحميل الإضافات من الرابط الخام المعطى."

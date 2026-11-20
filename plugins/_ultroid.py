@@ -12,19 +12,15 @@ from telethon.errors import (
 )
 
 from . import LOG_CHANNEL, LOGS, Button, asst, eor, get_string, ultroid_cmd
-from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, assistant_buttons, brand_file
+from pyUltroid.version import ultroid_version
 
 REPOMSG = f"""
-• **{BOT_NAME_CAPS}** •\n
-• Repo - [Click Here]({REPO_URL})
-• Based on [Ultroid](https://github.com/TeamUltroid/Ultroid)
-"""
+✨ **{BOT_NAME_CAPS}** ✨
 
-RP_BUTTONS = [
-    [
-        Button.url(get_string("bot_3"), REPO_URL),
-    ],
-]
+🤖 Personal Telegram Assistant
+⚡ Version - `{ultroid_version}`
+"""
 
 ULTSTRING = f"""🎇 **Thanks for Deploying {BOT_NAME}!**
 
@@ -51,13 +47,13 @@ async def repify(e):
     await e.eor(REPOMSG)
 
 
-@ultroid_cmd(pattern="ultroid$")
+@ultroid_cmd(pattern="intro$")
 async def useUltroid(rs):
-    button = Button.inline("Start >>", "initft_2")
+    button = Button.inline("Start >>", "initft_2", style="primary")
     msg = await asst.send_message(
         LOG_CHANNEL,
         ULTSTRING,
-        file="https://graph.org/file/54a917cc9dbb94733ea5f.jpg",
+        file=brand_file("deploy"),
         buttons=button,
     )
     if not (rs.chat_id == LOG_CHANNEL and rs.client._bot):

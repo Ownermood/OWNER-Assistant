@@ -57,7 +57,9 @@ async def _(e):
     nn = uf(dl)
     os.remove(dl)
     udB.set_key("CUSTOM_THUMBNAIL", str(nn))
-    await bash(f"wget {nn} -O resources/extras/ultroid.jpg")
+    await bash(f"wget {nn} -O resources/extras/thumbnail.jpg")
+    if os.path.exists("resources/extras/thumbnail.jpg"):
+        ULTConfig.thumb = "resources/extras/thumbnail.jpg"
     await e.eor(get_string("cvt_6").format(nn), link_preview=False)
 
 
@@ -136,7 +138,7 @@ async def uconverter(event):
         convert = conv_keys[input_]
     except KeyError:
         return await xx.edit(get_string("sts_3").format("gif/img/sticker/webm"))
-    file = await con.convert(b, outname="ultroid", convert_to=convert)
+    file = await con.convert(b, outname="converted", convert_to=convert)
     print(file)
 
     if file:

@@ -12,7 +12,7 @@
     »» To search in Reverse order.
 
 ✘ **Examples** :
-   •  `{i}search Ultroid`
+   •  `{i}search hello`
    •  `{i}search -r Heroku : 10`
 """
 

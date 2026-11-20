@@ -6,7 +6,7 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 from . import get_help
-from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, REPO_URL
+from pyUltroid.branding import BOT_NAME, BOT_NAME_CAPS, BOT_NAME_FANCY, BRAND_IMAGES, assistant_buttons, brand_file
 
 __doc__ = get_help("help_bot")
 
@@ -70,11 +70,18 @@ def ULTPIC():
     return inline_pic() or choice(ULTROID_IMAGES)
 
 
-buttons = [
-    [
-        Button.url(get_string("bot_3"), REPO_URL),
-    ]
-]
+def _buttons():
+    return assistant_buttons() or []
+
+
+def _branch():
+    try:
+        return Repo().active_branch.name
+    except Exception:
+        return "main"
+
+
+ALIVE_BULLETS = ("✵", "👑", "⚡", "🧩", "⏳", "🐍", "📡", "🌿")
 
 # Will move to strings
 alive_txt = """
@@ -110,16 +117,17 @@ async def lol(ult):
             LOGS.exception(er)
         inline = True
     pic = udB.get_key("ALIVE_PIC")
+    if pic is None:
+        pic = brand_file("alive")
     if isinstance(pic, list):
         pic = choice(pic)
     uptime = time_formatter((time.time() - start_time) * 1000)
     header = udB.get_key("ALIVE_TEXT") or get_string("bot_1")
-    y = Repo().active_branch
-    xx = Repo().remotes[0].config_reader.get("url")
-    rep = xx.replace(".git", f"/tree/{y}")
-    kk = f" `[{y}]({rep})` "
+    y = _branch()
+    kk = y
+    buttons = _buttons()
     if inline:
-        kk = f"<a href={rep}>{y}</a>"
+        kk = f"<code>{y}</code>"
         parse = "html"
         als = in_alive.format(
             header,
@@ -146,7 +154,8 @@ async def lol(ult):
         )
 
         if a := udB.get_key("ALIVE_EMOJI"):
-            als = als.replace("✵", a)
+            for b in ALIVE_BULLETS:
+                als = als.replace(b, a)
     if pic:
         try:
             await ult.reply(
@@ -154,7 +163,7 @@ async def lol(ult):
                 file=pic,
                 parse_mode=parse,
                 link_preview=False,
-                buttons=buttons if inline else None,
+                buttons=(buttons or None) if inline else None,
             )
             return await ult.try_delete()
         except ChatSendMediaForbiddenError:
@@ -166,7 +175,7 @@ async def lol(ult):
                 await ult.reply(
                     als,
                     parse_mode=parse,
-                    buttons=buttons if inline else None,
+                    buttons=(buttons or None) if inline else None,
                     link_preview=False,
                 )
                 return await ult.try_delete()
@@ -177,7 +186,7 @@ async def lol(ult):
         als,
         parse_mode=parse,
         link_preview=False,
-        buttons=buttons if inline else None,
+        buttons=(buttons or None) if inline else None,
     )
 
 
@@ -241,7 +250,7 @@ async def _(event):
         with open(file, "r") as f:
             code = f.read()[-2500:]
         file = await Carbon(
-            file_name="ultroid-logs",
+            file_name="owner-assistant-logs",
             code=code,
             backgroundColor=choice(ATRA_COL),
         )
@@ -269,14 +278,14 @@ async def _(event):
 @in_pattern("alive", owner=True)
 async def inline_alive(ult):
     pic = udB.get_key("ALIVE_PIC")
+    if pic is None:
+        pic = brand_file("alive")
     if isinstance(pic, list):
         pic = choice(pic)
     uptime = time_formatter((time.time() - start_time) * 1000)
     header = udB.get_key("ALIVE_TEXT") or get_string("bot_1")
-    y = Repo().active_branch
-    xx = Repo().remotes[0].config_reader.get("url")
-    rep = xx.replace(".git", f"/tree/{y}")
-    kk = f"<a href={rep}>{y}</a>"
+    kk = f"<code>{_branch()}</code>"
+    buttons = _buttons()
     als = in_alive.format(
         header, f"{ultroid_version} [{HOSTED_ON}]", UltVer, pyver(), uptime, kk
     )
@@ -289,7 +298,7 @@ async def inline_alive(ult):
             if ".jpg" in pic:
                 results = [
                     await builder.photo(
-                        pic, text=als, parse_mode="html", buttons=buttons
+                        pic, text=als, parse_mode="html", buttons=buttons or None
                     )
                 ]
             else:
@@ -304,7 +313,7 @@ async def inline_alive(ult):
                         title="Inline Alive",
                         description=BOT_NAME,
                         parse_mode="html",
-                        buttons=buttons,
+                        buttons=buttons or None,
                     )
                 ]
             return await ult.answer(results)
@@ -312,7 +321,7 @@ async def inline_alive(ult):
             LOGS.exception(er)
     result = [
         await builder.article(
-            "Alive", text=als, parse_mode="html", link_preview=False, buttons=buttons
+            "Alive", text=als, parse_mode="html", link_preview=False, buttons=buttons or None
         )
     ]
     await ult.answer(result)
@@ -349,7 +358,7 @@ async def _(e):
         )
     else:
         await xx.edit(
-            f'<code>Your BOT is </code><strong>up-to-date</strong><code> with </code><strong><a href="{Var.UPSTREAM_REPO}/tree/{branch}">[{branch}]</a></strong>',
+            f"<code>Your BOT is </code><strong>up-to-date</strong><code> with </code><strong>[{branch}]</strong>",
             parse_mode="html",
             link_preview=False,
         )

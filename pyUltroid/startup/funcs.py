@@ -47,7 +47,7 @@ from telethon.tl.types import (
 from telethon.utils import get_peer_id
 from decouple import config, RepositoryEnv
 from .. import LOGS, ULTConfig
-from ..branding import BOT_NAME, BRAND_IMAGES
+from ..branding import BOT_NAME, BRAND_IMAGES, brand_file
 from ..fns.helper import download_file, inline_mention, updater
 
 db_url = 0
@@ -373,18 +373,23 @@ async def autopilot():
             except BaseException as er:
                 LOGS.info("Error while promoting assistant in Log Channel..")
                 LOGS.exception(er)
-    if isinstance(chat.photo, ChatPhotoEmpty):
-        photo, _ = await download_file(
-            "https://graph.org/file/27c6812becf6f376cbb10.jpg", "channelphoto.jpg"
-        )
-        ll = await ultroid_bot.upload_file(photo)
+    # Set the OWNER Assistant photo on an empty log channel, and once on old
+    # channels that still have the previous (Ultroid) picture.
+    if isinstance(chat.photo, ChatPhotoEmpty) or not udB.get_key("OA_LOGPIC"):
+        photo = brand_file("avatar")
+        downloaded = photo.startswith("http")
         try:
+            if downloaded:
+                photo, _ = await download_file(photo, "channelphoto.jpg")
+            ll = await ultroid_bot.upload_file(photo)
             await ultroid_bot(
                 EditPhotoRequest(int(channel), InputChatUploadedPhoto(ll))
             )
+            udB.set_key("OA_LOGPIC", True)
         except BaseException as er:
             LOGS.exception(er)
-        os.remove(photo)
+        if downloaded and os.path.exists(photo):
+            os.remove(photo)
 
 
 # customize assistant
@@ -495,7 +500,7 @@ async def ready():
     if not udB.get_key("INIT_DEPLOY"):  # Detailed Message at Initial Deploy
         MSG = f"""🎇 **Thanks for Deploying {BOT_NAME}!**
 • Here, are the Some Basic stuff from, where you can Know, about its Usage."""
-        PHOTO = BRAND_IMAGES[0]
+        PHOTO = brand_file("deploy")
         BTTS = Button.inline("• Click to Start •", "initft_2")
         udB.set_key("INIT_DEPLOY", "Done")
     else:

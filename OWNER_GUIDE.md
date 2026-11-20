@@ -108,6 +108,29 @@ Key ek baar set karo (Saved Messages mein bhejo, phir message delete karo):
 | Assistant bot ki DP | `.botpic` (photo par reply karke apni photo) |
 | Command prefix badlo | `.setdb HNDLR !` |
 | Logs | `.logs` |
+| Welcome tour (log group mein) | `.intro` |
+
+### 💎 Premium emoji (Telegram Premium chahiye)
+
+| Kaam | Command |
+|---|---|
+| Premium emoji save karo | Apne account se premium emoji bhejo → us message par reply `.pemoji` |
+| Poora emoji pack save karo | `.pemoji pack https://t.me/addemoji/PackKaNaam` |
+| Status + saved list | `.pemoji` |
+| Dekho kaisa dikhta hai | `.pemoji test` |
+| Band / chalu | `.pemoji off` / `.pemoji on` |
+| Ek hatao / sab hatao | `.pemoji del 👑` / `.pemoji clear` |
+| Assistant bot mein bhi (try karo) | `.pemoji bot on` (na chale to `.pemoji bot off`) |
+
+Save karne ke baad `.alive`, `.ping`, `.help` jaise messages mein wahi emoji
+**apne aap** premium ban jaate hain. Premium nahi hai → normal emoji dikhte hain, kuch nahi tootta.
+
+### 🖼️ Pictures
+
+Alive, help, /start, PM security, deploy aur log channel ki photos ab bot ke andar hi hain
+(`resources/extras/owner_assistant_*.jpg`). Apni photo lagani ho:
+`.setdb ALIVE_PIC <link>`, `.setdb STARTMEDIA <link>`, `.setdb PMPIC <link>`, `.setdb INLINE_PIC <link>`.
+Photo hatani ho to value `False` rakho (jaise `.setdb PMPIC False`).
 
 **Update (VPS par):**
 ```bash
