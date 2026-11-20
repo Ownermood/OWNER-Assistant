@@ -100,6 +100,7 @@ from telethon.utils import get_peer_id
 from pyUltroid.fns.info import get_chat_info
 
 from . import (
+    read_text_file,
     HNDLR,
     LOGS,
     Image,
@@ -247,14 +248,15 @@ async def _(event):
         message = input_str
     elif event.reply_to_msg_id:
         previous_message = await event.get_reply_message()
-        if previous_message.media:
+        if previous_message.document and not previous_message.photo:
             downloaded_file_name = await event.client.download_media(
                 previous_message,
                 "./resources/downloads",
             )
-            with open(downloaded_file_name, "r") as fd:
-                message = fd.read()
+            message = read_text_file(downloaded_file_name)
             os.remove(downloaded_file_name)
+            if message is None:
+                return await xx.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
         else:
             message = previous_message.message
     else:

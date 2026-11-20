@@ -28,6 +28,7 @@ except ImportError:
 from . import upload_file as uf
 
 from . import (
+    read_text_file,
     ULTConfig,
     bash,
     con,
@@ -180,10 +181,10 @@ async def _(event):
     if not b:
         b = await a.download_media()
         rem = True
-    try:
-        with open(b) as c:
-            d = c.read()
-    except UnicodeDecodeError:
+    d = read_text_file(b)
+    if d is None:
+        if rem and os.path.exists(b):
+            os.remove(b)
         return await xx.eor(get_string("cvt_8"), time=5)
     try:
         await xx.edit(f"```{d}```")
