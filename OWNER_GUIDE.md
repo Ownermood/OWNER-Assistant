@@ -141,8 +141,27 @@ cd ~/Ultroid && git pull && docker compose up -d --build
 
 ## 📱 OWNER Manager (control bot)
 
+Chat hamesha saaf rehta hai: **ek hi menu message** jo button dabane par badalta hai.
+Tumhare bheje messages (commands, code, password) khud delete ho jaate hain.
+
 | Kaam | Kaise |
 |---|---|
+| Menu kholo | `/start` (upar status: 🟢 Running / ⚪ Stopped / 🔴 Not logged in) |
+| Account connect | **🔐 Login** → phone → code **spaces ke saath** `1 2 3 4 5` → 2FA |
+| Account hatao | **🚪 Logout** → Yes |
+| Chalao / roko / restart | **▶️ Run** · **⏹ Stop** · **🔄 Restart** |
+| Error dekhna | **📜 Logs** (poori file: **📄 Full log**) |
+| Premium emoji | **⚙️ Settings → ✨ Premium emoji**, phir premium emoji wala message ya pack link bhejo |
+| API key jaisi setting | `/setvar GEMINI_API_KEY value`, phir **Restart** |
+
+- Bot use karne ke liye pehle **@VillanCommunity** join karna padta hai. Manager bot ko us
+  channel mein **admin** banao, tabhi wo check kar payega.
+- Premium emoji text aur buttons (icon) dono pe lagte hain. Telegram ne bot ko allow nahi kiya
+  to bot khud normal emoji pe aa jata hai — kuch nahi tootta.
+- Crash ho to manager khud restart karta hai aur message bhejta hai. Telegram se logout ho
+  gaye to bhi message aayega — bas **Login** dabao.
+
+---|---|
 | Account connect karo | `/login` → phone → code **spaces ke saath** `1 2 3 4 5` → 2FA |
 | Account hatao (logout) | `/logout` → "Yes" |
 | Chal raha hai? | `/status` |

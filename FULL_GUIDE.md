@@ -1152,6 +1152,13 @@ file before changing anything.
   (message deleted, never stored). After `/logout` the `.env` SESSION is NOT
   used again (`use_env_session`). Crash → auto-restart (max 5 / 10 min);
   exit 0 = `.shutdown` (no restart); session dead → "logged out" message.
+  UI (PR #31): one live panel per chat (button press = edit; typed command =
+  delete owner's message + old panel, send new), no coloured buttons (owner
+  asked), premium emoji via `manager/emoji.py` (text entities + button `icon=`;
+  saved in `manager.json`; any RPCError while emojis are on → auto-off and
+  retry plain). Force join: `FORCE_JOIN` (default @VillanCommunity, `off` to
+  disable) checked with `GetParticipantRequest` — fails OPEN with a warning if
+  the bot isn't admin, so the owner is never locked out. Still owner-only.
 
 ### Layout
 
