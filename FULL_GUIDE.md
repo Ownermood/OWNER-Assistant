@@ -11,7 +11,7 @@
 5. [API keys (optional)](#5-api-keys-optional)
 6. [Safety rules](#6-safety-rules)
 7. [Problem aaye to](#7-problem-aaye-to)
-8. Every command — official plugins (~448 entries total)
+8. Every command — official plugins (~449 entries total)
 9. Every command — extra addons
 10. For Claude / developers (technical handoff)
 
@@ -120,7 +120,7 @@ Crash report ke **"Last 5 commits"** mein bhi sabse naya merge dikhta hai.
 | Block / unblock | `.block` · `.unblock` |
 | Message bhejo | `.send @username Hello!` |
 | Baad mein bhejo | `.schedule Happy Birthday 🎂 1h` |
-| Whisper | `.wspr @username secret baat` |
+| Whisper (group mein bhi) | `.wspr @username secret baat` |
 | Save | (reply) `.save` |
 
 ### 🤖 AI
@@ -714,7 +714,8 @@ Telegram mein **Saved Messages** mein bhejo, phir message **delete** karo. Resta
 
 **specialtools**
 
-- `.wspr <username>` — Send secret message..
+- `.wspr <@username/id> <message>`
+- `.wspr <message>` (reply to someone) — Secret message in any chat — only that person (and you) can open it. Max 200 characters. `.wspr @username` alone shows their profile card.
 - `.q <color-optional>`
 - `.q @username`
 - `.q r <color-optional>`

@@ -11,6 +11,7 @@ from telethon import Button
 from telethon.errors.rpcerrorlist import (
     BotInlineDisabledError,
     BotResponseTimeoutError,
+    ChatSendInlineForbiddenError,
     MessageNotModifiedError,
 )
 from telethon.tl import types
@@ -19,6 +20,7 @@ from telethon.tl.functions.users import GetFullUserRequest as gu
 from . import (
     HNDLR,
     LOGS,
+    udB,
     asst,
     callback,
     get_string,
@@ -28,30 +30,77 @@ from . import (
     ultroid_cmd,
 )
 
-buddhhu = {}
+class _Whispers(dict):
+    """Whispers survive restarts (kept in the DB, last 300 only)."""
+
+    def __init__(self):
+        super().__init__()
+        try:
+            for k, v in (udB.get_key("WHISPERS") or {}).items():
+                self[int(k)] = v
+        except Exception as er:
+            LOGS.info(f"whispers: {er}")
+
+    def _save(self):
+        keep = dict(list(self.items())[-300:])
+        if len(keep) != len(self):
+            self.clear()
+            dict.update(self, keep)
+        udB.set_key("WHISPERS", {str(k): v for k, v in keep.items()})
+
+    def update(self, *a, **k):
+        dict.update(self, *a, **k)
+        self._save()
+
+    def pop(self, *a):
+        val = dict.pop(self, *a)
+        self._save()
+        return val
+
+
+buddhhu = _Whispers()
+ALERT_LIMIT = 200  # Telegram shows at most 200 characters in a pop-up
 
 
 @ultroid_cmd(
     pattern="wspr( (.*)|$)",
 )
 async def _(e):
+    args = e.pattern_match.group(1).strip()
+    text = ""
     if e.reply_to_msg_id:
         okk = await e.get_reply_message()
-        put = f"@{okk.sender.username}" if okk.sender.username else okk.sender_id
+        sender = await okk.get_sender()
+        put = f"@{sender.username}" if getattr(sender, "username", None) else str(okk.sender_id)
+        text = args
     else:
-        put = e.pattern_match.group(1).strip()
-    if put:
-        try:
-            results = await e.client.inline_query(asst.me.username, f"msg {put}")
-        except BotResponseTimeoutError:
-            return await e.eor(
-                get_string("help_2").format(HNDLR),
-            )
-        except BotInlineDisabledError:
-            return await e.eor(get_string("help_3"))
+        put, _, text = args.partition(" ")
+        text = text.strip()
+    if not put:
+        return await e.eor(get_string("wspr_3"))
+    if len(text) > ALERT_LIMIT:
+        return await e.eor(
+            f"`Whisper too long ({len(text)}/{ALERT_LIMIT} characters). Telegram allows {ALERT_LIMIT}.`",
+            time=8,
+        )
+    # with a message: send the whisper straight away; without: show the user card
+    query = f"wspr {put} {text}" if text else f"msg {put}"
+    try:
+        results = await e.client.inline_query(asst.me.username, query)
+    except BotResponseTimeoutError:
+        return await e.eor(get_string("help_2").format(HNDLR))
+    except BotInlineDisabledError:
+        return await e.eor(get_string("help_3"))
+    if not results:
+        return await e.eor("`Assistant bot gave no result, try again.`", time=5)
+    try:
         await results[0].click(e.chat_id, reply_to=e.reply_to_msg_id, hide_via=True)
-        return await e.delete()
-    await e.eor(get_string("wspr_3"))
+    except ChatSendInlineForbiddenError:
+        return await e.eor(
+            "`This group does not allow inline bots.` Ask an admin to allow "
+            "\"Send inline bots\" (or \"Embed links\") for members, or make yourself admin."
+        )
+    await e.delete()
 
 
 @in_pattern("wspr", owner=True)
@@ -81,7 +130,7 @@ async def _(e):
         )
         return await e.answer([sur])
     try:
-        desc = zzz[2]
+        desc = zzz[2][:ALERT_LIMIT]
     except IndexError:
         sur = await e.builder.article(
             title="Type ur msg", text="You Didn't Type Your Msg"
@@ -100,7 +149,7 @@ async def _(e):
     ]
     us = logi.username or logi.first_name
     sur = await e.builder.article(
-        title=logi.first_name,
+        title=f"Whisper to {logi.first_name}",
         description=desc,
         text=get_string("wspr_1").format(us),
         buttons=button,
@@ -111,7 +160,7 @@ async def _(e):
 
 @in_pattern("msg", owner=True)
 async def _(e):
-    zzz = e.text.split(maxsplit=1)
+    zzz = e.text.split(maxsplit=2)
     desc = "Touch me"
     try:
         query = zzz[1]
