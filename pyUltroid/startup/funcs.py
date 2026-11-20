@@ -47,7 +47,7 @@ from telethon.tl.types import (
 from telethon.utils import get_peer_id
 from decouple import config, RepositoryEnv
 from .. import LOGS, ULTConfig
-from ..branding import BOT_NAME
+from ..branding import BOT_NAME, BRAND_IMAGES
 from ..fns.helper import download_file, inline_mention, updater
 
 db_url = 0
@@ -404,13 +404,7 @@ async def customize():
             sir = ultroid_bot.me.first_name
         else:
             sir = f"@{ultroid_bot.me.username}"
-        file = random.choice(
-            [
-                "https://graph.org/file/92cd6dbd34b0d1d73a0da.jpg",
-                "https://graph.org/file/a97973ee0425b523cdc28.jpg",
-                "resources/extras/ultroid_assistant.jpg",
-            ]
-        )
+        file = "resources/extras/owner_assistant_avatar.jpg"
         if not os.path.exists(file):
             file, _ = await download_file(file, "profile.jpg")
             rem = True
@@ -435,7 +429,7 @@ async def customize():
         await ultroid_bot.send_message("botfather", UL)
         await asyncio.sleep(1)
         await ultroid_bot.send_message(
-            "botfather", f"✨ Hello ✨!! I'm Assistant Bot of {sir}"
+            "botfather", f"✨ Hello ✨!! I'm {BOT_NAME} of {sir}"
         )
         await asyncio.sleep(2)
         await ultroid_bot.send_message("botfather", "/setdescription")
@@ -501,11 +495,11 @@ async def ready():
     if not udB.get_key("INIT_DEPLOY"):  # Detailed Message at Initial Deploy
         MSG = f"""🎇 **Thanks for Deploying {BOT_NAME}!**
 • Here, are the Some Basic stuff from, where you can Know, about its Usage."""
-        PHOTO = "https://graph.org/file/54a917cc9dbb94733ea5f.jpg"
+        PHOTO = BRAND_IMAGES[0]
         BTTS = Button.inline("• Click to Start •", "initft_2")
         udB.set_key("INIT_DEPLOY", "Done")
     else:
-        MSG = f"**{BOT_NAME} has been deployed!**\n➖➖➖➖➖➖➖➖➖➖\n**UserMode**: {inline_mention(ultroid_bot.me)}\n**Assistant**: @{asst.me.username}\n➖➖➖➖➖➖➖➖➖➖\n**Support**: @TeamUltroid\n➖➖➖➖➖➖➖➖➖➖"
+        MSG = f"**{BOT_NAME} has been deployed!**\n➖➖➖➖➖➖➖➖➖➖\n**UserMode**: {inline_mention(ultroid_bot.me)}\n**Assistant**: @{asst.me.username}\n➖➖➖➖➖➖➖➖➖➖"
         BTTS, PHOTO = None, None
         prev_spam = udB.get_key("LAST_UPDATE_LOG_SPAM")
         if prev_spam:
