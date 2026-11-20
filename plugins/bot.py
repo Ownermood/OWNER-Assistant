@@ -59,6 +59,7 @@ from . import (
     start_time,
     time_formatter,
     udB,
+    ultroid_bot,
     ultroid_cmd,
     ultroid_version,
     updater,
@@ -364,3 +365,38 @@ async def updava(event):
         force_document=False,
         buttons=Button.inline("Changelogs", data="changes"),
     )
+
+
+AVATAR = "resources/extras/owner_assistant_avatar.jpg"
+
+
+@ultroid_cmd(pattern="botpic$", fullsudo=True)
+async def set_assistant_pic(e):
+    """Change the assistant bot's profile photo (reply to a photo, or default avatar)."""
+    from pyUltroid.startup.funcs import _botfather_reply
+
+    if not asst.me.bot:
+        return await e.eor("`Assistant bot is not active.`")
+    msg = await e.eor("`Changing assistant bot photo at @BotFather...`")
+    reply = await e.get_reply_message()
+    file, temp = AVATAR, None
+    if reply and reply.photo:
+        file = temp = await reply.download_media("resources/downloads/")
+    try:
+        async with ultroid_bot.conversation("BotFather", timeout=60) as conv:
+            await _botfather_reply(conv, "/cancel")
+            await _botfather_reply(conv, "/setuserpic")
+            answer = await _botfather_reply(conv, f"@{asst.me.username}")
+            if "photo" not in answer.lower():
+                return await msg.edit(f"`BotFather said:` {answer[:300]}")
+            await conv.send_file(file)
+            done = (await conv.get_response()).raw_text or ""
+        await ultroid_bot.send_read_acknowledge("BotFather")
+    except Exception as er:
+        return await msg.edit(f"`Could not change photo: {er}`")
+    finally:
+        if temp and os.path.exists(temp):
+            os.remove(temp)
+    if "success" in done.lower():
+        return await msg.edit(f"`Done! New photo set for` @{asst.me.username}")
+    await msg.edit(f"`BotFather said:` {done[:300]}")
