@@ -53,7 +53,7 @@ file before changing anything.
 | `addons/` | Extra plugins bundled in this repo (53), incl. `addons/love.py` |
 | `telethonpatch/` | Vendored Telethon-Patch (GPLv3), fixed for Telethon 1.46 |
 | `strings/strings/*.yml` | All texts/help (25 languages; `en.yml` is the source) |
-| `resources/extras/owner_assistant_*.jpg` | Banners (1,2,3, alive, help, start, deploy, pm), avatar, thumb. Re-create with `dev/make_banners.py` |
+| `resources/extras/owner_assistant_*.jpg` | Owner's own AI-made art (black/blood-red/silver): anime villain king = avatar/alive/1/thumb, hooded shield = help/2, hooded = pm/3, crown = deploy, command-desk = start. 1024px squares (thumb 320). Replace only with images the owner sends — don't draw our own (owner found SVG drawings "cartoon") |
 | `dev/` | Checks + boot test (see below) |
 | `SETUP.md`, `OWNER_GUIDE.md` | Owner-facing docs (Hinglish) |
 
@@ -135,7 +135,10 @@ Full A–Z rebrand pass (#27): repo/support links removed everywhere (25 languag
 incl. translated "Ultroid" words), new banners (alive/help/start/deploy/pm) +
 upload thumbnail, log-channel photo replaced once (`OA_LOGPIC`), old Ultroid
 images deleted, `.ultroid` → `.intro`, file names (logs/zip/updates) renamed,
-premium emoji system (`.pemoji`), coloured buttons.
+premium emoji system (`.pemoji`), coloured buttons. #28: `.pemoji pack` takes up to 25 packs.
+#29: owner's AI images (uploaded via GitHub) used as avatar/banners/thumb; log-channel
+photo re-applied once via `OA_LOGPIC` = 2 (bump it when the avatar changes). Assistant bot DP
+only changes when the owner runs `.botpic`. Never use Pinterest/other artists' images.
 
 ## Roadmap the owner agreed to (not started)
 
