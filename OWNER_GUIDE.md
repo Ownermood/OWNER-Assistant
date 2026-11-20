@@ -74,7 +74,7 @@ Key ek baar set karo (Saved Messages mein bhejo, phir message delete karo):
 
 **Public / Private switch (saari animations, ek button):**
 
-- OWNER Manager bot ke menu mein **✅ FUN MODE: ON / ⛔ OFF** likha dikhega + button. **Default ON hai.** ON = koi bhi dost bot ko DM karke animations chala sakta hai (login/settings unhe kabhi nahi dikhega). OFF = sirf tum.
+- OWNER Manager bot ke menu mein **✅ FUN MODE: ON / ⛔ OFF** likha dikhega + button. **Default ON hai.** ON = koi bhi dost bot ko DM karke **16 fun features** (animations, joke, dice, truth/dare, fake hack, matrix...) chala sakta hai (login/settings unhe kabhi nahi dikhega). OFF = sirf tum.
 - Ya command se: `.funmode public` / `.funmode private` (phone se bhi chalega).
 - Private karte hi sabka band, sirf tum. Switch hamesha tumhare haath mein.
 

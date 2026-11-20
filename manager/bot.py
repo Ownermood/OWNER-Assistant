@@ -566,13 +566,14 @@ class Manager:
         rows, row = [], []
         for key, (em, label) in fun.MENU.items():
             row.append(self.btn(em, label, f"m:fun_{key}"))
-            if len(row) == 2:
+            if len(row) == 3:
                 rows.append(row)
                 row = []
         if row:
             rows.append(row)
         name = (getattr(event, "sender", None) and getattr(event.sender, "first_name", None)) or "you"
-        await self.send_panel(chat, f"💞 **Fun zone**\n\nHey {name}! Pick an animation 👇",
+        await self.send_panel(chat,
+                              f"🎉 **Fun Zone**\n\nHey {name}! {len(fun.MENU)} things to play with 👇",
                               rows, event if cb else None)
 
     async def play(self, chat, kind, event):
@@ -582,7 +583,7 @@ class Manager:
         self.playing[chat] = True
         try:
             who = (getattr(event, "sender", None) and getattr(event.sender, "first_name", None)) or "Someone"
-            frames = fun.build(kind, name=who, who=who)
+            frames = fun.build(kind, name=who, who=who, seed=int(time.time() * 1000) % 10**9)
             if not frames:
                 return
             msg = await self.bot.send_message(chat, frames[0], link_preview=False)

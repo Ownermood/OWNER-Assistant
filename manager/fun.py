@@ -203,15 +203,186 @@ def lovecalc_frames(a, b):
 
 
 MENU = {
-    "propose": ("💍", "Propose"),
-    "love": ("❤️", "Love"),
-    "rose": ("🌹", "Rose"),
-    "hearts": ("💕", "Hearts"),
+    "propose":  ("💍", "Propose"),
+    "love":     ("❤️", "Love"),
+    "rose":     ("🌹", "Rose"),
+    "hearts":   ("💕", "Hearts"),
     "lovecalc": ("💘", "Love calc"),
+    "rate":     ("⭐️", "Rate me"),
+    "joke":     ("😂", "Joke"),
+    "quote":    ("✨", "Quote"),
+    "8ball":    ("🎱", "8-ball"),
+    "dice":     ("🎲", "Dice"),
+    "truth":    ("🤫", "Truth"),
+    "dare":     ("🔥", "Dare"),
+    "fortune":  ("🔮", "Fortune"),
+    "compliment": ("💝", "Compliment"),
+    "hack":     ("💀", "Fake hack"),
+    "matrix":   ("🟩", "Matrix"),
 }
 
 
-def build(kind, name="you", who="Someone", second=None):
+# ---------------------------------------------------------------- more fun
+# Everything below runs offline inside the bot - no APIs, no owner account.
+
+JOKES = [
+    "Teacher: Why are you late?\nMe: Class started before I got here. 🤷",
+    "I told my laptop I needed a break… it said 'same'. 💻",
+    "My wallet is like an onion. Opening it makes me cry. 🧅",
+    "I'm not lazy, I'm on energy saving mode. 🔋",
+    "Exams are like relationships — I study everything except what's asked. 📚",
+    "I don't snore. I dream I'm a motorcycle. 🏍",
+    "I'm on a seafood diet. I see food and I eat it. 🍟",
+    "Parents: Study!\nMe: *opens phone to check the time, returns 3 hours later* ⏰",
+    "My brain has too many tabs open and one is playing music. 🎵",
+]
+
+QUOTES = [
+    "Hard work beats talent when talent doesn't work hard. 💪",
+    "You don't have to be great to start, but you have to start to be great. 🚀",
+    "Little by little, a little becomes a lot. 🌱",
+    "The pain you feel today is the strength you feel tomorrow. ⚡",
+    "Discipline is choosing what you want most over what you want now. 🎯",
+    "Fall seven times, stand up eight. 🔥",
+    "Your only limit is you. 🌟",
+    "Dreams don't work unless you do. ✨",
+]
+
+EIGHTBALL = [
+    "Yes, definitely ✅", "Without a doubt 💯", "You may rely on it 👍",
+    "Most likely 🙂", "Signs point to yes 🔮", "Ask again later ⏳",
+    "Better not tell you now 🤐", "Cannot predict now 🌫",
+    "Don't count on it ❌", "My reply is no 🙅", "Very doubtful 😬",
+]
+
+TRUTHS = [
+    "What's the last lie you told? 😬",
+    "Who was your first crush? 👀",
+    "What's your most embarrassing moment? 🙈",
+    "How many hours do you actually study? 📚",
+    "What's the one app you'd never let anyone see? 📱",
+    "Who do you text the most? 💬",
+    "What's a secret you've never told anyone here? 🤫",
+]
+
+DARES = [
+    "Send the 5th photo in your gallery 📸",
+    "Text your crush 'hi' right now 😳",
+    "Put your status as 'I'm in love' for 1 hour 💕",
+    "Send a voice note singing 🎤",
+    "Call a friend and speak only in English for 1 min 📞",
+    "Change your DP to a baby photo for an hour 👶",
+    "Type your last Google search here 🔍",
+]
+
+COMPLIMENTS = [
+    "You light up every chat you're in ✨",
+    "Your energy is contagious 🔥",
+    "You're the friend everyone wishes they had 🫂",
+    "Smart AND funny — that's rare 🧠",
+    "You make hard things look easy 💪",
+    "The world is better with you in it 🌍",
+]
+
+FORTUNES = [
+    "Something good is coming your way this week 🍀",
+    "A message you're waiting for will arrive soon 📩",
+    "Say yes to the next invitation. Trust me. 🎉",
+    "Your hard work is about to pay off 💰",
+    "Someone is thinking about you right now 💭",
+    "Rest today. Tomorrow needs you sharp. 😴",
+]
+
+MATRIX = "01アイウエオカキクケコサシスセソタチツテト#$%&@*"
+HACK_STEPS = [
+    "Initialising…",
+    "Connecting to server…",
+    "Bypassing firewall…",
+    "Cracking password…",
+    "Accessing database…",
+    "Downloading files…",
+    "Clearing traces…",
+]
+
+
+def _pick(seq, seed):
+    return random.Random(seed).choice(seq)
+
+
+def joke_frames(seed):
+    return ["🤔 **Thinking of a joke…**", "😄 " + _pick(JOKES, seed)]
+
+
+def quote_frames(seed):
+    return ["💭 **Finding something for you…**", "✨ **" + _pick(QUOTES, seed) + "**"]
+
+
+def eightball_frames(seed):
+    f = ["🎱 **Shaking the magic 8-ball…**", "🎱 . . .", "🎱 . .", "🎱 ."]
+    f.append("🎱 **" + _pick(EIGHTBALL, seed) + "**")
+    return f
+
+
+def dice_frames(seed):
+    r = random.Random(seed)
+    faces = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"]
+    f = ["🎲 **Rolling…**"]
+    for _ in range(5):
+        f.append("🎲 " + r.choice(faces))
+    final = r.randint(1, 6)
+    f.append(f"🎲 **{faces[final - 1]}  You rolled {final}!**")
+    return f
+
+
+def truthdare_frames(seed, dare=False):
+    pool, label, icon = (DARES, "DARE", "🔥") if dare else (TRUTHS, "TRUTH", "🤫")
+    return [f"{icon} **Picking a {label}…**", f"{icon} **{label}**\n\n{_pick(pool, seed)}"]
+
+
+def compliment_frames(name, seed):
+    return [f"💝 **A little something for {name}…**", "💝 " + _pick(COMPLIMENTS, seed)]
+
+
+def fortune_frames(seed):
+    return ["🔮 **Looking into the future…**", "🔮 ✨ . . .", "🔮 ✨ . .",
+            "🔮 **" + _pick(FORTUNES, seed) + "**"]
+
+
+def hack_frames(name):
+    f = [f"💀 **Hacking {name}'s phone…**"]
+    for i in range(len(HACK_STEPS)):
+        done = "\n".join(("[✔] " + s) if j <= i else "[ ] " + s
+                         for j, s in enumerate(HACK_STEPS))
+        pct = round((i + 1) / len(HACK_STEPS) * 100)
+        f.append("```\n" + done + "\n" + bar(pct) + "\n```")
+    f.append(f"💀 **Access granted!**\n\n__Just kidding {name} 😂 it's only an animation.__")
+    return f
+
+
+def matrix_frames(seed):
+    r = random.Random(seed)
+    f = ["🟩 **Entering the matrix…**"]
+    for _ in range(8):
+        f.append("```\n" + "\n".join(
+            "".join(r.choice(MATRIX) for _ in range(18)) for _ in range(6)
+        ) + "\n```")
+    f.append("🟩 **Wake up… 🐇**")
+    return f
+
+
+def rate_frames(name, seed):
+    r = random.Random(f"rate{seed}")
+    score = r.randint(55, 100)
+    f = [f"⭐️ **Rating {name}…**"]
+    for pct in (10, 35, 60, 85, score):
+        f.append(f"⭐️ **{name}**\n\n`{bar(pct)}`")
+    tag = "legend 🔥" if score > 90 else "awesome ✨" if score > 75 else "pretty cool 😎"
+    f.append(f"⭐️ **{name}** is `{score}%` {tag}")
+    return f
+
+
+def build(kind, name="you", who="Someone", second=None, seed=0):
+    """Frames for one fun item. Never touches the network or the owner."""
     if kind == "propose":
         return propose_frames(name, who)
     if kind == "love":
@@ -222,4 +393,26 @@ def build(kind, name="you", who="Someone", second=None):
         return hearts_frames()
     if kind == "lovecalc":
         return lovecalc_frames(who, second or name)
+    if kind == "rate":
+        return rate_frames(name, seed)
+    if kind == "joke":
+        return joke_frames(seed)
+    if kind == "quote":
+        return quote_frames(seed)
+    if kind == "8ball":
+        return eightball_frames(seed)
+    if kind == "dice":
+        return dice_frames(seed)
+    if kind == "truth":
+        return truthdare_frames(seed)
+    if kind == "dare":
+        return truthdare_frames(seed, dare=True)
+    if kind == "fortune":
+        return fortune_frames(seed)
+    if kind == "compliment":
+        return compliment_frames(name, seed)
+    if kind == "hack":
+        return hack_frames(name)
+    if kind == "matrix":
+        return matrix_frames(seed)
     return []
