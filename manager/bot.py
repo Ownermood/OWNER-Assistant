@@ -14,7 +14,7 @@ from telethon import Button, TelegramClient, errors, events
 from telethon.sessions import StringSession
 from telethon.tl.functions.channels import GetParticipantRequest
 
-from . import emoji, fun
+from . import fun
 
 
 # ----------------------------------------------------------------- config
@@ -238,47 +238,35 @@ class Manager:
         self.join_cache = {}
         self.playing = {}  # chat -> an animation is running
         self.join_problem = None
-        # Premium (custom) emoji on BUTTON ICONS only - message text keeps
-        # plain emojis (premium everywhere looked bad). Turns itself off if
-        # Telegram refuses custom emoji for this bot.
-        self.emoji_ok = bool(self.store.data.get("emoji_ok", True))
-        self.emap = emoji.load_map()
+        # Old builds stored a premium-emoji flag here; premium emoji are gone.
+        if self.store.data.pop("emoji_ok", None) is not None:
+            self.store.save()
 
     def btn(self, em, label, data=None, url=None):
-        icon = emoji.lookup(self.emap, em) if self.emoji_ok else None
-        text = label if icon else f"{em} {label}"
+        text = f"{em} {label}"
         if url:
-            return Button.url(text, url, icon=icon)
-        return Button.inline(text, data.encode(), icon=icon)
+            return Button.url(text, url)
+        return Button.inline(text, data.encode())
 
     # ------------------------------------------------------------ the one panel
-    async def show(self, chat, text, buttons=None, event=None, _retry=True):
+    async def show(self, chat, text, buttons=None, event=None):
         """Edit the live panel (button press) or replace it (typed command / alert)."""
-        try:
-            if isinstance(event, events.CallbackQuery.Event):
-                try:
-                    await event.edit(text, buttons=buttons, link_preview=False)
-                    self.panels[chat] = event.message_id
-                    self._save_panels()
-                    return
-                except errors.MessageNotModifiedError:
-                    return
-                except errors.MessageIdInvalidError:
-                    pass
-            old = self.panels.get(chat)
-            msg = await self.bot.send_message(chat, text, buttons=buttons, link_preview=False)
-            self.panels[chat] = msg.id
-            self._save_panels()
-            if old and old != msg.id:
-                await self.drop(chat, old)
-        except errors.RPCError:
-            if _retry and self.emoji_ok and self.emap:
-                # Telegram won't let this bot use custom emoji - go plain.
-                self.emoji_ok = False
-                self.store.data["emoji_ok"] = False
-                self.store.save()
-                return await self.show(chat, text, buttons, event, _retry=False)
-            raise
+        if isinstance(event, events.CallbackQuery.Event):
+            try:
+                await event.edit(text, buttons=buttons, link_preview=False)
+                self.panels[chat] = event.message_id
+                self._save_panels()
+                return
+            except errors.MessageNotModifiedError:
+                return
+            except errors.MessageIdInvalidError:
+                pass
+        old = self.panels.get(chat)
+        msg = await self.bot.send_message(chat, text, buttons=buttons, link_preview=False)
+        self.panels[chat] = msg.id
+        self._save_panels()
+        if old and old != msg.id:
+            await self.drop(chat, old)
 
     async def drop(self, chat, *ids):
         ids = [i for i in ids if i]
