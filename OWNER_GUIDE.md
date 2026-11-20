@@ -71,6 +71,22 @@ Key ek baar set karo (Saved Messages mein bhejo, phir message delete karo):
 
 ---
 
+
+**2nd id / partner ko sirf animations dena (baaki kuch nahi):**
+
+```
+.funuser add
+```
+(us insaan ke message pe reply karke, ya `.funuser add @username`)
+
+| Kaam | Command |
+|---|---|
+| List dekho | `.funuser` |
+| Hatao | `.funuser del <id>` |
+| Sab hatao (sirf tum) | `.funuser clear` |
+
+Wo log sirf `.propose .love .rose .hearts .lovecalc` chala payenge — aur koi command nahi, settings nahi, kuch nahi.
+
 ## 👮 Group (aap admin ho)
 
 | Command | Example |

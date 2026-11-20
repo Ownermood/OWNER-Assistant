@@ -66,6 +66,12 @@ def compile_pattern(data, hndlr):
     return re.compile("\\" + hndlr + data)
 
 
+def fun_users():
+    """User ids allowed to run fun=True commands (set by .funuser)."""
+    data = udB.get_key("FUN_USERS")
+    return data if isinstance(data, list) else []
+
+
 def ultroid_cmd(
     pattern=None, manager=False, ultroid_bot=ultroid_bot, asst=asst, **kwargs
 ):
@@ -75,6 +81,7 @@ def ultroid_cmd(
     fullsudo = kwargs.get("fullsudo", False)
     only_devs = kwargs.get("only_devs", False)
     func = kwargs.get("func", lambda e: not e.via_bot_id)
+    fun = kwargs.get("fun", False)
 
     def decor(dec):
         async def wrapp(ult):
@@ -97,8 +104,11 @@ def ultroid_cmd(
                 if owner_only:
                     return
                 if ult.sender_id not in owner_and_sudos():
-                    return
-                if ult.sender_id in _ignore_eval:
+                    # Allow a whitelisted "fun user" to run ONLY fun=True
+                    # commands (e.g. love animations). Nothing else.
+                    if not (fun and ult.sender_id in fun_users()):
+                        return
+                elif ult.sender_id in _ignore_eval:
                     return await eod(
                         ult,
                         get_string("py_d1"),

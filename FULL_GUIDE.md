@@ -1247,6 +1247,12 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   Assistant bot: only if `PREMIUM_EMOJI_BOT` (Telegram may refuse custom emoji for
   bots without a Fragment username / Premium owner — unverified). Never hard-code
   emoji IDs we haven't seen; the owner saves them with `.pemoji` / `.pemoji pack`.
+- `.funuser` (#34): an allowlist (DB `FUN_USERS`) of user ids who may run
+  ONLY `fun=True` commands (the love animations). Gate is in `ultroid_cmd`
+  (`fun_users()` + `fun=` kwarg); fun users bypass the owner/sudo check for
+  those commands only, never fullsudo or anything else. `.funuser clear` =
+  back to owner-only. This is the SAFE answer to "make the bot public" —
+  never build multi-user login/session-hosting.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 

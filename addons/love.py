@@ -30,7 +30,7 @@ import time
 from telethon.errors import FloodWaitError, MessageNotModifiedError
 from telethon.tl.functions.messages import EditMessageRequest
 
-from . import ultroid_cmd
+from . import HNDLR, udB, ultroid_cmd
 
 # Telegram limits how often one account may edit messages. Too many edits
 # in a row => FloodWait (minutes), during which *no* command can edit.
@@ -288,7 +288,7 @@ def heartbeat(title, beats=2):
 # ------------------------------------------------------------------ #
 
 
-@ultroid_cmd(pattern="propose( (.*)|$)")
+@ultroid_cmd(pattern="propose( (.*)|$)", fun=True)
 async def propose(event):
     name = await _target_name(event)
     msg = await _start(event, "💌")
@@ -349,7 +349,7 @@ async def propose(event):
     await play(msg, f, event=event)
 
 
-@ultroid_cmd(pattern="love( (.*)|$)")
+@ultroid_cmd(pattern="love( (.*)|$)", fun=True)
 async def love(event):
     name = await _target_name(event)
     msg = await _start(event, "❤️")
@@ -370,7 +370,7 @@ async def love(event):
     await play(msg, f, event=event)
 
 
-@ultroid_cmd(pattern="rose( (.*)|$)")
+@ultroid_cmd(pattern="rose( (.*)|$)", fun=True)
 async def rose(event):
     name = await _target_name(event)
     msg = await _start(event, "🌱")
@@ -386,7 +386,7 @@ async def rose(event):
     await play(msg, f, event=event)
 
 
-@ultroid_cmd(pattern="hearts$")
+@ultroid_cmd(pattern="hearts$", fun=True)
 async def hearts(event):
     msg = await _start(event, "💕")
     if not msg:
@@ -407,7 +407,7 @@ async def hearts(event):
     await play(msg, frames, event=event)
 
 
-@ultroid_cmd(pattern="lovecalc( (.*)|$)")
+@ultroid_cmd(pattern="lovecalc( (.*)|$)", fun=True)
 async def lovecalc(event):
     names = event.pattern_match.group(1).strip().split()
     if len(names) < 2:
@@ -432,3 +432,78 @@ async def lovecalc(event):
         verdict = "Hmm... great friends for now 😅 (just for fun!)"
     frames.append(head + f"`{bar(pct)}` **{pct}%**\n\n{verdict}")
     await play(msg, frames, event=event)
+
+
+
+
+# ----------------------------------------------------------------------------
+# Who may use the fun animations besides you (2nd id, partner...).
+#   .funuser              -> list
+#   .funuser add          -> reply to them, or give @username / id
+#   .funuser del <id>     -> remove one
+#   .funuser clear        -> back to just you (private)
+# Fun users can run ONLY the love animations, nothing else.
+# ----------------------------------------------------------------------------
+
+
+def _fun_ids():
+    data = udB.get_key("FUN_USERS")
+    return data if isinstance(data, list) else []
+
+
+@ultroid_cmd(pattern="funuser( (.*)|$)")
+async def funuser(event):
+    arg = (event.pattern_match.group(1) or "").strip()
+    low = arg.lower()
+    ids = _fun_ids()
+
+    if low.startswith("clear"):
+        udB.del_key("FUN_USERS")
+        return await event.eor("🔒 `Fun animations are private again (only you).`")
+
+    if low.split()[:1] == ["del"] or low.split()[:1] == ["remove"]:
+        rest = arg.split(maxsplit=1)[1].strip() if len(arg.split()) > 1 else ""
+        try:
+            uid = int(rest)
+        except ValueError:
+            return await event.eor("`Give the numeric id: .funuser del 123456`")
+        if uid in ids:
+            ids.remove(uid)
+            udB.set_key("FUN_USERS", ids)
+            return await event.eor("🗑 `Removed. Now {} allowed.`".format(len(ids)))
+        return await event.eor("`That id is not in the list.`")
+
+    if low.startswith("add"):
+        rest = arg.split(maxsplit=1)[1].strip() if len(arg.split()) > 1 else ""
+        uid = None
+        if event.is_reply:
+            uid = (await event.get_reply_message()).sender_id
+        elif rest:
+            try:
+                uid = int(rest)
+            except ValueError:
+                try:
+                    uid = (await event.client.get_entity(rest)).id
+                except Exception:
+                    return await event.eor("`Couldn't find that user. Reply to them, or give a valid @username / id.`")
+        if not uid:
+            return await event.eor("`Reply to the person, or: .funuser add @username (or their id).`")
+        if uid in ids:
+            return await event.eor("`Already added.`")
+        ids.append(uid)
+        udB.set_key("FUN_USERS", ids)
+        return await event.eor(
+            "💞 `Added {}. They can now use the love animations "
+            "({h}propose {h}love {h}rose {h}hearts {h}lovecalc) — nothing else.`".format(uid, h=HNDLR)
+        )
+
+    if not ids:
+        return await event.eor(
+            "👥 **Fun users:** none (only you).\n\n"
+            "Add someone: reply with `{h}funuser add`, or `{h}funuser add @username`.".format(h=HNDLR)
+        )
+    lines = "\n".join("• `{}`".format(i) for i in ids)
+    await event.eor(
+        "👥 **Fun users** (love animations only):\n{}\n\n"
+        "`{h}funuser del <id>`  ·  `{h}funuser clear`".format(lines, h=HNDLR)
+    )
