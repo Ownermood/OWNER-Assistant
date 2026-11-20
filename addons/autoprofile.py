@@ -8,19 +8,13 @@
 # Ported Plugin
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}autoname`
-   `Starts AUTONAME`.
+• `{i}autoname` / `{i}stopname`
+    Start or stop showing the live time and date in your name.
 
-• `{i}stopname`
-   `Stops AUTONAME.`
-
-• `{i}autobio`
-   `Starts AUTOBIO.`
-
-• `{i}stopbio`
-   `Stops AUTOBIO.`
+• `{i}autobio` / `{i}stopbio`
+    Start or stop a live bio with the date, time and a random line.
 """
 
 import asyncio
@@ -79,20 +73,20 @@ def _start(key, func):
 async def autoname_(event):
     if event.pattern_match.group(1) == "stop":
         udB.del_key("AUTONAME")
-        return await event.eor("`AUTONAME has been Stopped !`")
+        return await event.eor("AUTONAME has been stopped!")
     udB.set_key("AUTONAME", "True")
     _start("AUTONAME", _name_loop)
-    await eod(event, "`Started AUTONAME`")
+    await eod(event, "Started AUTONAME")
 
 
 @ultroid_cmd(pattern="(auto|stop)bio$")
 async def autobio_(event):
     if event.pattern_match.group(1) == "stop":
         udB.del_key("AUTOBIO")
-        return await event.eor("`AUTOBIO has been Stopped !`")
+        return await event.eor("AUTOBIO has been stopped!")
     udB.set_key("AUTOBIO", "True")
     _start("AUTOBIO", _bio_loop)
-    await eod(event, "`Started AUTOBIO`")
+    await eod(event, "Started AUTOBIO")
 
 
 # Resume after a restart.

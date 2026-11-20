@@ -6,10 +6,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
 • `{i}bored`
-    Get some activity to do when you get bored
+    Get an idea for something to do when you're bored.
 """
 
 from . import async_searcher, ultroid_cmd
@@ -17,7 +17,7 @@ from . import async_searcher, ultroid_cmd
 
 @ultroid_cmd(pattern="bored$")
 async def bored_cmd(event):
-    msg = await event.eor("`Generating an Activity for You!`")
+    msg = await event.eor("Generating an Activity for you!")
     content = await async_searcher(
         "https://bored-api.appbrewery.com/random", re_json=True
     )

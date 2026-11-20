@@ -32,7 +32,7 @@ async def kang_cmd(ult):
     if not isinstance(sender, User):
         return
     if not ult.is_reply:
-        return await ult.eor("`Reply to a sticker/photo..`", time=5)
+        return await ult.eor("Reply to a sticker/photo.", time=5)
     reply = await ult.get_reply_message()
     if sender.username:
         pre = sender.username[:4]
@@ -61,7 +61,7 @@ async def kang_cmd(ult):
     elif reply.text:
         dl = await Quotly().create_quotly(reply)
     else:
-        return await ult.eor("`Reply to sticker or text to add it in your pack...`")
+        return await ult.eor("Reply to sticker or text to add it in your pack.")
     if not emoji:
         emoji = "🏵"
     if dl:
@@ -159,7 +159,7 @@ async def kang_cmd(ult):
 async def do_magic(ult):
     ko = udB.get_key("STICKERS") or {}
     if not ko.get(ult.sender_id):
-        return await ult.reply("No Sticker Pack Found!")
+        return await ult.reply("No sticker pack found!")
     al_ = []
     ul = ko[ult.sender_id]
     for _ in ul.keys():

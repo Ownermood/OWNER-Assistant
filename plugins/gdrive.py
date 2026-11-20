@@ -5,24 +5,22 @@
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 """
-✘ Commands Available
+📖 **Commands**
 
-• `{i}gdul <reply/file name>`
-    Reply to file to upload on Google Drive.
-    Add file name to upload on Google Drive.
+• `{i}gdul` (reply to a file) or `{i}gdul <file path>`
+    Upload a file to your Google Drive.
 
-• `{i}gdown <file id/link> | <filename>`
-    Download from Gdrive link or file id.
+• `{i}gdown <link or file ID> | <file name (optional)>`
+    Download a file from Google Drive.
 
-• `{i}gdsearch <file name>`
-    Search file name on Google Drive and get link.
+• `{i}gdsearch <name>`
+    Search your Google Drive and get links.
 
 • `{i}gdlist`
-    List all GDrive files.
+    List all your Google Drive files.
 
 • `{i}gdfolder`
-    Link to your Google Drive Folder.
-    If added then all files will be uploaded in this folder.
+    Get the link to your upload folder. If one is set, every upload goes there.
 """
 
 import os
@@ -44,7 +42,7 @@ async def gdown(event):
     GDrive = GDriveManager()
     match = event.pattern_match.group(1).strip()
     if not match:
-        return await eod(event, "`Give file id or Gdrive link to download from!`")
+        return await eod(event, "Give file id or Gdrive link to download from!")
     filename = match.split(" | ")[1].strip() if " | " in match else None
     eve = await event.eor(get_string("com_1"))
     _start = time.time()
@@ -104,7 +102,7 @@ async def _(event):
         return await eod(event, get_string("gdrive_6").format(asst.me.username))
     input_file = event.pattern_match.group(1).strip() or await event.get_reply_message()
     if not input_file:
-        return await eod(event, "`Reply to file or give its location.`")
+        return await eod(event, "Reply to file or give its location.")
     mone = await event.eor(get_string("com_1"))
     if isinstance(input_file, Message):
         location = "resources/downloads"
@@ -134,7 +132,7 @@ async def _(event):
         if not os.path.exists(filename):
             return await eod(
                 mone,
-                "File Not found in local server. Give me a file path :((",
+                "File not found in local server. Give me a file path :((",
                 time=5,
             )
     folder_id = None
@@ -142,7 +140,7 @@ async def _(event):
         files = os.listdir(filename)
         if not files:
             return await eod(
-                mone, "`Requested directory is empty. Can't create empty directory.`"
+                mone, "Requested directory is empty. Can't create empty directory."
             )
         folder_id = GDrive.create_directory(filename)
         c = 0
@@ -181,7 +179,7 @@ async def _(event):
         return await event.eor(get_string("gdrive_6").format(asst.me.username))
     input_str = event.pattern_match.group(1).strip()
     if not input_str:
-        return await event.eor("`Give filename to search on GDrive...`")
+        return await event.eor("Give filename to search on GDrive.")
     eve = await event.eor(f"`Searching for {input_str} in G-Drive...`")
     files = GDrive.search(input_str)
     msg = ""
@@ -229,4 +227,4 @@ async def _(event):
             + GDrive._create_folder_link(GDrive.folder_id)
         )
     else:
-        await eod(event, "Set FOLDERID from your Assistant bot's Settings ")
+        await eod(event, "Set FOLDERID from your Assistant bot's settings ")

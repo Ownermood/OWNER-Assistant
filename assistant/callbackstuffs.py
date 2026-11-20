@@ -292,12 +292,12 @@ async def update(eve):
             heroku_applications = heroku.apps()
         except BaseException as er:
             LOGS.exception(er)
-            return await eve.edit("`Wrong HEROKU_API.`")
+            return await eve.edit("Wrong HEROKU_API.")
         for app in heroku_applications:
             if app.name == app_name:
                 heroku_app = app
         if not heroku_app:
-            await eve.edit("`Wrong HEROKU_APP_NAME.`")
+            await eve.edit("Wrong HEROKU_APP_NAME.")
             repo.__del__()
             return
         await eve.edit(get_string("clst_1"))
@@ -489,7 +489,7 @@ async def _(e):
             id = id.split("?id=")[-1]
         udB.set_key("GDRIVE_FOLDER_ID", id)
         await repl.reply(
-            "`Success.`",
+            "Success.",
             buttons=get_back_button("gdrive"),
         )
 
@@ -696,7 +696,7 @@ async def tagloggrr(e):
         get_back_button("cbs_otvars"),
     ]
     await e.edit(
-        "Choose Options",
+        "Choose options",
         buttons=BUTTON,
     )
 
@@ -704,7 +704,7 @@ async def tagloggrr(e):
 @callback("deltag", owner=True)
 async def _(e):
     udB.del_key("TAG_LOG")
-    await e.answer("Done!!! Tag Logger has been turned Off")
+    await e.answer("Done!!! Tag Logger has been turned off")
 
 
 @callback("eaddon", owner=True)
@@ -738,7 +738,7 @@ async def eddon(event):
 async def eddof(event):
     udB.set_key("ADDONS", "False")
     await event.edit(
-        "Done! ADDONS has been turned off!! After Setting All Things Do Restart",
+        "Done! ADDONS has been turned off!! After setting all Things do Restart",
         buttons=get_back_button("eaddon"),
     )
 
@@ -775,7 +775,7 @@ async def eddof(event):
     var = "SUDO"
     await setit(event, var, "False")
     await event.edit(
-        "Done! SUDO MODE has been turned off!! After Setting All Things Do Restart",
+        "Done! SUDO MODE has been turned off!! After setting all Things do Restart",
         buttons=get_back_button("sudo"),
     )
 
@@ -1009,7 +1009,7 @@ async def apon(event):
     var = "AUTOAPPROVE"
     await setit(event, var, "True")
     await event.edit(
-        "Done!! AUTOAPPROVE  Started!!",
+        "Done!! AUTOAPPROVE  started!",
         buttons=[[Button.inline("« Back", data="cbs_apauto")]],
     )
 
@@ -1019,7 +1019,7 @@ async def apof(event):
     try:
         udB.set_key("AUTOAPPROVE", "False")
         return await event.edit(
-            "Done! AUTOAPPROVE Stopped!!",
+            "Done! AUTOAPPROVE stopped!",
             buttons=[[Button.inline("« Back", data="cbs_apauto")]],
         )
     except BaseException as er:
@@ -1039,7 +1039,7 @@ async def l_vcs(event):
     )
 
     await event.edit(
-        "PMLOGGER This Will Forward Ur Pm to Ur Private Group -",
+        "PMLOGGER this Will Forward your Pm to your Private group -",
         buttons=[
             BT,
             [Button.inline("PM Log Group", "abs_pmlgg")],
@@ -1052,7 +1052,7 @@ async def l_vcs(event):
 async def pmlog(event):
     await setit(event, "PMLOG", "True")
     await event.edit(
-        "Done!! PMLOGGER  Started!!",
+        "Done!! PMLOGGER  started!",
         buttons=[[Button.inline("« Back", data="pml")]],
     )
 
@@ -1062,7 +1062,7 @@ async def pmlogof(event):
     try:
         udB.del_key("PMLOG")
         return await event.edit(
-            "Done! PMLOGGER Stopped!!",
+            "Done! PMLOGGER stopped!",
             buttons=[[Button.inline("« Back", data="pml")]],
         )
     except BaseException as er:
@@ -1078,7 +1078,7 @@ async def pmonn(event):
     var = "PMSETTING"
     await setit(event, var, "True")
     await event.edit(
-        "Done! PMPermit has been turned on!!",
+        "Done! PMPermit has been turned on!",
         buttons=[[Button.inline("« Back", data="cbs_ppmset")]],
     )
 
@@ -1088,7 +1088,7 @@ async def pmofff(event):
     var = "PMSETTING"
     await setit(event, var, "False")
     await event.edit(
-        "Done! PMPermit has been turned off!!",
+        "Done! PMPermit has been turned off!",
         buttons=[[Button.inline("« Back", data="cbs_ppmset")]],
     )
 
@@ -1196,7 +1196,7 @@ async def chon(event):
         for i, e in AST_PLUGINS["pmbot"]:
             event.client.add_event_handler(i, events.NewMessage(**e))
     await event.edit(
-        "Done! Now u Can Chat With People Via This Bot",
+        "Done! Now you Can chat with People Via this Bot",
         buttons=[Button.inline("« Back", data="cbs_chatbot")],
     )
 
@@ -1209,7 +1209,7 @@ async def chon(event):
         for i, e in AST_PLUGINS["pmbot"]:
             event.client.remove_event_handler(i)
     await event.edit(
-        "Done! Chat People Via This Bot Stopped.",
+        "Done! Chat People Via this Bot stopped.",
         buttons=[Button.inline("« Back", data="cbs_chatbot")],
     )
 
@@ -1266,7 +1266,7 @@ async def fdroid_dler(event):
     uri = event.data_match.group(1).decode("utf-8")
     if FD_MEDIA.get(uri):
         return await event.edit(file=FD_MEDIA[uri])
-    await event.answer("• Starting Download •", alert=True)
+    await event.answer("• Starting download •", alert=True)
     await event.edit("• Downloading.. •")
     URL = f"https://f-droid.org/packages/{uri}"
     conte = await async_searcher(URL, re_content=True)

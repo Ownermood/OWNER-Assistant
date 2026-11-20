@@ -2,12 +2,10 @@
 # Made For : https://github.com/TeamUltroid/UltroidAddons
 
 """
-Search animes and manga from anilist.co using @animedb_bot
+📖 **Commands**
 
-✘ Commands Available
-
-• `{i}manga <keyword>`
-    To get manga info
+• `{i}manga <name>`
+    Get details about a manga (from anilist.co).
 """
 
 
@@ -18,10 +16,10 @@ from . import *
     pattern="manga(?: |$)(.*)",
 )
 async def manga(ult):
-    msg = await ult.eor("`Searching ...`")
+    msg = await ult.eor("Searching ...")
     keyword = ult.pattern_match.group(1)
     if not keyword:
-        return await msg.edit("`Provide a Keyword to search`")
+        return await msg.edit("Provide a Keyword to search")
     try:
         animes = await ult.client.inline_query("animedb_bot", f"<m> {keyword}")
         await animes[0].click(
@@ -32,4 +30,4 @@ async def manga(ult):
         )
         return await msg.delete()
     except Exception:
-        return await msg.edit("`No Results Found ...`")
+        return await msg.edit("No results found ...")

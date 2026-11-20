@@ -153,7 +153,7 @@ async def date(event):
 async def _(event):
     result = await event.client(GetAdminedPublicChannelsRequest())
     if not result.chats:
-        return await event.eor("`No username Reserved`")
+        return await event.eor("No username Reserved")
     output_str = "".join(
         f"- {channel_obj.title} @{channel_obj.username} \n"
         for channel_obj in result.chats
@@ -167,7 +167,7 @@ async def _(event):
 async def stats(
     event: NewMessage.Event,
 ):
-    ok = await event.eor("`Collecting stats...`")
+    ok = await event.eor("Collecting stats.")
     start_time = time.time()
     private_chats = 0
     bots = 0
@@ -256,14 +256,14 @@ async def _(event):
             message = read_text_file(downloaded_file_name)
             os.remove(downloaded_file_name)
             if message is None:
-                return await xx.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
+                return await xx.eor("Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.", time=8)
         else:
             message = previous_message.message
     else:
         message = None
     if not message:
         return await xx.eor(
-            "`Reply to a Message/Document or Give me Some Text !`", time=5
+            "Reply to a message/document or give me some text!", time=5
         )
     done, data = await get_paste(message)
     if not done and data.get("error"):
@@ -451,7 +451,7 @@ async def abs_rmbg(event):
         Image.open(dl).save(file)
         os.remove(dl)
         dl = file
-    xx = await event.eor("`Sending to remove.bg`")
+    xx = await event.eor("Sending to remove.bg")
     dn, out = await ReTrieveFile(dl)
     os.remove(dl)
     if not dn:
@@ -485,7 +485,7 @@ async def telegraphcmd(event):
     match = event.pattern_match.group(1).strip() or "OWNER Assistant"
     reply = await event.get_reply_message()
     if not reply:
-        return await xx.eor("`Reply to Message.`")
+        return await xx.eor("Reply to message.")
     if not reply.media and reply.message:
         content = reply.message
     else:
@@ -574,7 +574,7 @@ async def sugg(event):
     if not (event.is_reply or text):
         return await eod(
             event,
-            "`Please reply to a message to make a suggestion poll!`",
+            "Please reply to a message to make a suggestion poll!",
         )
     if event.is_reply and not text:
         reply = await event.get_reply_message()
@@ -738,10 +738,10 @@ async def get_thumbnail(file_path, thumbnail_path):
 async def get_restricted_msg(event):
     match = event.pattern_match.group(1).strip()
     if not match:
-        await event.eor("`Please provide a link!`", time=5)
+        await event.eor("Please provide a link!", time=5)
         return
     
-    xx = await event.eor("`Loading...`")
+    xx = await event.eor("Loading...")
     chat, msg = get_chat_and_msgid(match)
     if not (chat and msg):
         return await event.eor(
@@ -758,7 +758,7 @@ async def get_restricted_msg(event):
         return await event.eor(f"**ERROR**\n`{er}`")
     
     if not message:
-        return await event.eor("`Message not found or may not exist.`")
+        return await event.eor("Message not found or may not exist.")
     
     try:
         await event.client.send_message(event.chat_id, message)
@@ -825,7 +825,7 @@ async def get_restricted_msg(event):
                 os.remove(thumb_path)
             await xx.try_delete()
         else:
-            await event.eor("`Cannot process this type of media.`")
+            await event.eor("Cannot process this type of media.")
     else:
-        await event.eor("`No media found in the message.`")
+        await event.eor("No media found in the message.")
 

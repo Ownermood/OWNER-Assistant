@@ -76,7 +76,7 @@ async def _(ult):
 @ultroid_cmd(pattern="setpic$", fullsudo=True)
 async def _(ult):
     if not ult.is_reply:
-        return await ult.eor("`Reply to a Media..`", time=5)
+        return await ult.eor("Reply to a photo or video.", time=5)
     reply_message = await ult.get_reply_message()
     ok = await ult.eor(get_string("com_1"))
     replfile = await reply_message.download_media()
@@ -86,7 +86,7 @@ async def _(ult):
             await ult.client(UploadProfilePhotoRequest(file=file))
         else:
             await ult.client(UploadProfilePhotoRequest(video=file))
-        await eod(ok, "`My Profile Photo has Successfully Changed !`")
+        await eod(ok, "✅ Profile photo changed.")
     except Exception as ex:
         await eod(ok, f"Error occured.\n`{str(ex)}`")
     os.remove(replfile)
@@ -97,7 +97,7 @@ async def _(ult):
 
 @ultroid_cmd(pattern="delpfp( (.*)|$)", fullsudo=True)
 async def remove_profilepic(delpfp):
-    ok = await eor(delpfp, "`...`")
+    ok = await eor(delpfp, "...")
     group = delpfp.text[8:]
     if group == "all":
         lim = 0
@@ -154,7 +154,7 @@ async def gpoto(e):
             else:
                 okla.append(photo_path)
     if not okla:
-        return await eor(a, "`Pfp Not Found...`")
+        return await eor(a, "No profile photo found.")
     if not just_dl:
         await a.delete()
         await e.reply(file=okla)

@@ -6,10 +6,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
 • `{i}sticklet <text>`
-   `create random sticker with text.`
+    Make a colourful text sticker.
 """
 
 import io
@@ -37,13 +37,13 @@ async def sticklet(event):
             if msg and msg.text:
                 sticktext = msg.text
             else:
-                return await a.eor("`Give me some Text`")
+                return await a.eor("Give me some text")
         except BotMethodInvalidError:
-            return await a.eor("`Give me some Text`")
+            return await a.eor("Give me some text")
     else:
         sticktext = event.pattern_match.group(1)
     if not sticktext:
-        return await event.eor("`Give me some Text`")
+        return await event.eor("Give me some text")
     sticktext = textwrap.wrap(sticktext, width=10)
     # converts back the list to a string
     sticktext = "\n".join(sticktext)

@@ -31,7 +31,7 @@ async def echo(e):
             else:
                 user = int(user)
         except BaseException:
-            return await e.eor("Reply To A user.", time=5)
+            return await e.eor("Reply to someone's message.", time=5)
     if check_echo(e.chat_id, user):
         return await e.eor("Echo already activated for this user.", time=5)
     add_echo(e.chat_id, user)
@@ -54,7 +54,7 @@ async def rm(e):
             else:
                 user = int(user)
         except BaseException:
-            return await e.eor("Reply To A User.", time=5)
+            return await e.eor("Reply to someone's message.", time=5)
     if check_echo(e.chat_id, user):
         rem_echo(e.chat_id, user)
         ok = await e.client.get_entity(user)
@@ -73,4 +73,4 @@ async def lstecho(e):
             user += f"•{kk}" + "\n"
         await e.eor(user)
     else:
-        await e.eor("`List is Empty, For echo`", time=5)
+        await e.eor("Echo isn't on for anyone.", time=5)

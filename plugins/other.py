@@ -66,10 +66,10 @@ async def saf(e):
     x = await e.get_reply_message()
     if not x:
         return await eod(
-            e, "Reply to Any Message to save it to ur saved messages", time=5
+            e, "Reply to any message to save it to your saved messages", time=5
         )
     if e.pattern_match.group(1).strip() == "f":
         await x.forward_to(e.sender_id)
     else:
         await e.client.send_message(e.sender_id, x)
-    await e.eor("Message saved to Your Pm/Saved Messages.", time=5)
+    await e.eor("Message saved to your Pm/Saved messages.", time=5)

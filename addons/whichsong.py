@@ -5,10 +5,10 @@
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}whichsong`
-   Reply to a song file, to recognise the song.
+• `{i}whichsong` (reply to a song file)
+    Find out which song it is.
 """
 
 from os import remove

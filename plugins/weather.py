@@ -6,14 +6,16 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-**Get Weather Data using OpenWeatherMap API**
-❍  Commands Available -
+📖 **Commands**
 
-• `{i}weather` <city name>
-    Shows the Weather of Cities
+• `{i}weather <city>`
+    See the weather in a city.
+    Example: `{i}weather Delhi`
 
-• `{i}air` <city name>
-    Shows the Air Condition of Cities
+• `{i}air <city>`
+    See the air quality in a city.
+
+    Needs an OpenWeatherMap API key: `{i}setdb OPENWEATHER_API <key>`
 """
 
 import datetime
@@ -83,7 +85,7 @@ async def weather(event):
         return
     input_str = event.pattern_match.group(1)
     if not input_str:
-        await event.eor("No Location was Given...", time=5)
+        await event.eor("No Location was Given.", time=5)
         return
     elif input_str == "butler":
         await event.eor("search butler,au for australila", time=5)
@@ -133,7 +135,7 @@ async def air_pollution(event):
         return
     input_str = event.pattern_match.group(1)
     if not input_str:
-        await event.eor("`No Location was Given...`", time=5)
+        await event.eor("No Location was Given.", time=5)
         return
     try:
         geo_data = await async_searcher(
@@ -145,7 +147,7 @@ async def air_pollution(event):
         LOGS.info(e)
         geo_data = None
     if not isinstance(geo_data, list) or not geo_data:
-        await event.eor("`Unable to find coordinates for the given location.`", time=5)
+        await event.eor("Unable to find coordinates for the given location.", time=5)
         return
     place = geo_data[0]
     latitude, longitude = place["lat"], place["lon"]
@@ -154,7 +156,7 @@ async def air_pollution(event):
     air_pollution_data = await get_air_pollution_data(latitude, longitude, x)
     if air_pollution_data is None:
         await event.eor(
-            "`Unable to fetch air pollution data for the given location.`", time=5
+            "Unable to fetch air pollution data for the given location.", time=5
         )
         return
     await msg.edit(

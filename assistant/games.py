@@ -239,7 +239,7 @@ async def choose_cata(event):
         )
         qs = qsss["results"]
         if not qs:
-            await event.respond("Sorry, No Question Found for the given Criteria..")
+            await event.respond("Sorry, no question found for the given Criteria.")
             await event.delete()
             return
         TRIVIA_CHATS.update({chat: {}})

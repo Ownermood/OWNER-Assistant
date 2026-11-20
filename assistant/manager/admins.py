@@ -20,7 +20,7 @@ async def dowj(e):
     if replied:
         user = replied.sender_id
     else:
-        return await e.eor("Reply to a message...")
+        return await e.eor("Reply to a message.")
     try:
         await replied.delete()
         if e.pattern_match.group(1).strip() == "kick":
@@ -42,9 +42,9 @@ async def callback_(event):
     try:
         perm = await event.client.get_permissions(event.chat_id, event.sender_id)
     except UserNotParticipantError:
-        return await event.answer("Join the Group First!", alert=True)
+        return await event.answer("Join the group first!", alert=True)
     if not perm.is_admin:
-        return await event.answer("You are not an Admin!", alert=True)
+        return await event.answer("You are not an admin!", alert=True)
     _ult_cache["admin_callback"].update({data: (event.sender, perm)})
-    await event.answer("Verification Done!")
+    await event.answer("Verification done!")
     await event.delete()

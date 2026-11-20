@@ -149,12 +149,12 @@ async def setgb(event):
             add_goodbye(event.chat_id, txt, m, btn)
         else:
             add_goodbye(event.chat_id, None, m, btn)
-        await eor(x, "`Goodbye note saved`")
+        await eor(x, "Goodbye note saved")
     elif text:
         if not btn:
             txt, btn = get_msg_button(text)
         add_goodbye(event.chat_id, txt, None, btn)
-        await eor(x, "`Goodbye note saved`")
+        await eor(x, "Goodbye note saved")
     else:
         await eor(x, get_string("grt_7"), time=5)
 
@@ -164,7 +164,7 @@ async def clearwgb(event):
     if not get_goodbye(event.chat_id):
         return await event.eor(get_string("grt_6"), time=5)
     delete_goodbye(event.chat_id)
-    await event.eor("`Goodbye Note Deleted`", time=5)
+    await event.eor("Goodbye note deleted", time=5)
 
 
 @ultroid_cmd(pattern="getgoodbye$", groups_only=True)

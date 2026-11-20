@@ -40,7 +40,7 @@ async def _(event):
             )
             _webupload_cache[int(event.chat_id)][int(event.id)] = file.name
     else:
-        return await xx.eor("Reply to file or give file path...")
+        return await xx.eor("Reply to file or give file path.")
     if not event.client._bot:
         results = await event.client.inline_query(
             asst.me.username, f"fl2lnk {event.chat_id}:{event.id}"
@@ -51,4 +51,4 @@ async def _(event):
     else:
         __cache = f"{event.chat_id}:{event.id}"
         buttons = webupload_buttons(__cache)
-        await xx.edit("Choose Server to Upload File...", buttons=buttons)
+        await xx.edit("Pick a site to upload the file to.", buttons=buttons)

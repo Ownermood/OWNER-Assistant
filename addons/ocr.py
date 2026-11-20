@@ -8,10 +8,13 @@
 
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}ocr <language code><reply to a photo>`
-    text recognition service.
+• `{i}ocr <language code>` (reply to a photo)
+    Read the text in a photo.
+    Example: `{i}ocr eng`
+
+    Needs a free key from ocr.space: `{i}setdb OCR_API <key>`
 """
 
 
@@ -46,15 +49,15 @@ TE = f"API not found, Please get it from ocr.space and set\n\ncommand `{HNDLR}se
 @ultroid_cmd(pattern="ocr( (.*)|$)")
 async def ocrify(ult):
     if not ult.is_reply:
-        return await ult.eor("`Reply to Photo...`")
-    msg = await ult.eor("`Processing..`")
+        return await ult.eor("Reply to photo.")
+    msg = await ult.eor("Processing...")
     OAPI = udB.get_key("OCR_API")
     if not OAPI:
         return await msg.edit(TE)
     pat = ult.pattern_match.group(1).strip()
     repm = await ult.get_reply_message()
     if not repm.photo:
-        return await msg.edit("`Not a Photo..`")
+        return await msg.edit("Not a photo.")
     dl = await repm.download_media()
     try:
         trt = await ocr_space(dl, OAPI, pat or None)

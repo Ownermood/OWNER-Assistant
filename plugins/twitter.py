@@ -6,20 +6,19 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}tw <tweet text>`
-    Tweet the text.
+• `{i}tw <text>`
+    Post a tweet.
 
-• `{i}twdetail <tweet id/link>`
-    Get tweet details with reply/quote/comment count.
+• `{i}twdetail <tweet link or ID>`
+    See a tweet's details (likes, replies, quotes).
 
 • `{i}twuser <username>`
-    Get user details of the Twitter account.
+    See a Twitter/X profile.
 
 • `{i}twl <tweet link>`
-    Upload the tweet media to telegram.
-
+    Download a tweet's photos and videos.
 """
 
 import os

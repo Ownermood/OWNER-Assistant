@@ -6,13 +6,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available
+📖 **Commands**
 
-• `{i}clone <reply/username>`
-    clone the identity of user.
+• `{i}clone` (reply, or add @username)
+    Copy someone's name, bio and photo onto your account (for fun).
 
 • `{i}revert`
-    Revert to your original identity
+    Go back to your own name, bio and photo.
 """
 import os
 
@@ -74,7 +74,7 @@ async def _(event):
     try:
         user = await _target_user(event)
         if not user or getattr(user, "broadcast", False) or not hasattr(user, "first_name"):
-            return await eve.edit("`Reply to a user or give a username to clone.`")
+            return await eve.edit("Reply to a user or give a username to clone.")
         full = await event.client(GetFullUserRequest(user.id))
     except Exception as er:
         return await eve.edit(f"`{er}`")
@@ -134,7 +134,7 @@ async def _(event):
 async def _(event):
     backup = udB.get_key(BACKUP_KEY)
     if not backup:
-        return await event.eor("`You haven't cloned anyone, nothing to revert.`")
+        return await event.eor("You haven't cloned anyone, nothing to revert.")
     client = event.client
     # Delete only the photos that .clone added - never your own DP.
     if backup.get("photos"):
@@ -159,4 +159,4 @@ async def _(event):
         )
     )
     udB.del_key(BACKUP_KEY)
-    await event.eor("Succesfully reverted to your account back !")
+    await event.eor("Successfully reverted to your account back!")

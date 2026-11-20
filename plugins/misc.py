@@ -62,7 +62,7 @@ async def diela(e):
 async def pinterest(e):
     m = e.pattern_match.group(1).strip()
     if not m:
-        return await e.eor("`Give pinterest link.`", time=3)
+        return await e.eor("Give pinterest link.", time=3)
     msg = await e.eor(get_string("com_1"))
     try:
         from yt_dlp import YoutubeDL
@@ -87,14 +87,14 @@ async def pinterest(e):
 async def mobs(e):
     mat = e.pattern_match.group(1).strip()
     if not mat:
-        await e.eor("Please Give a Mobile Name to look for.")
+        await e.eor("Please give a Mobile name to look for.")
     query = mat.replace(" ", "%20")
     jwala = f"https://gadgets.ndtv.com/search?searchtext={query}"
     c = await async_searcher(jwala)
     b = bs(c, "html.parser", from_encoding="utf-8")
     co = b.find_all("div", "rvw-imgbox")
     if not co:
-        return await e.eor("No Results Found!")
+        return await e.eor("No results found!")
     bt = await e.eor(get_string("com_1"))
     out = "**📱 Mobile / Gadgets Search**\n\n"
     li = co[0].find("a")

@@ -1,12 +1,13 @@
 # credit https://t.me/I_m_FlaSh
 
 """
-✘ Commands Available -
-• `{i}totalmsgs`
-    Returns your total msg count in current chat
+📖 **Commands**
 
-• `{i}totalmsgs [username]/<reply>`
-    Returns total msg count of user in current chat
+• `{i}totalmsgs`
+    See how many messages you've sent in this chat.
+
+• `{i}totalmsgs <username>` (or reply to someone)
+    See how many messages they've sent here.
 """
 
 from telethon.utils import get_display_name

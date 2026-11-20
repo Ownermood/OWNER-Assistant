@@ -52,7 +52,7 @@ async def warn(e):
             else:
                 user = int(user)
         except BaseException:
-            return await e.eor("Reply To A User", time=5)
+            return await e.eor("Reply to someone's message.", time=5)
         try:
             reason = e.text.split(maxsplit=2)[-1]
         except BaseException:
@@ -71,25 +71,25 @@ async def warn(e):
             try:
                 await ultroid_bot.edit_permissions(e.chat_id, user, view_messages=False)
             except BaseException:
-                return await e.eor("`Something Went Wrong.`", time=5)
+                return await e.eor(get_string("com_7"), time=5)
         elif "kick" in action:
             try:
                 await ultroid_bot.kick_participant(e.chat_id, user)
             except BaseException:
-                return await e.eor("`Something Went Wrong.`", time=5)
+                return await e.eor(get_string("com_7"), time=5)
         elif "mute" in action:
             try:
                 await ultroid_bot.edit_permissions(
                     e.chat_id, user, until_date=None, send_messages=False
                 )
             except BaseException:
-                return await e.eor("`Something Went Wrong.`", time=5)
+                return await e.eor(get_string("com_7"), time=5)
         add_warn(e.chat_id, user, count + 1, r)
         c, r = warns(e.chat_id, user)
         ok = await ultroid_bot.get_entity(user)
         user = inline_mention(ok)
         r = r.split("|$|")
-        text = f"User {user} Got {action} Due to {count+1} Warns.\n\n"
+        text = f"{user} reached {count+1} warnings, so I used: **{action}**.\n\n"
         for x in range(c):
             text += f"•**{x+1}.** {r[x]}\n"
         await e.eor(text)
@@ -99,7 +99,7 @@ async def warn(e):
     user = inline_mention(ok)
     await eor(
         e,
-        f"**WARNING :** {count+1}/{number}\n**To :**{user}\n**Be Careful !!!**\n\n**Reason** : {reason}",
+        f"⚠️ **Warning {count+1}/{number}** for {user}\nPlease follow the group rules.\n\n**Reason:** {reason}",
     )
 
 
@@ -122,11 +122,11 @@ async def rwarn(e):
             else:
                 user = int(user)
         except BaseException:
-            return await e.eor("Reply To user")
+            return await e.eor("Reply to someone's message.")
     reset_warn(e.chat_id, user)
     ok = await e.client.get_entity(user)
     user = inline_mention(ok)
-    await e.eor(f"Cleared All Warns of {user}.")
+    await e.eor(f"✅ Cleared all warnings for {user}.")
 
 
 @ultroid_cmd(
@@ -148,25 +148,25 @@ async def twarns(e):
             else:
                 user = int(user)
         except BaseException:
-            return await e.eor("Reply To A User", time=5)
+            return await e.eor("Reply to someone's message.", time=5)
     c, r = warns(e.chat_id, user)
     if c and r:
         ok = await e.client.get_entity(user)
         user = inline_mention(ok)
         r = r.split("|$|")
-        text = f"User {user} Got {c} Warns.\n\n"
+        text = f"{user} has {c} warnings:\n\n"
         for x in range(c):
             text += f"•**{x+1}.** {r[x]}\n"
         await e.eor(text)
     else:
-        await e.eor("`No Warnings`")
+        await e.eor("No warnings for this person.")
 
 
 @ultroid_cmd(pattern="setwarn( (.*)|$)", manager=True)
 async def warnset(e):
     ok = e.pattern_match.group(1).strip()
     if not ok:
-        return await e.eor("Invalid format. Correct usage: .setwarns <number>|<action>")
+        return await e.eor("That format isn't right. Example: `.setwarn 3 | mute`")
     if "|" in ok:
         try:
             number, action = ok.split("|")
@@ -174,13 +174,13 @@ async def warnset(e):
             action = action.strip()
         except ValueError:
             return await e.eor(
-                "Invalid format. Correct usage: .setwarns <number>|<action>", time=5
+                "That format isn't right. Example: `.setwarn 3 | mute`", time=5
             )
         if action not in ["ban", "mute", "kick"]:
-            return await e.eor("Only mute / ban / kick options are supported", time=5)
+            return await e.eor("The action must be mute, ban or kick.", time=5)
         udB.set_key("SETWARN", f"{number} {action}")
-        await e.eor(f"Done. Your Warn Count is now {number} and Action is {action}")
+        await e.eor(f"✅ Done. After {number} warnings I'll {action} the person.")
     else:
         await e.eor(
-            "Invalid format. Correct usage: .setwarns <number>|<action>", time=5
+            "That format isn't right. Example: `.setwarn 3 | mute`", time=5
         )

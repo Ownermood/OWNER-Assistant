@@ -7,10 +7,10 @@
 
 
 """
-✘ Commands Available
+📖 **Commands**
 
 • `{i}qfancy`
-    Gets random quotes from QuoteFancy.com.
+    Get a random quote picture.
 """
 
 import asyncio

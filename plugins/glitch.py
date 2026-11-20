@@ -5,10 +5,10 @@
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 """
-✘ Commands Available -
+📖 **Commands**
 
-•`{i}glitch <reply to media>`
-    gives a glitchy gif.
+• `{i}glitch` (reply to a photo or sticker)
+    Make a glitchy GIF from it.
 """
 import os
 

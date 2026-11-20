@@ -6,15 +6,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-Fasly Bot Cheat.
+📖 **Commands**
 
-• `{i}fastly` - On/Off command. 
+• `{i}fastly`
+    Turn the @FastlyWriteBot auto-answer on or off. It tries to reply first to that bot's typing games.
 
-• Also Required : `OCR_API`. Add it using the command `.setdb OCR_API api_key`
-• To get the API visit 'https://ocr.space/ocrapi'
-The bot will try to auto reply first to the messages by @FastlyWriteBot
-
-• Add User id of fastly clone to `FASTLY_CLONES` to allow this plugin work with them.
+    Needs an OCR key: get one at ocr.space/ocrapi, then `{i}setdb OCR_API <key>`.
+    For copies of that bot, add their user IDs to `FASTLY_CLONES`.
 """
 
 from telethon import events
@@ -61,16 +59,16 @@ async def fastly_bot(event):
 
 @ultroid_cmd(pattern="fastly$")
 async def fastOnOff(event):
-    xx = await event.eor("`...`")
+    xx = await event.eor("...")
     get_ = udB.get_key("FASTLY")
     if not get_:
         if not udB.get_key("OCR_API"):
             return await xx.edit("`OCR_API` is missing.\nAdd it before using this..")
         udB.set_key("FASTLY", True)
         _add_handler()
-        return await xx.edit("`Auto Fastly Response Activated`")
+        return await xx.edit("Auto Fastly Response Activated")
     udB.del_key("FASTLY")
-    await xx.edit("`Fastly Stopped!`")
+    await xx.edit("Fastly stopped!")
 
 
 _ADDED = []

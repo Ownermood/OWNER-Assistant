@@ -1,15 +1,11 @@
 # credits to @Harpia-Vieillot
 # For @TeamUltroid
 """
-✘ Commands Available
+📖 **Commands**
 
-• `{i}wreplace <count> <old word>;<new word>`
-    Note : Don't use brackets
-
-  Ex. :
-   `{i}wreplace 10 Hi;Hello`
-
-  Use: It replaces a perticular word by new word (only in your msgs.) In many msgs at a time
+• `{i}wreplace <how many messages> <old word>;<new word>`
+    Replace a word in your own recent messages.
+    Example: `{i}wreplace 10 Hi;Hello` changes 'Hi' to 'Hello' in your last 10 messages.
 """
 
 import asyncio
@@ -39,4 +35,4 @@ async def harpia(e):
             await asyncio.sleep(1)
         except InlineBotRequiredError:
             pass
-    await eod(msg, "Finished...")
+    await eod(msg, "Finished.")

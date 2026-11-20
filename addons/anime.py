@@ -6,10 +6,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}character <character name>`
-   Fetch anime character details.
+• `{i}character <name>`
+    Get details about an anime character.
 """
 
 from . import *
@@ -19,7 +19,7 @@ from . import *
 async def anime_char_search(event):
     char_name = event.pattern_match.group(1).strip()
     if not char_name:
-        return await event.eor("`Enter the name of a character too please!`", time=5)
+        return await event.eor("Enter the name of a character too please!", time=5)
     xx = await event.eor(get_string("com_1"))
     try:
         res = await async_searcher(
@@ -29,7 +29,7 @@ async def anime_char_search(event):
         )
         char_json = res["data"][0]
     except Exception:
-        return await eod(xx, "`Couldn't find character!`", time=5)
+        return await eod(xx, "Couldn't find character!", time=5)
     pic = char_json.get("images", {}).get("jpg", {}).get("image_url")
     msg = f"**[{char_json['name']}]({char_json['url']})**"
     if char_json.get("name_kanji"):

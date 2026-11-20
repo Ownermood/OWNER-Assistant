@@ -103,7 +103,7 @@ async def _(e):
     except BotInlineDisabledError:
         return await e.eor(get_string("help_3"))
     if not results:
-        return await e.eor("`Assistant bot gave no result, try again.`", time=5)
+        return await e.eor("Assistant bot gave no result, try again.", time=5)
     try:
         await results[0].click(e.chat_id, reply_to=e.reply_to_msg_id, hide_via=True)
     except ChatSendInlineForbiddenError:
@@ -249,7 +249,7 @@ async def _(e):
         if e.sender_id in buddhhu[ids]:
             await e.answer(buddhhu[ids][-1], alert=True)
         else:
-            await e.answer("Not For You", alert=True)
+            await e.answer("Not for you", alert=True)
     else:
         await e.answer(get_string("wspr_2"), alert=True)
 

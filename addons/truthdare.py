@@ -6,13 +6,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
 • `{i}truth`
-   `Get Truth Task.`
+    Get a truth question.
 
 • `{i}dare`
-   `Get Dare Task.`
+    Get a dare.
 """
 
 
@@ -32,17 +32,17 @@ async def _get(kind):
 
 @ultroid_cmd(pattern="truth$")
 async def gtruth(ult):
-    m = await ult.eor("`Generating a Truth Statement.. `")
+    m = await ult.eor("Generating a Truth Statement.. ")
     cm = await _get("truth")
     if not cm:
-        return await m.edit("`Service is down, try again later.`")
+        return await m.edit("Service is down, try again later.")
     await m.edit(f"**#TruthTask**\n\n`{cm}`")
 
 
 @ultroid_cmd(pattern="dare$")
 async def gdare(ult):
-    m = await ult.eor("`Generating a Dare Task.. `")
+    m = await ult.eor("Generating a Dare Task.. ")
     cm = await _get("dare")
     if not cm:
-        return await m.edit("`Service is down, try again later.`")
+        return await m.edit("Service is down, try again later.")
     await m.edit(f"**#DareTask**\n\n`{cm}`")

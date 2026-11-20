@@ -5,13 +5,14 @@
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 """
-✘ Commands Available -
+📖 **Commands**
 
-•`{i}addnsfw <ban/mute/kick>`
-   If someone sends 18+ content it will be deleted and action will be taken.
+• `{i}addnsfw <ban / mute / kick>`
+    Delete 18+ pictures in this group and punish the sender.
+    Example: `{i}addnsfw mute`
 
-•`{i}remnsfw`
-   Remove Chat from nsfw filtering.
+• `{i}remnsfw`
+    Turn the 18+ filter off.
 """
 
 import os
@@ -39,13 +40,13 @@ async def addnsfw(e):
         action = "mute"
     nsfw_chat(e.chat_id, action)
     ultroid_bot.add_handler(nsfw_check, events.NewMessage(incoming=True))
-    await e.eor("Added This Chat To Nsfw Filter")
+    await e.eor("Added this chat to Nsfw filter")
 
 
 @ultroid_cmd(pattern="remnsfw", admins_only=True)
 async def remnsfw(e):
     rem_nsfw(e.chat_id)
-    await e.eor("Removed This Chat from Nsfw Filter.")
+    await e.eor("Removed this chat from Nsfw filter.")
 
 
 NWARN = {}

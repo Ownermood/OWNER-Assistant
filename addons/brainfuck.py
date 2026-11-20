@@ -2,13 +2,13 @@
 # Made For : https://github.com/TeamUltroid/UltroidAddons
 
 """
-✘ Commands Available
+📖 **Commands**
 
-• `{i}bf`
-    Text to Brainfuck String Generator with text or reply.
+• `{i}bf <text>` (or reply)
+    Turn text into Brainfuck code.
 
-• `{i}rbf`
-    Brainfuck Interpreter with string or reply.
+• `{i}rbf <code>` (or reply)
+    Run Brainfuck code and show the result.
 """
 
 import asyncio
@@ -198,7 +198,7 @@ async def _(event):
             return await eod(event, "Give me some text lol", time=5)
     out = bf(input_)
     if len(out) > 4000:
-        return await event.eor("`Text too long.`")
+        return await event.eor("Text too long.")
     await event.eor(out)
 
 

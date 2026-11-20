@@ -208,7 +208,7 @@ async def _(event):
         try:
             cm = cmd.split(maxsplit=1)[1]
         except IndexError:
-            await event.eor("->> Wrong Format <<-")
+            await event.eor("->> Wrong format <<-")
             cm = None
         return cm
 

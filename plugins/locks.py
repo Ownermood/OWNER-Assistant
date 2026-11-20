@@ -26,11 +26,11 @@ from . import ultroid_cmd
 async def un_lock(e):
     mat = e.pattern_match.group(2).strip()
     if not mat:
-        return await e.eor("`Give some Proper Input..`", time=5)
+        return await e.eor("Give some proper input.", time=5)
     lock = e.pattern_match.group(1) == ""
     ml = lock_unlock(mat, lock)
     if not ml:
-        return await e.eor("`Incorrect Input`", time=5)
+        return await e.eor("Incorrect input", time=5)
     msg = "Locked" if lock else "Unlocked"
     try:
         await e.client(EditChatDefaultBannedRightsRequest(e.chat_id, ml))

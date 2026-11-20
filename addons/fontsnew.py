@@ -5,37 +5,20 @@
 #
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}weeb <text>`
-    turns text to 山乇乇乃 font
+Write your text in a fun style:
 
-• `{i}tantext <text>`
-    turns text to ᎿᎯᏁᎿᏋﾒᎿ font
-
-• `{i}linetext <text>`
-    turns text to 𝕃𝕀ℕ𝔼𝕋𝔼𝕏𝕋
-
-• `{i}boxtext <text>`
-    turns text to 🄱🄾🅇🅃🄴🅇🅃
-
-• `{i}bubbletext <text>`
-    turns text to ⒷⓊⒷⒷⓁⒺⓉⒺⓍⓉ
-
-• `{i}cursive <text>`
-    turns text to 𝓬𝓾𝓻𝓼𝓲𝓿𝓮 font
-
-• `{i}greekify <text>`
-    turns text to ϑгεεκιғψ font
-
-• `{i}sorcify <text>`
-    turns text to ֆօʀƈɛʀɛʀ font
-
-• `{i}fraktify <text>`
-    turns text to 𝖋𝖗𝖆𝖐𝖙𝖚𝖗𝖊 font
-
-• `{i}rusify <text>`
-    turns text to яц$їfч font
+• `{i}weeb <text>` - 山乇乇乃
+• `{i}tantext <text>` - ᎿᎯᏁᎿᏋﾒᎿ
+• `{i}linetext <text>` - 𝕃𝕀ℕ𝔼𝕋𝔼𝕏𝕋
+• `{i}boxtext <text>` - 🄱🄾🅇🅃🄴🅇🅃
+• `{i}bubbletext <text>` - ⒷⓊⒷⒷⓁⒺⓉⒺⓍⓉ
+• `{i}cursive <text>` - 𝓬𝓾𝓻𝓼𝓲𝓿𝓮
+• `{i}greekify <text>` - ϑгεεκιғψ
+• `{i}sorcify <text>` - ֆօʀƈɛʀɛʀ
+• `{i}fraktify <text>` - 𝖋𝖗𝖆𝖐𝖙𝖚𝖗𝖊
+• `{i}rusify <text>` - яц$їfч
 """
 
 
@@ -356,7 +339,7 @@ async def weebify(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        await ult.eor("What I am Supposed to Weebify? Please Give Text Sir")
+        await ult.eor("What I am Supposed to Weebify? Please give text Sir")
         return
     string = "".join(args).lower()
     for normiecharacter in string:
@@ -373,7 +356,7 @@ async def tantxt(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        await ult.eor("What I am Supposed to tanify? Please Give Text Sir")
+        await ult.eor("What I am Supposed to tanify? Please give text Sir")
         return
     string = "".join(args).lower()
     for normiecharacter in string:
@@ -390,7 +373,7 @@ async def linetxt(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        await ult.eor("What I am Supposed to linefy? Please Give Text Sir")
+        await ult.eor("What I am Supposed to linefy? Please give text Sir")
         return
     string = "".join(args).lower()
     for normiecharacter in string:
@@ -407,7 +390,7 @@ async def boxtxt(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        return await ult.edit("What I am Supposed to boxify? Please Give Text Sir")
+        return await ult.edit("What I am Supposed to boxify? Please give text Sir")
     string = "".join(args).lower()
     for normiecharacter in string:
         if normiecharacter in normiefont:
@@ -423,7 +406,7 @@ async def bubbletxt(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        return await ult.edit("What I am Supposed to bubblify? Please Give Text Sir")
+        return await ult.edit("What I am Supposed to bubblify? Please give text Sir")
     string = "".join(args).lower()
     for normiecharacter in string:
         if normiecharacter in normiefont:
@@ -440,7 +423,7 @@ async def cursive(ult):
         args = get.text
     if not args:
         return await ult.edit(
-            "What I am Supposed to write in cursive? Please Give Text Sir"
+            "What I am Supposed to write in cursive? Please give text Sir"
         )
     string = "".join(args).lower()
     for normiecharacter in string:
@@ -457,7 +440,7 @@ async def greektext(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        return await ult.edit("What I am Supposed to greekify? Please Give Text Sir")
+        return await ult.edit("What I am Supposed to greekify? Please give text Sir")
     string = "".join(args).lower()
     for normiecharacter in string:
         if normiecharacter in normiefont:
@@ -474,7 +457,7 @@ async def sorcerertext(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        await ult.eor("What I am Supposed to sorcify? Please Give Text Sir")
+        await ult.eor("What I am Supposed to sorcify? Please give text Sir")
         return
     string = "".join(args).lower()
     for normiecharacter in string:
@@ -491,7 +474,7 @@ async def frakturtext(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        await ult.eor("What I am Supposed to fraktify? Please Give Text Sir")
+        await ult.eor("What I am Supposed to fraktify? Please give text Sir")
         return
     string = "".join(args).lower()
     for normiecharacter in string:
@@ -508,7 +491,7 @@ async def rusitext(ult):
         get = await ult.get_reply_message()
         args = get.text
     if not args:
-        return await ult.edit("What I am Supposed to rusify? Please Give Text Sir")
+        return await ult.edit("What I am Supposed to rusify? Please give text Sir")
     string = "".join(args).lower()
     for normiecharacter in string:
         if normiecharacter in normiefont:

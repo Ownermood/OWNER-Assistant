@@ -89,7 +89,7 @@ async def unmuting(e):
 async def setflood(e):
     input_ = e.pattern_match.group(1).strip()
     if not input_:
-        return await e.eor("`What?`", time=5)
+        return await e.eor("What?", time=5)
     if not input_.isdigit():
         return await e.eor(get_string("com_3"), time=5)
     if m := set_flood(e.chat_id, input_):

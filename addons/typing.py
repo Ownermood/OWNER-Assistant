@@ -8,10 +8,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}type <msg>`
-    Edits the Message and shows like someone is typing.
+• `{i}type <message>`
+    Show your message appearing letter by letter, like live typing.
 """
 
 import asyncio
@@ -25,7 +25,7 @@ from . import *
 async def _(event):
     input_str = event.pattern_match.group(1).strip()[:200]
     if not input_str:
-        return await event.eor("Give me something to type !")
+        return await event.eor("Give me something to type!")
     shiiinabot = "\u2060" * 602
     okla = await event.eor(shiiinabot)
     typing_symbol = "|"

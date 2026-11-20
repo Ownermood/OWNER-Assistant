@@ -164,7 +164,7 @@ async def _(ult):
 async def _(ult):
     input_ = ult.pattern_match.group(1).strip()
     if not input_:
-        return await ult.eor("`Input some link`", time=5)
+        return await ult.eor("Input some link", time=5)
     text = None
     if len(input_.split()) > 1:
         spli_ = input_.split()
@@ -181,9 +181,9 @@ async def _(ult):
 async def _(e):
     reply = await e.get_reply_message()
     if not (reply and reply.media):
-        return await e.eor("`Reply to a gif or audio file only.`")
+        return await e.eor("Reply to a gif or audio file only.")
     if "audio" in mediainfo(reply.media):
-        msg = await e.eor("`Downloading...`")
+        msg = await e.eor("Downloading...")
         try:
             bbbb = await reply.download_media(thumb=-1)
         except TypeError:
@@ -194,11 +194,11 @@ async def _(e):
         cv2.imwrite("img.jpg", output)
         thumb = "img.jpg"
         audio, _ = await e.client.fast_downloader(reply.document)
-        await msg.edit("`Creating video note...`")
+        await msg.edit("Creating video note.")
         await bash(
             f'ffmpeg -i "{thumb}" -i "{audio.name}" -preset ultrafast -c:a libmp3lame -ab 64 circle.mp4 -y'
         )
-        await msg.edit("`Uploading...`")
+        await msg.edit("Uploading...")
         data = await metadata("circle.mp4")
         file, _ = await e.client.fast_uploader("circle.mp4", to_delete=True)
         await e.client.send_file(
@@ -237,7 +237,7 @@ async def _(e):
         await msg.delete()
 
     else:
-        await e.eor("`Reply to a gif or audio file only.`")
+        await e.eor("Reply to a gif or audio file only.")
 
 
 FilesEMOJI = {
@@ -268,7 +268,7 @@ async def _(e):
         files += "/*"
     files = glob.glob(files)
     if not files:
-        return await e.eor("`Directory Empty or Incorrect.`", time=5)
+        return await e.eor("That folder is empty or doesn't exist.", time=5)
     folders = []
     allfiles = []
     for file in sorted(files):
@@ -373,10 +373,10 @@ async def sangmata(event):
         user = str(reply.sender_id)
     if not user:
         return await event.eor(
-            "`Reply to a user's message, or give a user id / username.`", time=10
+            "Reply to a user's message, or give a user id / username.", time=10
         )
 
-    msg = await event.eor("`Processing...`")
+    msg = await event.eor("Processing...")
     user_id, user_name = None, None
     if user.lstrip("-").isdigit():
         # An id works even if this account has never seen the user:
@@ -393,7 +393,7 @@ async def sangmata(event):
         except Exception:
             entity = None
         if not isinstance(entity, types.User):
-            return await msg.edit("`Can't find that user. Try their numeric id.`")
+            return await msg.edit("Can't find that user. Try their numeric id.")
         user_id = entity.id
         user_name = " ".join(filter(None, [entity.first_name, entity.last_name]))
 
@@ -420,7 +420,7 @@ async def sangmata(event):
         return await msg.edit(f"`{SANGMATA} did not reply. Try again in a minute.`")
     full = "\n".join(responses)
     if "no records" in full.lower() or "no data" in full.lower():
-        return await msg.edit("`This user doesn't have any name/username history.`")
+        return await msg.edit("This user doesn't have any name/username history.")
 
     who = mentionuser(user_name or user_id, user_id)
     names, usernames = sanga_seperator(responses)

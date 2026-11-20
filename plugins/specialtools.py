@@ -239,7 +239,7 @@ session = Session()
 async def _(event):
     x = event.pattern_match.group(1).strip()
     if not x:
-        return await event.eor("`Give something to search`")
+        return await event.eor("Give something to search")
     uu = await event.eor(get_string("com_1"))
     
     headers = {
@@ -276,7 +276,7 @@ async def _(event):
             continue
     
     if retry_count >= max_retries:
-        return await uu.edit("`Failed to fetch stickers after multiple retries`")
+        return await uu.edit("Failed to fetch stickers after multiple retries")
     try:
         sticks = {}
         for pack in packs:
@@ -301,7 +301,7 @@ async def _(event):
 async def wall(event):
     inp = event.pattern_match.group(1).strip()
     if not inp:
-        return await event.eor("`Give me something to search..`")
+        return await event.eor("Give me something to search.")
     nn = await event.eor(get_string("com_1"))
     query = f"hd {inp}"
     images = await get_google_images(query)
@@ -314,7 +314,7 @@ async def wall(event):
 async def quott_(event):
     match = event.pattern_match.group(1).strip()
     if not event.is_reply:
-        return await event.eor("`Reply to Message..`")
+        return await event.eor("Reply to message.")
     msg = await event.eor(get_string("com_1"))
     reply = await event.get_reply_message()
     replied_to, reply_ = None, None

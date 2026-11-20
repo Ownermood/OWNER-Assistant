@@ -7,13 +7,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}pokemon <query>`
-    Send details of Pokemon.
+• `{i}pokemon <name>`
+    Get details about a Pokémon.
 
-• `{i}pokecard <query>`
-    Send Card of Pokemon.
+• `{i}pokecard <name>`
+    Get a Pokémon card picture.
 """
 
 from . import async_searcher, ultroid_cmd
@@ -29,13 +29,13 @@ def _title(text):
 async def pokedex(event):
     pokemon = event.pattern_match.group(1).strip().lower().replace(" ", "-")
     if not pokemon:
-        return await event.eor("`Give a Pokemon Name`")
-    xx = await event.eor("`Booting up the pokedex.......`")
+        return await event.eor("Give a Pokemon name")
+    xx = await event.eor("Booting up the pokedex.")
     try:
         poke = await async_searcher(f"{POKEAPI}/pokemon/{pokemon}", re_json=True)
         species = await async_searcher(poke["species"]["url"], re_json=True)
     except Exception:
-        return await xx.edit("`Be sure To give correct Name`")
+        return await xx.edit("Be sure to give correct name")
 
     types = ", ".join(_title(t["type"]["name"]) for t in poke["types"])
     abilities = ", ".join(_title(a["ability"]["name"]) for a in poke["abilities"])
@@ -119,7 +119,7 @@ async def pokedex(event):
 async def pokecard(event):
     pokename = event.pattern_match.group(1).strip().lower()
     if not pokename:
-        return await event.eor("`Give A Pokemon name`")
+        return await event.eor("Give A Pokemon name")
     try:
         a = await async_searcher(
             "https://api.pokemontcg.io/v2/cards",
@@ -130,4 +130,4 @@ async def pokecard(event):
         await event.client.send_file(event.chat_id, o)
         await event.delete()
     except BaseException:
-        await event.eor("`Be sure To give correct Name`")
+        await event.eor("Be sure to give correct name")

@@ -6,10 +6,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• {i}spcheck <text/reply to message>
-    check spelling of the text/sentence
+• `{i}spcheck <text>` (or reply)
+    Check the spelling and get the corrected text.
 """
 
 import asyncio
@@ -27,7 +27,7 @@ async def spellchk(event):
         if reply.text:
             to_check = reply.text
     if not to_check:
-        return await event.eor("`Give me some text/sentence to check its spelling!.`")
+        return await event.eor("Give me some text/sentence to check its spelling!.")
     correct = await asyncio.to_thread(lambda: str(TextBlob(to_check).correct()))
     await eor(
         event, f"**Given Phrase:** `{to_check}`\n**Corrected Phrase:** `{correct}`"

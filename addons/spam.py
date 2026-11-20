@@ -6,20 +6,21 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
-• `{i}spam <no of msgs> <your msg>`
-  `{i}spam <no of msgs> <reply message>`
-    spams chat, the current limit for this is from 1 to 99.
+📖 **Commands**
 
-• `{i}bigspam <no of msgs> <your msg>`
-  `{i}bigspam <no of msgs> <reply message>`
-    Spams chat, the current limit is above 100.
+⚠️ Spamming can get your account limited or banned by Telegram. Use with care.
 
-• `{i}delayspam <delay time> <count> <msg>`
-    Spam chat with delays..
+• `{i}spam <count> <message>` (or reply to a message)
+    Send a message many times (1 to 99).
+
+• `{i}bigspam <count> <message>` (or reply)
+    Send it 100 or more times.
+
+• `{i}delayspam <seconds> <count> <message>`
+    Send it many times with a pause between each.
 
 • `{i}tspam <text>`
-    Spam Chat with One-One Character..
+    Send the text one letter at a time.
 """
 
 import asyncio
@@ -33,7 +34,7 @@ from . import *
 async def tmeme(e):
     message = e.pattern_match.group(1).replace(" ", "")
     if not message:
-        return await eod(e, "`Give some text..`")
+        return await eod(e, "Give some text.")
     for letter in message[:100]:
         await e.respond(letter)
         await asyncio.sleep(0.3)
@@ -45,19 +46,19 @@ async def spammer(e):
     message = e.text
     if e.reply_to:
         if not len(message.split()) >= 2:
-            return await eod(e, "`Use in Proper Format`")
+            return await eod(e, "Use in proper format")
         spam_message = await e.get_reply_message()
     else:
         if not len(message.split()) >= 3:
-            return await eod(e, "`Reply to a Message or Give some Text..`")
+            return await eod(e, "Reply to a message or give some text.")
         spam_message = message.split(maxsplit=2)[2]
     counter = message.split()[1]
     try:
         counter = int(counter)
         if counter >= 100:
-            return await eod(e, "`Use bigspam cmd`")
+            return await eod(e, "Use bigspam cmd")
     except BaseException:
-        return await eod(e, "`Use in Proper Format`")
+        return await eod(e, "Use in proper format")
     await e.delete()
     for _ in range(counter):
         try:
@@ -71,17 +72,17 @@ async def bigspam(e):
     message = e.text
     if e.reply_to:
         if not len(message.split()) >= 2:
-            return await eod(e, "`Use in Proper Format`")
+            return await eod(e, "Use in proper format")
         spam_message = await e.get_reply_message()
     else:
         if not len(message.split()) >= 3:
-            return await eod(e, "`Reply to a Message or Give some Text..`")
+            return await eod(e, "Reply to a message or give some text.")
         spam_message = message.split(maxsplit=2)[2]
     counter = message.split()[1]
     try:
         counter = int(counter)
     except BaseException:
-        return await eod(e, "`Use in Proper Format`")
+        return await eod(e, "Use in proper format")
     await e.delete()
     # Sent one by one with a small gap: Python 3.11+ rejects bare coroutines in
     # asyncio.wait, and a burst of thousands gets the account flood-limited.

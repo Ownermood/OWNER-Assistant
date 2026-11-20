@@ -9,14 +9,15 @@
 
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}tts` `LanguageCode <reply to a message>`
-• `{i}tts` `LangaugeCode | text to speak`
+• `{i}tts <language code> | <text>`
+    Turn text into a voice message.
+    Example: `{i}tts en | hello everyone`
+    Or reply to a message: `{i}tts hi`
 
-• `{i}stt` `<reply to audio file>`
-  `Convert Speech to Text...`
-  `Note - Sometimes Not 100% Accurate`
+• `{i}stt` (reply to a voice or audio)
+    Turn speech into text. It isn't always 100% right.
 """
 
 import os
@@ -90,7 +91,7 @@ async def _(event):
 async def speec_(e):
     reply = await e.get_reply_message()
     if not (reply and reply.media):
-        return await eod(e, "`Reply to Audio-File..`")
+        return await eod(e, "Reply to audio-file.")
     # Not Hard Checking File Types
     re = await reply.download_media()
     fn = re + ".wav"

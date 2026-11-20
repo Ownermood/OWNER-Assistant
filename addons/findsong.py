@@ -2,10 +2,10 @@
 # Made by senku
 
 """
-✘ Commands Available
+📖 **Commands**
 
-• `{i}findsong <reply to song>`
-   Identify the song name
+• `{i}findsong` (reply to a song)
+    Find the song's name.
 """
 
 from telethon.errors.rpcerrorlist import YouBlockedUserError
@@ -30,7 +30,7 @@ async def _(event):
                 return await snku.edit(
                     "An error while identifying the song. Try to use a 5-10s long audio message."
                 )
-            await snku.edit("Wait just a sec...")
+            await snku.edit("Wait just a sec.")
             result = await conv.get_response()
             await event.client.send_read_acknowledge(conv.chat_id)
         except YouBlockedUserError:

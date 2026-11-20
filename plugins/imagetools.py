@@ -90,7 +90,7 @@ from . import (
 async def _(event):
     reply = await event.get_reply_message()
     if not (reply and reply.media):
-        return await event.eor("`Reply To a Black and White Image`")
+        return await event.eor("Reply to a Black and White image")
     xx = await event.eor("`Coloring image 🎨🖌️...`")
     image = await reply.download_media()
     img = cv2.VideoCapture(image)
@@ -199,10 +199,10 @@ async def sampl(ult):
             except MessageDeleteForbiddenError:
                 await ult.reply(f"Colour Sample for `{color}` !", file="csample.png")
         except ChatSendMediaForbiddenError:
-            await ult.eor("Umm! Sending Media is disabled here!")
+            await ult.eor("Umm! Sending media is disabled here!")
 
     else:
-        await ult.eor("Wrong Color Name/Hex Code specified!")
+        await ult.eor("Wrong Color name/Hex code specified!")
 
 
 @ultroid_cmd(
@@ -210,7 +210,7 @@ async def sampl(ult):
 )
 async def ultd(event):
     ureply = await event.get_reply_message()
-    xx = await event.eor("`...`")
+    xx = await event.eor("...")
     if not (ureply and (ureply.media)):
         await xx.edit(get_string("cvt_3"))
         return
@@ -241,7 +241,7 @@ async def ultd(event):
 async def ok(event):
     hm = await event.get_reply_message()
     if not (hm and (hm.photo or hm.sticker)):
-        return await event.eor("`Reply to Sticker or Photo..`")
+        return await event.eor("Reply to sticker or photo.")
     col = event.pattern_match.group(1).strip()
     wh = 20
     if not col:
@@ -254,7 +254,7 @@ async def ok(event):
                 col = col_[0]
             col = [int(col) for col in col.split(",")[:2]]
         except ValueError:
-            return await event.eor("`Not a Valid Input...`")
+            return await event.eor("Not a valid input.")
     okla = await hm.download_media()
     img1 = cv2.imread(okla)
     constant = cv2.copyMakeBorder(img1, wh, wh, wh, wh, cv2.BORDER_CONSTANT, value=col)
@@ -269,7 +269,7 @@ async def ok(event):
 async def pixelator(event):
     reply_message = await event.get_reply_message()
     if not (reply_message and (reply_message.photo or reply_message.sticker)):
-        return await event.eor("`Reply to a photo`")
+        return await event.eor("Reply to a photo")
     hw = 50
     try:
         hw = int(event.pattern_match.group(1).strip())

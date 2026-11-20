@@ -6,28 +6,28 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available
+📖 **Commands**
 
 • `{i}joke`
-    To get joke.
-
-• `{i}url <long url>`
-    To get a shorten link of long link.
-
-• `{i}phlogo <first_name> <last_name>`
-    Make a phub based logo.
+    Get a joke.
 
 • `{i}decide`
-    Decide something.
+    Can't decide? Get a yes / no / maybe.
+
+• `{i}url <long link>`
+    Make a short link.
+
+• `{i}phlogo <word 1> <word 2>`
+    Make a two-colour logo with your words.
+
+• `{i}gps <place>`
+    Show a place on the map.
 
 • `{i}xo`
-    Opens tic tac game only where using inline mode is allowed.
+    Play tic-tac-toe (only in chats where inline bots are allowed).
 
 • `{i}wordi`
-    Opens word game only where using inline mode is allowed.
-
-• `{i}gps <name of place>`
-    Shows the desired place in the map.
+    Play a word game (only in chats where inline bots are allowed).
 """
 
 import random, os
@@ -49,7 +49,7 @@ async def _(ult):
 async def _(event):
     input_str = event.pattern_match.group(1).strip()
     if not input_str:
-        await event.eor("`Give some url`")
+        await event.eor("Give some url")
         return
     try:
         response_api = (
@@ -64,12 +64,12 @@ async def _(event):
             ),
         )
     else:
-        await event.eor("`Something went wrong. Please try again Later.`")
+        await event.eor("Something went wrong. Please try again later.")
 
 
 @ultroid_cmd(pattern="decide$")
 async def _(event):
-    hm = await event.eor("`Deciding`")
+    hm = await event.eor("Deciding")
     try:
         r = await async_searcher("https://yesno.wtf/api", re_json=True)
     except Exception:
@@ -85,7 +85,7 @@ async def _(event):
 async def xo(ult):
     xox = await ult.client.inline_query("xobot", "play")
     if not xox:
-        return await ult.eor("`@xobot did not respond.`")
+        return await ult.eor("@xobot did not respond.")
     await random.choice(xox).click(
         ult.chat_id, reply_to=ult.reply_to_msg_id, silent=True, hide_via=True
     )
@@ -100,7 +100,7 @@ async def make_logog(ult):
     if not match and (reply and reply.text):
         match = reply.text
     if not match:
-        return await msg.edit("`Provide a name to make logo...`")
+        return await msg.edit("Provide a name to make logo.")
     first, last = "", ""
     if len(match.split()) >= 2:
         first, last = match.split()[:2]

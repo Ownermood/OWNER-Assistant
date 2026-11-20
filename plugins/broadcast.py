@@ -121,7 +121,7 @@ async def list_all(event):
         with io.BytesIO(str.encode(MSG)) as out_file:
             out_file.name = "channels.txt"
             await event.reply(
-                "Channels in Database",
+                "Channels in database",
                 file=out_file,
                 force_document=True,
                 allow_cache=False,
@@ -184,7 +184,7 @@ async def sending(event):
     channels = KeyM.get()
     if not channels:
         return await x.edit(f"Please add channels by using `{HNDLR}add` in them.")
-    await x.edit("Sending....")
+    await x.edit("Sending...")
     if event.reply_to_msg_id:
         previous_message = await event.get_reply_message()
         if previous_message.poll:

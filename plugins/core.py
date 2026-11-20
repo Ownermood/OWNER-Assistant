@@ -107,10 +107,10 @@ async def get_the_addons_lol(event):
     name_of_it = split_thelink[-1]
     plug = await async_searcher(thelink)
     fil = f"addons/{name_of_it}"
-    await xx.edit("Packing the codes...")
+    await xx.edit("Packing the codes.")
     with open(fil, "w", encoding="utf-8") as uult:
         uult.write(plug)
-    await xx.edit("Packed. Now loading the plugin..")
+    await xx.edit("Packed. Now loading the plugin.")
     shortname = name_of_it.split(".")[0]
     try:
         load_addons(fil)

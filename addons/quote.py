@@ -6,10 +6,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}qbot <reply>`
-    Make sticker quote without QuotlyBot
+• `{i}qbot` (reply to a message)
+    Make a quote sticker from a message.
 """
 
 
@@ -460,7 +460,7 @@ async def replied_user(draw, tot, text, maxlength, title):
 async def _(event):
     reply = await event.get_reply_message()
     if not reply:
-        return await event.eor("`Reply to a message.`")
+        return await event.eor("Reply to a message.")
     msg = reply.message or ""
     repliedreply = await reply.get_reply_message()
     user = await reply.get_sender()

@@ -157,7 +157,7 @@ async def destination(e):
         y = e.chat_id
     if not DestiM.contains(y):
         DestiM.add(y)
-        await e.eor("Destination added succesfully")
+        await e.eor("Destination added successfully")
     else:
         await e.eor("Destination channel already added")
 

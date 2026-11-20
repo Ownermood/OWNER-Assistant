@@ -5,25 +5,25 @@
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}yta <(youtube/any) link>`
-   Download audio from the link.
+• `{i}yta <link>`
+    Download the audio from a YouTube (or other) link.
 
-• `{i}ytv <(youtube/any) link>`
-   Download video  from the link.
+• `{i}ytv <link>`
+    Download the video from a link.
 
-• `{i}ytsa <(youtube) search query>`
-   Search and download audio from youtube.
+• `{i}ytsa <song name>`
+    Search YouTube and send the audio.
+    Example: `{i}ytsa believer`
 
-• `{i}ytsv <(youtube) search query>`
-   Search and download video from youtube.
+• `{i}ytsv <video name>`
+    Search YouTube and send the video.
 
-• `{i}ytcookies <reply to cookies.txt>`
-   Fix "Sign in to confirm you're not a bot". Export YouTube cookies
-   (cookies.txt, Netscape format) from a browser logged in to a spare
-   Google account, send the file, reply to it with this command.
-   `{i}ytcookies` = status · `{i}ytcookies del` = remove.
+• `{i}ytcookies` (reply to a cookies.txt file)
+    Fix the "Sign in to confirm you're not a bot" error.
+    Export YouTube cookies (cookies.txt) from a browser logged in to a spare Google account, send the file here and reply to it with this command.
+    `{i}ytcookies` - see status   ·   `{i}ytcookies del` - remove them
 """
 import asyncio
 import os
@@ -47,7 +47,7 @@ async def yt_cookies(event):
     if arg in ("del", "delete", "remove", "off"):
         udB.del_key("YT_COOKIES")
         _clear_cookie_file()
-        return await event.eor("`YouTube cookies removed.`", time=5)
+        return await event.eor("YouTube cookies removed.", time=5)
     reply = await event.get_reply_message()
     if not (reply and reply.file):
         status = "saved ✅" if udB.get_key("YT_COOKIES") else "not set ❌"
@@ -58,7 +58,7 @@ async def yt_cookies(event):
         )
     if (reply.file.size or 0) > 1024 * 1024:
         return await event.eor("`File too big — send only the YouTube cookies.txt.`", time=8)
-    msg = await event.eor("`Checking cookies...`")
+    msg = await event.eor("Checking cookies.")
     path = await reply.download_media("resources/downloads/")
     text = read_text_file(path) if path else None
     if path and os.path.exists(path):

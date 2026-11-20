@@ -193,7 +193,7 @@ async def lol(ult):
 @ultroid_cmd(pattern="ping$", chats=[], type=["official", "assistant"])
 async def _(event):
     start = time.time()
-    x = await event.eor("Pong !")
+    x = await event.eor("🏓 Pong!")
     end = round((time.time() - start) * 1000)
     uptime = time_formatter((time.time() - start_time) * 1000)
     await x.edit(get_string("ping").format(end, uptime))
@@ -257,7 +257,7 @@ async def _(event):
         if isinstance(file, dict):
             await event.eor(f"`{file}`")
             return
-        await event.reply(f"**{BOT_NAME} Logs.**", file=file)
+        await event.reply(f"📄 **{BOT_NAME} logs**", file=file)
     elif opt == "open":
         with open("ultroid.log", "r") as f:
             file = f.read()[-4000:]
@@ -352,13 +352,13 @@ async def _(e):
         )
         Link = x.message_link
         await xx.edit(
-            f'<strong><a href="{Link}">[ChangeLogs]</a></strong>',
+            f'<strong><a href="{Link}">See what\'s new</a></strong>',
             parse_mode="html",
             link_preview=False,
         )
     else:
         await xx.edit(
-            f"<code>Your BOT is </code><strong>up-to-date</strong><code> with </code><strong>[{branch}]</strong>",
+            f"✅ Your bot is <strong>up to date</strong> with <strong>[{branch}]</strong>",
             parse_mode="html",
             link_preview=False,
         )
@@ -385,8 +385,8 @@ async def set_assistant_pic(e):
     from pyUltroid.startup.funcs import _botfather_reply
 
     if not asst.me.bot:
-        return await e.eor("`Assistant bot is not active.`")
-    msg = await e.eor("`Changing assistant bot photo at @BotFather...`")
+        return await e.eor("The assistant bot isn't running.")
+    msg = await e.eor("⏳ Changing the assistant bot's photo with @BotFather...")
     reply = await e.get_reply_message()
     file, temp = AVATAR, None
     if reply and reply.photo:
@@ -397,15 +397,15 @@ async def set_assistant_pic(e):
             await _botfather_reply(conv, "/setuserpic")
             answer = await _botfather_reply(conv, f"@{asst.me.username}")
             if "photo" not in answer.lower():
-                return await msg.edit(f"`BotFather said:` {answer[:300]}")
+                return await msg.edit(f"BotFather replied: {answer[:300]}")
             await conv.send_file(file)
             done = (await conv.get_response()).raw_text or ""
         await ultroid_bot.send_read_acknowledge("BotFather")
     except Exception as er:
-        return await msg.edit(f"`Could not change photo: {er}`")
+        return await msg.edit(f"😕 Couldn't change the photo: {er}")
     finally:
         if temp and os.path.exists(temp):
             os.remove(temp)
     if "success" in done.lower():
-        return await msg.edit(f"`Done! New photo set for` @{asst.me.username}")
-    await msg.edit(f"`BotFather said:` {done[:300]}")
+        return await msg.edit(f"✅ Done! New photo set for @{asst.me.username}")
+    await msg.edit(f"BotFather replied: {done[:300]}")

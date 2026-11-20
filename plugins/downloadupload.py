@@ -65,7 +65,7 @@ async def down(event):
             ),
         )
     except InvalidURL:
-        return await msg.eor("`Invalid URL provided :(`", time=5)
+        return await msg.eor("Invalid URL provided :(", time=5)
     await msg.eor(f"`{filename}` `downloaded in {time_formatter(d*1000)}.`")
 
 
@@ -139,7 +139,7 @@ async def _(event):
     if match:
         match = match.strip()
     if not event.out and match == ".env":
-        return await event.reply("`You can't do this...`")
+        return await event.reply("You can't do this.")
     stream, force_doc, delete, thumb = (
         False,
         True,

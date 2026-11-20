@@ -5,12 +5,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
+📖 **Commands**
 
-✘ Commands Available -
-
-• `{i}wiki <search query>``
-    Wikipedia search from telegram.
-
+• `{i}wiki <search>`
+    Search Wikipedia.
 """
 
 import asyncio
@@ -24,7 +22,7 @@ from . import *
 async def wiki(e):
     srch = e.pattern_match.group(1)
     if not srch:
-        return await e.eor("`Give some text to search on wikipedia !`")
+        return await e.eor("Give some text to search on wikipedia!")
     msg = await e.eor(f"`Searching {srch} on wikipedia..`")
     try:
         mk = await asyncio.to_thread(wikipedia.summary, srch)

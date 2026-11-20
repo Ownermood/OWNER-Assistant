@@ -6,14 +6,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}htg <text>`
-   How To Google.
-   Some peoples don't know how to google so help them 🙃🙂.
+• `{i}htg <question>`
+    Send a 'let me Google that for you' link.
 
-• `{i}htd <text>`
-   How to duck duck go...
+• `{i}htd <question>`
+    Same, with DuckDuckGo.
 """
 
 
@@ -30,7 +29,7 @@ async def _(e):
     key = e.pattern_match.group(1)
     text = (e.pattern_match.group(2) or "").strip()
     if not text:
-        return await e.eor("`Give some text`", time=5)
+        return await e.eor("Give some text", time=5)
     target = "https://" + API[key].format(quote_plus(text))
     try:
         response = await async_searcher("https://da.gd/s", params={"url": target})
@@ -40,4 +39,4 @@ async def _(e):
         return await e.eor(
             "[{}]({})\n`Thank me Later 🙃` ".format(text, response.rstrip()), time=8
         )
-    await e.eor("`something is wrong. please try again later.`")
+    await e.eor("something is wrong. please try again later.")

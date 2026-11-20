@@ -9,16 +9,16 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}mmf <upper text> ; <lower text> <reply to media>`
-    To create memes as sticker,
-    for trying different fonts use (.mmf <text>_1)(u can use 1 to 10).
+• `{i}mmf <top text> ; <bottom text>` (reply to a photo or sticker)
+    Make a meme sticker.
 
-• `{i}mms <upper text> ; <lower text> <reply to media>`
-    To create memes as pic,
-    for trying different fonts use (.mms <text>_1)(u can use 1 to 10).
+• `{i}mms <top text> ; <bottom text>` (reply to a photo or sticker)
+    Make a meme picture.
 
+    Try other fonts by adding `_1` to `_10` at the end.
+    Example: `{i}mms when the exam ; is tomorrow_3`
 """
 
 import asyncio
@@ -36,14 +36,14 @@ async def ultd(event):
     ureply = await event.get_reply_message()
     msg = event.pattern_match.group(1)
     if not (ureply and (ureply.media)):
-        xx = await event.eor("`Reply to any media`")
+        xx = await event.eor("Reply to any media")
         return
     if not msg:
-        xx = await event.eor("`Give me something text to write...`")
+        xx = await event.eor("Give me something text to write.")
         return
     ultt = await ureply.download_media()
     if ultt.endswith((".tgs")):
-        xx = await event.eor("`Ooo Animated Sticker 👀...`")
+        xx = await event.eor("⏳ Animated sticker - this takes a moment...")
         cmd = ["lottie_convert.py", ultt, "ult.png"]
         file = "ult.png"
         process = await asyncio.create_subprocess_exec(
@@ -53,12 +53,12 @@ async def ultd(event):
         stderr.decode().strip()
         stdout.decode().strip()
     elif ultt.endswith((".webp", ".png")):
-        xx = await event.eor("`Processing`")
+        xx = await event.eor("Processing")
         im = Image.open(ultt)
         im.save("ult.png", format="PNG", optimize=True)
         file = "ult.png"
     else:
-        xx = await event.eor("`Processing`")
+        xx = await event.eor("Processing")
         img = cv2.VideoCapture(ultt)
         heh, lol = img.read()
         cv2.imwrite("ult.png", lol)
@@ -190,14 +190,14 @@ async def mms(event):
     ureply = await event.get_reply_message()
     msg = event.pattern_match.group(1)
     if not (ureply and (ureply.media)):
-        xx = await event.eor("`Reply to any media`")
+        xx = await event.eor("Reply to any media")
         return
     if not msg:
         xx = await event.eor("`Give me something text to write 😑`")
         return
     ultt = await ureply.download_media()
     if ultt.endswith((".tgs")):
-        xx = await event.eor("`Ooo Animated Sticker 👀...`")
+        xx = await event.eor("⏳ Animated sticker - this takes a moment...")
         cmd = ["lottie_convert.py", ultt, "ult.png"]
         file = "ult.png"
         process = await asyncio.create_subprocess_exec(
@@ -207,12 +207,12 @@ async def mms(event):
         stderr.decode().strip()
         stdout.decode().strip()
     elif ultt.endswith((".webp", ".png")):
-        xx = await event.eor("`Processing`")
+        xx = await event.eor("Processing")
         im = Image.open(ultt)
         im.save("ult.png", format="PNG", optimize=True)
         file = "ult.png"
     else:
-        xx = await event.eor("`Processing`")
+        xx = await event.eor("Processing")
         img = cv2.VideoCapture(ultt)
         heh, lol = img.read()
         cv2.imwrite("ult.png", lol)
