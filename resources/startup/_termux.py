@@ -62,8 +62,7 @@ INFO_TEXT = f"""
 2. You can install that requirement whenever you want with 'pip install' (a very basic python+bash knowledge is required.)
 
 3. Some of the plugins are disabled for 'Termux Users' to save resources (by adding in EXCLUDE_OFFICIAL).
-   - Read More - https://t.me/UltroidUpdates/36
-   - Also, way to enable the disabled plugins is mentioned in that post.
+   - Enable one again: .setdb EXCLUDE_OFFICIAL with that name removed.
 
    # Disabled Plugins Name
     -    autocorrect    -     compressor

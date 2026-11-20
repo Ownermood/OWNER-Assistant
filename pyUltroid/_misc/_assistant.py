@@ -120,26 +120,26 @@ def in_pattern(pattern=None, owner=False, **kwargs):
                 err = format_exc()
 
                 def error_text():
-                    return f"**#ERROR #INLINE**\n\nQuery: `{asst.me.username} {pattern}`\n\n**Traceback:**\n`{format_exc()}`"
+                    return f"**#ERROR #INLINE**\n\nQuery: `{asst.me.username} {pattern}`\n\n**Traceback:**\n`{err}`"
 
                 LOGS.exception(er)
+                # full error goes to the log group only, never into the chat
+                try:
+                    await asst.send_message(udB.get_key("LOG_CHANNEL"), error_text()[:4000])
+                except Exception as er2:
+                    LOGS.exception(er2)
                 try:
                     await event.answer(
                         [
                             await event.builder.article(
-                                title="Unhandled Exception has Occured!",
-                                text=error_text(),
-                                buttons=Button.url(
-                                    "Report", "https://t.me/UltroidSupportChat"
-                                ),
+                                title="Something went wrong",
+                                description="Details were sent to your log group.",
+                                text="`Something went wrong. Details are in the log group.`",
                             )
                         ]
                     )
-                except QueryIdInvalidError:
+                except Exception:
                     LOGS.exception(err)
-                except Exception as er:
-                    LOGS.exception(er)
-                    await asst.send_message(udB.get_key("LOG_CHANNEL"), error_text())
 
         asst.add_event_handler(wrapper, InlineQuery(pattern=pattern, **kwargs))
 
