@@ -237,11 +237,11 @@ class Manager:
         self.kb_msg = None  # "share phone" keyboard message during login
         self.join_cache = {}
         self.join_problem = None
-        # Premium (custom) emoji for buttons + text; off automatically if
-        # Telegram refuses it for this bot (self.emoji_ok becomes False).
+        # Premium (custom) emoji on BUTTON ICONS only - message text keeps
+        # plain emojis (premium everywhere looked bad). Turns itself off if
+        # Telegram refuses custom emoji for this bot.
         self.emoji_ok = bool(self.store.data.get("emoji_ok", True))
-        emoji.install(bot, lambda: self.emoji_ok)
-        self.emap = getattr(bot, "_oa_emoji_map", {}) or {}
+        self.emap = emoji.load_map()
 
     def btn(self, em, label, data=None, url=None):
         icon = emoji.lookup(self.emap, em) if self.emoji_ok else None
