@@ -14,6 +14,8 @@ from telethon import Button, TelegramClient, errors, events
 from telethon.sessions import StringSession
 from telethon.tl.functions.channels import GetParticipantRequest
 
+from . import emoji
+
 
 # ----------------------------------------------------------------- config
 
@@ -235,15 +237,21 @@ class Manager:
         self.kb_msg = None  # "share phone" keyboard message during login
         self.join_cache = {}
         self.join_problem = None
+        # Premium (custom) emoji for buttons + text; off automatically if
+        # Telegram refuses it for this bot (self.emoji_ok becomes False).
+        self.emoji_ok = bool(self.store.data.get("emoji_ok", True))
+        emoji.install(bot, lambda: self.emoji_ok)
+        self.emap = getattr(bot, "_oa_emoji_map", {}) or {}
 
     def btn(self, em, label, data=None, url=None):
-        text = f"{em} {label}"
+        icon = emoji.lookup(self.emap, em) if self.emoji_ok else None
+        text = label if icon else f"{em} {label}"
         if url:
-            return Button.url(text, url)
-        return Button.inline(text, data.encode())
+            return Button.url(text, url, icon=icon)
+        return Button.inline(text, data.encode(), icon=icon)
 
     # ------------------------------------------------------------ the one panel
-    async def show(self, chat, text, buttons=None, event=None):
+    async def show(self, chat, text, buttons=None, event=None, _retry=True):
         """Edit the live panel (button press) or replace it (typed command / alert)."""
         try:
             if isinstance(event, events.CallbackQuery.Event):
@@ -261,6 +269,12 @@ class Manager:
             if old and old != msg.id:
                 await self.drop(chat, old)
         except errors.RPCError:
+            if _retry and self.emoji_ok and self.emap:
+                # Telegram won't let this bot use custom emoji - go plain.
+                self.emoji_ok = False
+                self.store.data["emoji_ok"] = False
+                self.store.save()
+                return await self.show(chat, text, buttons, event, _retry=False)
             raise
 
     async def drop(self, chat, *ids):
