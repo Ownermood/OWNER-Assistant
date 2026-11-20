@@ -84,12 +84,12 @@ UND = get_string("pmperm_1")
 UNS = get_string("pmperm_2")
 NO_REPLY = get_string("pmperm_3")
 
-UNAPPROVED_MSG = "**PMSecurity of {ON}!**\n\n{UND}\n\nYou have {warn}/{twarn} warnings!"
+UNAPPROVED_MSG = "**🔒 {ON}'s inbox**\n\n{UND}\n\n⚠️ Warnings: {warn}/{twarn}"
 if udB.get_key("PM_TEXT"):
     UNAPPROVED_MSG = (
-        "**PMSecurity of {ON}!**\n\n"
+        "**🔒 {ON}'s inbox**\n\n"
         + udB.get_key("PM_TEXT")
-        + "\n\nYou have {warn}/{twarn} warnings!"
+        + "\n\n⚠️ Warnings: {warn}/{twarn}"
     )
 # 1
 WARNS = udB.get_key("PMWARNS") or 4
@@ -258,7 +258,7 @@ if udB.get_key("PMSETTING"):
             if user.id in LASTMSG:
                 prevmsg = LASTMSG[user.id]
                 if event.text != prevmsg:
-                    if "PMSecurity" in event.text or "**PMSecurity" in event.text:
+                    if "PMSecurity" in event.text or "'s inbox**" in event.text:
                         return
                     await delete_pm_warn_msgs(user.id)
                     message_ = UNAPPROVED_MSG.format(
@@ -790,7 +790,7 @@ async def in_pm_ans(event):
     try:
         msg_ = WARN_MSGS[from_user]
     except KeyError:
-        msg_ = "**PMSecurity of {OWNER_NAME}**"
+        msg_ = f"**🔒 {OWNER_NAME}'s inbox**"
     wrns = f"{warns}/{WARNS}"
     buttons = [
         [

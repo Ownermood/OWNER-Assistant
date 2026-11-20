@@ -369,8 +369,8 @@ async def _(event):
         common_chats,
     )
     if chk := is_gbanned(user_id):
-        caption += f"""<b>••Gʟᴏʙᴀʟʟʏ Bᴀɴɴᴇᴅ</b>: <code>True</code>
-<b>••Rᴇᴀsᴏɴ</b>: <code>{chk}</code>"""
+        caption += f"""<b>• Globally banned</b>: <code>True</code>
+<b>• Reason</b>: <code>{chk}</code>"""
     await event.client.send_message(
         event.chat_id,
         caption,

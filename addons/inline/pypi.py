@@ -81,13 +81,13 @@ async def inline_pypi_handler(event):
                 event.builder.article(
                     type="photo",
                     include_media=True,
-                    title="sᴇᴀʀᴄʜ ᴘʏᴘɪ",
+                    title="Search PyPI",
                     thumb=wb(pypimg, 0, "image/jpeg", []),
                     content=wb(pypimg, 0, "image/jpeg", []),
-                    text=f"**ᴘʏᴘɪ sᴇᴀʀᴄʜ**\n\nʏᴏᴜ ᴅɪᴅɴ'ᴛ sᴇᴀʀᴄʜ ғᴏʀ ᴀɴʏᴛʜɪɴɢ.",
+                    text=f"**PyPI search**\n\nYou didn't search for anything.",
                     buttons=[
                         Button.switch_inline(
-                            "sᴇᴀʀᴄʜ ᴀɢᴀɪɴ",
+                            "Search again",
                             query="pypi ",
                             same_peer=True,
                         ),
@@ -105,7 +105,7 @@ async def inline_pypi_handler(event):
         version = info["version"]
         summary = info["summary"]
         qid = generate_unique_id(name)
-        txt = f"**ᴘᴀᴄᴋᴀɢᴇ:** [{name}]({url}) (`{version}`)\n\n**ᴅᴇᴛᴀɪʟs:** `{summary}`"
+        txt = f"**Package:** [{name}]({url}) (`{version}`)\n\n**Details:** `{summary}`"
 
         offset = txt.find(name)
         length = len(name)
@@ -115,8 +115,8 @@ async def inline_pypi_handler(event):
         document_links = re.findall(r"(https?://\S+)", info["description"])
 
         buttons = [
-            Button.inline("sʜᴏᴡ ᴅᴇᴛᴀɪʟs", data=f"pypi_details:{qid}"),
-            Button.inline("ᴅᴏᴄᴜᴍᴇɴᴛ ʟɪɴᴋs", data=f"pypi_documents:{qid}"),
+            Button.inline("Show details", data=f"pypi_details:{qid}"),
+            Button.inline("Document links", data=f"pypi_documents:{qid}"),
         ]
 
         await event.answer(
@@ -124,7 +124,7 @@ async def inline_pypi_handler(event):
                 event.builder.article(
                     type="photo",
                     include_media=True,
-                    title="ᴘᴀᴄᴋᴀɢᴇ ɪɴғᴏ",
+                    title="Package info",
                     thumb=wb(
                         "https://graph.org/file/f09380ada91534b2f6687.jpg",
                         0,
@@ -162,9 +162,9 @@ async def inline_pypi_handler(event):
         await event.answer(
             [
                 event.builder.article(
-                    title="ᴘᴀᴄᴋᴀɢᴇ ɴᴏᴛ ғᴏᴜɴᴅ",
+                    title="Package not found",
                     thumb=wb(pypimg, 0, "image/jpeg", []),
-                    text=f"**ᴘᴀᴄᴋᴀɢᴇ:** `{package}`\n\n**ᴅᴇᴛᴀɪʟs:** `ɴᴏᴛ ғᴏᴜɴᴅ`",
+                    text=f"**Package:** `{package}`\n\n**Details:** `Not found`",
                 )
             ]
         )
@@ -175,12 +175,12 @@ async def inline_pypi_handler(event):
 async def show_details(event):
     qid = event.data.decode().split(":", 1)[1]
     if not PYPI_LIST.get(qid):
-        return await event.answer("Qᴜᴇʀʏ ᴇxᴘɪʀᴇᴅ! Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ 🔍")
+        return await event.answer("Query expired! Search again 🔍")
     info = PYPI_LIST[qid]
     details = info["info"]
 
-    author = details.get("author", "Uɴᴋɴᴏᴡɴ")
-    author_email = details.get("author_email", "Uɴᴋɴᴏᴡɴ")
+    author = details.get("author", "Unknown")
+    author_email = details.get("author_email", "Unknown")
     classifiers = "\n".join(details.get("classifiers", []))
     description = details.get("description", "N/A")
 
@@ -189,19 +189,19 @@ async def show_details(event):
     clean_description = clean_desc(clean_description)
     PYPI_LIST[qid]["description"] = clean_description
 
-    text = f"**ᴀᴜᴛʜᴏʀ:** {author}\n"
-    text += f"**ᴀᴜᴛʜᴏʀ ᴇᴍᴀɪʟ:** {author_email}\n"
-    text += f"**ᴄʟᴀssɪғɪᴇʀs:**\n{classifiers}\n"
+    text = f"**Author:** {author}\n"
+    text += f"**Author email:** {author_email}\n"
+    text += f"**Classifiers:**\n{classifiers}\n"
 
     if description == "N/A":
         buttons = [
-            Button.inline("ʙᴀᴄᴋ", data=f"pypi_back_button:{qid}"),
+            Button.inline("« Back", data=f"pypi_back_button:{qid}"),
         ]
         await event.edit(text, buttons=buttons)
     else:
         buttons = [
-            Button.inline("ᴍᴏʀᴇ", data=f"pypi_description_more:{qid}"),
-            Button.inline("ʙᴀᴄᴋ", data=f"pypi_back_button:{qid}"),
+            Button.inline("More »", data=f"pypi_description_more:{qid}"),
+            Button.inline("« Back", data=f"pypi_back_button:{qid}"),
         ]
         await event.edit(text, buttons=buttons)
 
@@ -210,10 +210,10 @@ async def show_details(event):
 async def show_documents(event):
     qid = event.data.decode().split(":", 1)[1]
     if not PYPI_LIST.get(qid):
-        return await event.answer("Qᴜᴇʀʏ ᴇxᴘɪʀᴇᴅ! Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ 🔍")
+        return await event.answer("Query expired! Search again 🔍")
     document_links = PYPI_LIST[qid]["document_links"]
     if document_links:
-        text = "**ᴅᴏᴄ ʟɪɴᴋs**\n╭────────────────•\n"
+        text = "**Documentation links**\n╭────────────────•\n"
         text += "\n".join(
             [
                 f"╰➢ [{link.split('//')[1].split('/')[0]}]({link})"
@@ -222,11 +222,11 @@ async def show_documents(event):
         )
         text += "\n╰────────────────•"
         buttons = [
-            Button.inline("ʙᴀᴄᴋ", data=f"pypi_back_button:{qid}"),
+            Button.inline("« Back", data=f"pypi_back_button:{qid}"),
         ]
         await event.edit(text, buttons=buttons)
     else:
-        await event.answer("ɴᴏ ᴅᴏᴄᴜᴍᴇɴᴛ ʟɪɴᴋs ғᴏᴜɴᴅ.")
+        await event.answer("No documentation links found.")
 
 
 @callback(re.compile("pypi_description_more:(.*)"), owner=True)
@@ -234,7 +234,7 @@ async def show_full_description(event):
     qid = event.data.decode().split(":", 1)[1]
     description = PYPI_LIST[qid].get("description")
     if description:
-        already_defined_text_length = len("ᴅᴇsᴄʀɪᴘᴛɪᴏɴ:\nPage X/Y\n")
+        already_defined_text_length = len("Description:\nPage X/Y\n")
         current_page = 1
         await show_description_with_pagination(
             event, qid, description, already_defined_text_length, current_page
@@ -252,10 +252,10 @@ async def show_description_with_pagination(
     ]
     total_chunks = len(description_chunks)
 
-    text = f"**ᴅᴇsᴄʀɪᴘᴛɪᴏɴ:**\n**Pᴀɢᴇ** `{current_page}`/`{total_chunks}`\n{description_chunks[current_page - 1]}"
+    text = f"**Description:**\n**Page** `{current_page}`/`{total_chunks}`\n{description_chunks[current_page - 1]}"
     buttons = [
         Button.inline("<<", data=f"pypi_description_page:{qid}:{current_page-1}"),
-        Button.inline("ʙᴀᴄᴋ", data=f"pypi_back_button:{qid}"),
+        Button.inline("« Back", data=f"pypi_back_button:{qid}"),
         Button.inline(">>", data=f"pypi_description_page:{qid}:{current_page+1}"),
     ]
     await event.edit(text, buttons=buttons)
@@ -266,7 +266,7 @@ async def handle_description_page(event):
     qid, page = event.data.decode().split(":")[1:]
     description = PYPI_LIST[qid].get("description")
     if description:
-        already_defined_text_length = len("ᴅᴇsᴄʀɪᴘᴛɪᴏɴ:\nPage X/Y\n")
+        already_defined_text_length = len("Description:\nPage X/Y\n")
         page_number = int(page)
         await show_description_with_pagination(
             event,
@@ -281,7 +281,7 @@ async def handle_description_page(event):
 async def back_button_clicked(event):
     qid = event.data.decode().split(":", 1)[1]
     if not PYPI_LIST.get(qid):
-        return await event.answer("Qᴜᴇʀʏ ᴇxᴘɪʀᴇᴅ! Sᴇᴀʀᴄʜ ᴀɢᴀɪɴ 🔍")
+        return await event.answer("Query expired! Search again 🔍")
     text = PYPI_LIST[qid]["text"]
     buttons = PYPI_LIST[qid]["buttons"]
     await event.edit(text, buttons=buttons)

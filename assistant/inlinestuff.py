@@ -52,8 +52,8 @@ async def _(e):
         kkkk = e.builder.article(
             title="Enter Device Codename",
             thumb=wb(ofox, 0, "image/jpeg", []),
-            text="**OFᴏx🦊Rᴇᴄᴏᴠᴇʀʏ**\n\nYou didn't search anything",
-            buttons=Button.switch_inline("Sᴇᴀʀᴄʜ Aɢᴀɪɴ", query="ofox ", same_peer=True),
+            text="**OFox🦊Recovery**\n\nYou didn't search anything",
+            buttons=Button.switch_inline("Search Again", query="ofox ", same_peer=True),
         )
         return await e.answer([kkkk])
     device, releases = await get_ofox(match)
@@ -85,9 +85,9 @@ async def _(e):
                     thumb=wb(ofox, 0, "image/jpeg", []),
                     link_preview=True,
                     buttons=[
-                        Button.url("Dᴏᴡɴʟᴏᴀᴅ", url=f"{link}"),
+                        Button.url("Download", url=f"{link}"),
                         Button.switch_inline(
-                            "Sᴇᴀʀᴄʜ Aɢᴀɪɴ", query="ofox ", same_peer=True
+                            "Search Again", query="ofox ", same_peer=True
                         ),
                     ],
                 )
@@ -233,8 +233,8 @@ async def _(e):
         title = a.get("title")
         desc = a.get("snippet")
         link = a.get("link")
-        text = f"**••Tɪᴛʟᴇ••** `{title}`\n\n"
-        text += f"**Dᴇsᴄʀɪᴘᴛɪᴏɴ** `{desc}`"
+        text = f"**Title:** `{title}`\n\n"
+        text += f"**Description:** `{desc}`"
         modss.append(
             await e.builder.article(
                 title=title,
@@ -242,15 +242,15 @@ async def _(e):
                 text=text,
                 link_preview=True,
                 buttons=[
-                    [Button.url("Dᴏᴡɴʟᴏᴀᴅ", url=f"{link}")],
+                    [Button.url("Download", url=f"{link}")],
                     [
                         Button.switch_inline(
-                            "Mᴏʀᴇ Mᴏᴅs",
+                            "More Mods",
                             query="mods ",
                             same_peer=True,
                         ),
                         Button.switch_inline(
-                            "Sʜᴀʀᴇ",
+                            "Share",
                             query=f"mods {quer}",
                             same_peer=False,
                         ),
@@ -320,7 +320,7 @@ async def _(e):
                             same_peer=True,
                         ),
                         Button.switch_inline(
-                            "Sʜᴀʀᴇ",
+                            "Share",
                             query=f"app {f}",
                             same_peer=False,
                         ),
@@ -580,16 +580,16 @@ async def inline_tl(ult):
 
 InlinePlugin.update(
     {
-        "Pʟᴀʏ Sᴛᴏʀᴇ Aᴘᴘs": "app telegram",
-        "Mᴏᴅᴅᴇᴅ Aᴘᴘs": "mods minecraft",
-        "Sᴇᴀʀᴄʜ Oɴ Gᴏᴏɢʟᴇ": "go OWNER Assistant",
-        "WʜɪSᴘᴇʀ": "wspr @username Hello🎉",
-        "YᴏᴜTᴜʙᴇ Dᴏᴡɴʟᴏᴀᴅᴇʀ": "yt Ed Sheeran Perfect",
+        "Play Store Apps": "app telegram",
+        "Modded Apps": "mods minecraft",
+        "Search on Google": "go OWNER Assistant",
+        "Whisper": "wspr @username Hello🎉",
+        "YouTube Downloader": "yt Ed Sheeran Perfect",
         "Piston Eval": "run javascript console.log('Hello OWNER')",
-        "OʀᴀɴɢᴇFᴏx🦊": "ofox beryllium",
-        "Tᴡɪᴛᴛᴇʀ Usᴇʀ": "twitter telegram",
-        "Fᴅʀᴏɪᴅ Sᴇᴀʀᴄʜ": "fdroid telegram",
-        "Sᴀᴀᴠɴ sᴇᴀʀᴄʜ": "saavn",
-        "Tʟ Sᴇᴀʀᴄʜ": "tl",
+        "OrangeFox🦊": "ofox beryllium",
+        "Twitter User": "twitter telegram",
+        "F-Droid Search": "fdroid telegram",
+        "Saavn Search": "saavn",
+        "TL Search": "tl",
     }
 )
