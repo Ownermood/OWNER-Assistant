@@ -12,6 +12,11 @@ import time
 
 from telethon import Button, TelegramClient, errors, events
 from telethon.sessions import StringSession
+from telethon.tl.functions.channels import GetParticipantRequest
+from telethon.tl.functions.messages import GetStickerSetRequest
+from telethon.tl.types import DocumentAttributeCustomEmoji, InputStickerSetShortName
+
+from . import emoji
 
 # ----------------------------------------------------------------- config
 
@@ -194,30 +199,26 @@ class Runner:
 
 # ----------------------------------------------------------------- the bot
 
-HELP = """**OWNER Manager** - control your OWNER Assistant from here.
+FORCE_JOIN = (os.environ.get("FORCE_JOIN") or "@VillanCommunity").strip()
+if FORCE_JOIN.lower() in ("off", "false", "no", "0", "none"):
+    FORCE_JOIN = ""
+FORCE_JOIN_ID = _int("FORCE_JOIN_ID", -1004443904846)
+JOIN_URL = f"https://t.me/{FORCE_JOIN.lstrip('@')}" if FORCE_JOIN.startswith("@") else FORCE_JOIN
+MAX_PACKS = 25
+PACK_RE = re.compile(r"(?:t\.me|telegram\.me)/(?:addemoji|addstickers)/(\w+)")
 
-🔐 /login - log in your Telegram account (phone + code)
-🚪 /logout - log out and stop the userbot
-📊 /status - is it running? which account?
-▶️ /run  ⏹ /stop  🔄 /restart - control the userbot
-📜 /logs - last lines of the userbot log
-⚙️ /vars  /setvar KEY value  /delvar KEY - extra settings (applied on restart)
-❌ /cancel - cancel a login
+HELP = """❓ **Help**
 
-Only you (OWNER_ID) can use this bot."""
+🔐 **Login** – connect your Telegram account
+🚪 **Logout** – remove it, userbot stops
+▶️ **Run** · ⏹ **Stop** · 🔄 **Restart** – control the userbot
+📜 **Logs** – see errors
+⚙️ **Settings** – premium emoji, extra vars
 
+Commands also work: /login /logout /status /restart /logs /cancel
+`/setvar KEY value` · `/delvar KEY`
 
-def panel():
-    return [
-        [Button.inline("🔐 Login", b"m:login", style="success"),
-         Button.inline("🚪 Logout", b"m:logout", style="danger")],
-        [Button.inline("📊 Status", b"m:status", style="primary"),
-         Button.inline("📜 Logs", b"m:logs")],
-        [Button.inline("▶️ Run", b"m:run", style="success"),
-         Button.inline("⏹ Stop", b"m:stop", style="danger"),
-         Button.inline("🔄 Restart", b"m:restart", style="primary")],
-        [Button.inline("⚙️ Vars", b"m:vars"), Button.inline("❓ Help", b"m:help")],
-    ]
+Your messages here are deleted automatically to keep the chat clean."""
 
 
 def fmt_uptime(sec):
@@ -235,23 +236,180 @@ class Manager:
         self.runner = runner or Runner(self.userbot_exited)
         self.login = None  # {"step", "client", "phone", "hash", "tries", "since"}
         self.logged_out = False
+        self.panels = {}  # chat id -> id of the one live menu message
+        self.kb_msg = None  # "share phone" keyboard message during login
+        self.join_cache = {}
+        self.join_problem = None
+        emoji.install(bot, self.emoji_map)
 
-    # ---- helpers
-    async def tell(self, text, **kw):
+    # ------------------------------------------------------------ emoji
+    def emoji_map(self):
+        if not self.store.data.get("emoji_on", True):
+            return {}
+        return self.store.data.get("emoji") or {}
+
+    def btn(self, em, label, data=None, url=None):
+        """Button with a premium emoji icon when saved, else a normal emoji."""
+        icon = emoji.lookup(self.emoji_map(), em) if self.store.data.get("icons_on", True) else None
+        text = label if icon else f"{em} {label}"
+        if url:
+            return Button.url(text, url, icon=icon)
+        return Button.inline(text, data.encode(), icon=icon)
+
+    # ------------------------------------------------------------ the one panel
+    async def show(self, chat, text, buttons=None, event=None, _retry=True):
+        """Edit the live panel (button press) or replace it (typed command / alert)."""
+        try:
+            if isinstance(event, events.CallbackQuery.Event):
+                try:
+                    await event.edit(text, buttons=buttons, link_preview=False)
+                    self.panels[chat] = event.message_id
+                    return
+                except errors.MessageNotModifiedError:
+                    return
+                except errors.MessageIdInvalidError:
+                    pass
+            old = self.panels.get(chat)
+            msg = await self.bot.send_message(chat, text, buttons=buttons, link_preview=False)
+            self.panels[chat] = msg.id
+            if old and old != msg.id:
+                await self.drop(chat, old)
+        except errors.RPCError as er:
+            using = self.emoji_map() and (self.store.data.get("emoji_on", True))
+            if _retry and using:
+                # Telegram did not accept premium emojis from this bot: fall back.
+                self.store.data.update(emoji_on=False, icons_on=False, emoji_error=str(er)[:120])
+                self.store.save()
+                return await self.show(chat, text, buttons, event, _retry=False)
+            raise
+
+    async def drop(self, chat, *ids):
+        ids = [i for i in ids if i]
+        if ids:
+            try:
+                await self.bot.delete_messages(chat, ids)
+            except Exception:
+                pass
+
+    async def clean(self, event):
+        """Delete the owner's typed message (keeps the chat tidy)."""
+        try:
+            await event.delete()
+        except Exception:
+            pass
+
+    async def tell(self, text, extra=None):
+        """Alert the owner: replaces the panel so it is the newest message."""
         if not OWNER_ID:
             return
         try:
-            await self.bot.send_message(OWNER_ID, text, **kw)
+            await self.show(OWNER_ID, text + "\n\n" + self.status_text(), self.menu_buttons())
         except Exception as er:  # owner never pressed /start, or blocked the bot
             log("could not message owner:", er)
 
+    # ------------------------------------------------------------ views
     def account_text(self):
         acc = self.store.data.get("account")
         if not acc:
-            return "unknown"
+            return "—"
         user = f" (@{acc['username']})" if acc.get("username") else ""
-        return f"{acc['name']}{user} `{acc['id']}`"
+        return f"{acc['name']}{user}"
 
+    def state(self):
+        if self.runner.running:
+            return "running"
+        if self.logged_out or not self.store.session:
+            return "logged_out"
+        return "stopped"
+
+    def status_text(self):
+        st = self.state()
+        line = {"running": "🟢 Running", "stopped": "⚪ Stopped", "logged_out": "🔴 Not logged in"}[st]
+        lines = [f"**Status:** {line}", f"👤 {self.account_text()}"]
+        if st == "running" and self.runner.started:
+            lines.append(f"⏳ {fmt_uptime(time.time() - self.runner.started)}")
+        if self.join_problem:
+            lines.append(f"⚠️ {self.join_problem}")
+        return "\n".join(lines)
+
+    def menu_buttons(self):
+        st = self.state()
+        rows = []
+        if st == "logged_out":
+            rows.append([self.btn("🔐", "Login", "m:login")])
+        elif st == "running":
+            rows.append([self.btn("🔄", "Restart", "m:restart"), self.btn("⏹", "Stop", "m:stop")])
+        else:
+            rows.append([self.btn("▶️", "Run", "m:run")])
+        rows.append([self.btn("📜", "Logs", "m:logs"), self.btn("⚙️", "Settings", "m:settings")])
+        if st != "logged_out":
+            rows.append([self.btn("🔐", "Login again", "m:login"), self.btn("🚪", "Logout", "m:logout")])
+        rows.append([self.btn("🔃", "Refresh", "m:menu")])
+        return rows
+
+    def back(self, to="m:menu"):
+        return self.btn("◀️", "Back", to)
+
+    async def view_menu(self, chat, event=None, note=""):
+        head = "👑 **OWNER Manager**\n\n"
+        await self.show(chat, head + (note + "\n\n" if note else "") + self.status_text(),
+                        self.menu_buttons(), event)
+
+    async def view_logs(self, chat, event=None):
+        lines = list(self.runner.lines)
+        body = "\n".join(lines[-25:])[-3300:] if lines else "No logs yet."
+        await self.show(chat, f"📜 **Logs** (last lines)\n```\n{body}\n```",
+                        [[self.btn("🔃", "Refresh", "m:logs"), self.btn("📄", "Full log", "m:logfile")],
+                         [self.back()]], event)
+
+    async def send_logfile(self, chat):
+        lines = list(self.runner.lines)
+        if not lines:
+            return
+        path = os.path.join(DATA_DIR, "userbot-logs.txt")
+        with open(path, "w") as f:
+            f.write("\n".join(lines))
+        try:
+            await self.bot.send_file(chat, path, caption="📄 Userbot log",
+                                     buttons=[[self.btn("🗑", "Close", "m:close")]])
+        finally:
+            os.remove(path)
+
+    async def view_settings(self, chat, event=None):
+        await self.show(chat, "⚙️ **Settings**",
+                        [[self.btn("✨", "Premium emoji", "m:emoji")],
+                         [self.btn("🧩", "Extra vars", "m:vars"), self.btn("❓", "Help", "m:help")],
+                         [self.back()]], event)
+
+    async def view_emoji(self, chat, event=None, note=""):
+        data = self.store.data
+        mapping = data.get("emoji") or {}
+        shown = sorted({k for k in mapping if (k + "️") not in mapping})
+        on = data.get("emoji_on", True)
+        lines = ["✨ **Premium emoji**", ""]
+        if note:
+            lines += [note, ""]
+        lines.append(f"Saved: **{len(shown)}**  ·  {'✅ On' if on else '❌ Off'}")
+        if shown:
+            lines.append(" ".join(shown[:60]))
+        if data.get("emoji_error") and not on:
+            lines += ["", f"⚠️ Telegram refused premium emoji for this bot:\n`{data['emoji_error']}`"]
+        lines += ["", "**Add:** send or forward me a message with premium emojis,",
+                  "or send pack links (`t.me/addemoji/...`, up to 25)."]
+        toggle = self.btn("❌", "Turn off", "m:emoji_off") if on else self.btn("✅", "Turn on", "m:emoji_on")
+        rows = [[toggle, self.btn("🗑", "Clear", "m:emoji_clear")], [self.back("m:settings")]]
+        await self.show(chat, "\n".join(lines), rows, event)
+
+    async def view_vars(self, chat, event=None, note=""):
+        env = self.store.env
+        body = "\n".join(f"`{k}` = `{mask(v)}`" for k, v in sorted(env.items())) or "None yet."
+        text = (f"🧩 **Extra vars** (used after Restart)\n\n{body}\n\n"
+                "**Add:** `/setvar KEY value`\n**Remove:** `/delvar KEY`")
+        if note:
+            text = note + "\n\n" + text
+        await self.show(chat, text, [[self.back("m:settings")]], event)
+
+    # ------------------------------------------------------------ userbot control
     async def start_userbot(self, check=True):
         session = self.store.session
         if not session:
@@ -272,98 +430,27 @@ class Manager:
         return True, "Started."
 
     async def userbot_exited(self, code):
-        tail = "\n".join(list(self.runner.lines)[-12:])[-1500:]
+        tail = "\n".join(list(self.runner.lines)[-10:])[-1200:]
         if code == 0:
-            await self.tell("⏹ Userbot stopped itself (`.shutdown`?). Press **Run** to start it again.",
-                            buttons=panel())
-            return
+            return await self.tell("⏹ Userbot stopped itself (`.shutdown`).")
         ok, _ = await check_session(self.store.session)
         if not ok:
             self.logged_out = True
-            await self.tell("🚪 **Your account is logged out** (session ended).\n"
-                            "Userbot stopped. Press **Login** to connect again.", buttons=panel())
-            return
+            return await self.tell("🚪 **Your account got logged out.** Tap **Login** to connect again.")
         if self.runner.crash_too_often():
-            await self.tell(f"❌ Userbot crashed {MAX_CRASHES} times in 10 min - auto restart stopped.\n"
-                            f"```\n{tail}\n```\nFix the problem, then press **Run**.", buttons=panel())
-            return
-        await self.tell(f"⚠️ Userbot crashed (code `{code}`), restarting in 10s...\n```\n{tail}\n```")
+            return await self.tell(f"❌ Userbot crashed {MAX_CRASHES} times in 10 min, auto-restart is off.\n"
+                                   f"```\n{tail}\n```")
+        await self.tell(f"⚠️ Userbot crashed, restarting in 10s…\n```\n{tail}\n```")
         await asyncio.sleep(10)
         if not self.runner.running and not self.logged_out:
             await self.start_userbot(check=False)
 
-    # ---- access
-    async def allowed(self, event):
-        if not OWNER_ID:
-            text = (f"⚙️ Setup needed: put this line in your `.env` and restart:\n\n"
-                    f"`OWNER_ID={event.sender_id}`")
-            if isinstance(event, events.CallbackQuery.Event):
-                await event.answer("OWNER_ID not set", alert=True)
-            else:
-                await event.reply(text)
-            return False
-        if event.sender_id != OWNER_ID:
-            if isinstance(event, events.CallbackQuery.Event):
-                await event.answer("This is a private bot.", alert=True)
-            elif event.is_private:
-                await event.reply("🔒 This is a private bot.")
-            return False
-        return True
-
-    # ---- actions (shared by commands and buttons)
-    async def do_status(self, respond):
-        r = self.runner
-        state = "🟢 Running" if r.running else ("🔴 Logged out" if self.logged_out or not self.store.session else "⚪ Stopped")
-        lines = [f"**Userbot:** {state}", f"**Account:** {self.account_text()}"]
-        if r.running and r.started:
-            lines.append(f"**Uptime:** {fmt_uptime(time.time() - r.started)}")
-        if r.crashes:
-            lines.append(f"**Crashes (10 min):** {len(r.crashes)}")
-        if self.login:
-            lines.append(f"**Login in progress:** step `{self.login['step']}`")
-        await respond("\n".join(lines), buttons=panel())
-
-    async def do_run(self, respond):
-        ok, msg = await self.start_userbot()
-        await respond(("✅ " if ok else "❌ ") + msg + ("" if ok else "\nPress **Login** first."), buttons=panel())
-
-    async def do_stop(self, respond):
-        if not self.runner.running:
-            return await respond("⚪ Userbot is not running.", buttons=panel())
-        await self.runner.stop()
-        await respond("⏹ Userbot stopped.", buttons=panel())
-
-    async def do_restart(self, respond):
-        await self.runner.stop()
-        ok, msg = await self.start_userbot()
-        await respond(("🔄 Restarted." if ok else "❌ " + msg), buttons=panel())
-
-    async def do_logs(self, respond, event):
-        lines = list(self.runner.lines)
-        if not lines:
-            return await respond("📜 No logs yet.")
-        text = "\n".join(lines[-40:])
-        if len(text) < 3500:
-            return await respond(f"```\n{text}\n```")
-        path = os.path.join(DATA_DIR, "userbot-logs.txt")
-        with open(path, "w") as f:
-            f.write("\n".join(lines))
-        await self.bot.send_file(event.chat_id, path, caption="📜 Userbot logs")
-        os.remove(path)
-
-    async def do_vars(self, respond):
-        env = self.store.env
-        if not env:
-            return await respond("⚙️ No extra vars. Add one: `/setvar KEY value`\n(Applied on next restart.)")
-        body = "\n".join(f"`{k}` = `{mask(v)}`" for k, v in sorted(env.items()))
-        await respond(f"⚙️ **Extra vars** (applied on restart):\n{body}")
-
-    async def do_logout(self, respond):
+    async def do_logout(self):
         session = self.store.session
         await self.runner.stop()
         self.logged_out = True
         if not session:
-            return await respond("🚪 Already logged out.", buttons=panel())
+            return "🚪 Already logged out."
         client = new_client(session)
         try:
             await client.connect()
@@ -374,11 +461,58 @@ class Manager:
         finally:
             await client.disconnect()
         self.store.clear_session()
-        await respond("🚪 **Logged out.** Userbot stopped and this session is removed from Telegram.\n"
-                      "Press **Login** whenever you want to connect again.", buttons=panel())
+        return "🚪 **Logged out.** The session is removed from Telegram."
 
-    # ---- login conversation
+    # ------------------------------------------------------------ access
+    async def is_member(self, uid):
+        if not FORCE_JOIN:
+            return True
+        hit = self.join_cache.get(uid)
+        if hit and time.time() - hit < 300:
+            return True
+        for channel in (FORCE_JOIN, FORCE_JOIN_ID):
+            try:
+                await self.bot(GetParticipantRequest(channel, uid))
+                self.join_problem = None
+                self.join_cache[uid] = time.time()
+                return True
+            except errors.UserNotParticipantError:
+                return False
+            except (errors.ChatAdminRequiredError, errors.ChannelPrivateError):
+                self.join_problem = f"Make this bot an admin in {FORCE_JOIN} so it can check members."
+                return True  # never lock the owner out of their own bot
+            except Exception as er:
+                log("force join check:", channel, er)
+        self.join_problem = f"Can't find {FORCE_JOIN}. Check FORCE_JOIN in .env."
+        return True
+
+    async def allowed(self, event):
+        cb = isinstance(event, events.CallbackQuery.Event)
+        if not OWNER_ID:
+            text = f"⚙️ Setup: put this in your `.env` and restart:\n\n`OWNER_ID={event.sender_id}`"
+            return await (event.answer("OWNER_ID not set", alert=True) if cb else event.reply(text)) and False
+        if event.sender_id != OWNER_ID:
+            if cb:
+                await event.answer("🔒 This is a private bot.", alert=True)
+            elif event.is_private:
+                await event.reply("🔒 This is a private bot.")
+            return False
+        if not await self.is_member(event.sender_id):
+            if not cb:
+                await self.clean(event)
+            elif event.data == b"m:joined":
+                await event.answer("You haven't joined yet.", alert=True)
+            await self.show(event.chat_id,
+                            f"📢 **Join {FORCE_JOIN} to use this bot.**\n\nJoin, then tap **I've joined**.",
+                            [[self.btn("📢", "Join channel", url=JOIN_URL)],
+                             [self.btn("✅", "I've joined", "m:joined")]], event if cb else None)
+            return False
+        return True
+
+    # ------------------------------------------------------------ login
     async def cancel_login(self):
+        if self.kb_msg:
+            await self.remove_keyboard(OWNER_ID)
         if self.login:
             client = self.login.get("client")
             self.login = None
@@ -388,31 +522,45 @@ class Manager:
                 except Exception:
                     pass
 
-    async def begin_login(self, respond):
+    async def remove_keyboard(self, chat):
+        old, self.kb_msg = self.kb_msg, None
+        try:
+            tmp = await self.bot.send_message(chat, "·", buttons=Button.clear())
+            await self.drop(chat, old, tmp.id)
+        except Exception:
+            await self.drop(chat, old)
+
+    async def begin_login(self, chat, event=None):
         await self.cancel_login()
         self.login = {"step": "phone", "client": None, "tries": 0, "since": time.time()}
-        warn = ""
-        if self.runner.running:
-            warn = f"\n\n⚠️ Currently running as {self.account_text()}. A new login replaces it."
-        await respond(
-            "🔐 **Login**\n\nSend your phone number with country code, like `+919876543210`,\n"
-            "or tap the button below to share it." + warn + "\n\n/cancel to stop.",
-            buttons=[[Button.request_phone("📱 Share my phone number", resize=True, single_use=True)]],
-        )
+        warn = f"\n\n⚠️ Now running as {self.account_text()} — this will replace it." if self.runner.running else ""
+        await self.show(chat, "🔐 **Login · step 1/3**\n\nSend your phone number with country code,\n"
+                        "like `+919876543210` — or tap **📱 Share my phone** below." + warn,
+                        [[self.btn("✖️", "Cancel", "m:cancel")]], event)
+        try:
+            msg = await self.bot.send_message(
+                chat, "👇", buttons=[[Button.request_phone("📱 Share my phone", resize=True, single_use=True)]])
+            self.kb_msg = msg.id
+        except Exception as er:
+            log("phone keyboard:", er)
 
     async def login_step(self, event):
+        chat = event.chat_id
         st = self.login
+        cancel = [[self.btn("✖️", "Cancel", "m:cancel")]]
+        await self.clean(event)
         if time.time() - st["since"] > LOGIN_TIMEOUT:
             await self.cancel_login()
-            return await event.reply("⌛ Login timed out. Press /login to try again.", buttons=Button.clear())
+            return await self.view_menu(chat, note="⌛ Login timed out. Tap **Login** to try again.")
         text = (event.raw_text or "").strip()
 
         if st["step"] == "phone":
             contact = getattr(event.message, "contact", None) if event.message else None
-            phone = contact.phone_number if contact else text
-            phone = "+" + re.sub(r"\D", "", phone or "")
+            phone = "+" + re.sub(r"\D", "", (contact.phone_number if contact else text) or "")
             if len(phone) < 8:
-                return await event.reply("Send a valid phone number with country code, like `+919876543210`.")
+                return await self.show(chat, "🔐 **Login · step 1/3**\n\n❌ Send a valid number, like `+919876543210`.",
+                                       cancel)
+            await self.remove_keyboard(chat)
             client = new_client("")
             await client.connect()
             try:
@@ -420,70 +568,58 @@ class Manager:
             except errors.FloodWaitError as fw:
                 await client.disconnect()
                 self.login = None
-                return await event.reply(f"⏳ Telegram says wait {fw.seconds} seconds, then /login again.",
-                                         buttons=Button.clear())
+                return await self.view_menu(chat, note=f"⏳ Telegram says wait {fw.seconds}s, then try again.")
             except (errors.PhoneNumberInvalidError, errors.PhoneNumberBannedError,
                     errors.PhoneNumberUnoccupiedError) as er:
                 await client.disconnect()
                 self.login = None
-                return await event.reply(f"❌ {er.__class__.__name__.replace('Error', '')}. Check the number and /login again.",
-                                         buttons=Button.clear())
+                return await self.view_menu(chat, note=f"❌ {er.__class__.__name__.replace('Error', '')} — check the number.")
             st.update(step="code", client=client, phone=phone, hash=sent.phone_code_hash, tries=0)
-            return await event.reply(
-                "📩 Telegram sent you a login code.\n\n"
-                "Send it here **with spaces**, like `1 2 3 4 5`\n"
-                "(if you send it plain, Telegram blocks that code).",
-                buttons=Button.clear(),
-            )
+            return await self.show(chat, "🔐 **Login · step 2/3**\n\n📩 Telegram sent you a code.\n"
+                                   "Send it **with spaces**, like `1 2 3 4 5`\n"
+                                   "(sent without spaces, Telegram blocks it).", cancel)
 
         if st["step"] == "code":
             code = re.sub(r"\D", "", text)
-            try:
-                await event.delete()
-            except Exception:
-                pass
             if len(code) < 5:
-                return await event.respond("Send the code with spaces, like `1 2 3 4 5`.")
+                return await self.show(chat, "🔐 **Login · step 2/3**\n\nSend the code with spaces, like `1 2 3 4 5`.",
+                                       cancel)
             try:
                 await st["client"].sign_in(st["phone"], code=code, phone_code_hash=st["hash"])
             except errors.SessionPasswordNeededError:
                 st.update(step="password", tries=0)
-                return await event.respond("🔑 Your account has 2-step verification.\n"
-                                           "Send your **2FA password** (the message is deleted right away, "
-                                           "and the password is never saved).")
+                return await self.show(chat, "🔐 **Login · step 3/3**\n\n🔑 Send your **2FA password**.\n"
+                                       "It is deleted at once and never saved.", cancel)
             except errors.PhoneCodeInvalidError:
                 st["tries"] += 1
                 if st["tries"] >= 3:
                     await self.cancel_login()
-                    return await event.respond("❌ Wrong code 3 times. Press /login to start again.")
-                return await event.respond("❌ Wrong code, send it again (with spaces).")
+                    return await self.view_menu(chat, note="❌ Wrong code 3 times. Tap **Login** to start again.")
+                return await self.show(chat, "🔐 **Login · step 2/3**\n\n❌ Wrong code, send it again (with spaces).",
+                                       cancel)
             except errors.PhoneCodeExpiredError:
                 await self.cancel_login()
-                return await event.respond("⌛ That code expired (or Telegram blocked it because it was sent "
-                                           "without spaces). Press /login and send the new code like `1 2 3 4 5`.")
-            return await self.finish_login(event)
+                return await self.view_menu(chat, note="⌛ Code expired (or blocked because it was sent without "
+                                            "spaces). Tap **Login** and send the new code like `1 2 3 4 5`.")
+            return await self.finish_login(chat)
 
         if st["step"] == "password":
-            try:
-                await event.delete()
-            except Exception:
-                pass
             if not text:
-                return await event.respond("Send your 2FA password.")
+                return
             try:
                 await st["client"].sign_in(password=text)
             except errors.PasswordHashInvalidError:
                 st["tries"] += 1
                 if st["tries"] >= 3:
                     await self.cancel_login()
-                    return await event.respond("❌ Wrong password 3 times. Press /login to start again.")
-                return await event.respond("❌ Wrong password, try again.")
+                    return await self.view_menu(chat, note="❌ Wrong password 3 times. Tap **Login** to start again.")
+                return await self.show(chat, "🔐 **Login · step 3/3**\n\n❌ Wrong password, try again.", cancel)
             except errors.FloodWaitError as fw:
                 await self.cancel_login()
-                return await event.respond(f"⏳ Telegram says wait {fw.seconds} seconds, then /login again.")
-            return await self.finish_login(event)
+                return await self.view_menu(chat, note=f"⏳ Telegram says wait {fw.seconds}s, then try again.")
+            return await self.finish_login(chat)
 
-    async def finish_login(self, event):
+    async def finish_login(self, chat):
         client = self.login["client"]
         me = await client.get_me()
         session = client.session.save()
@@ -494,10 +630,41 @@ class Manager:
         self.store.set_session(session, account)
         await self.runner.stop()
         await self.start_userbot(check=False)
-        await event.respond(f"✅ **Logged in as {self.account_text()}**\nUserbot is starting... "
-                            "check /status in a minute.", buttons=panel())
+        await self.view_menu(chat, note=f"✅ **Logged in as {self.account_text()}**")
 
-    # ---- wiring
+    # ------------------------------------------------------------ premium emoji input
+    async def save_emojis(self, event):
+        chat = event.chat_id
+        text = event.raw_text or ""
+        pairs = emoji.extract(event.message)
+        names = list(dict.fromkeys(PACK_RE.findall(text)))[:MAX_PACKS]
+        bad = []
+        for i, name in enumerate(names):
+            try:
+                res = await self.bot(GetStickerSetRequest(InputStickerSetShortName(name), hash=0))
+            except errors.FloodWaitError as fw:
+                bad.append(f"{name} (wait {fw.seconds}s)")
+                break
+            except errors.RPCError:
+                bad.append(f"{name} (not found)")
+                continue
+            got = [(a.alt.strip(), d.id) for d in res.documents for a in d.attributes
+                   if isinstance(a, DocumentAttributeCustomEmoji) and a.alt]
+            if not got:
+                bad.append(f"{name} (not an emoji pack)")
+            pairs += got
+            if i < len(names) - 1:
+                await asyncio.sleep(1)
+        data = self.store.data
+        mapping = data.setdefault("emoji", {})
+        n = emoji.add_pairs(mapping, pairs)
+        data.update(emoji_on=True, icons_on=True, emoji_error=None)
+        self.store.save()
+        note = f"✅ Saved {n} emoji(s)." + (f"\n❌ Skipped: {', '.join(bad)}" if bad else "")
+        note += "\nIf they still look normal here, Telegram doesn't allow premium emoji for this bot."
+        await self.view_emoji(chat, note=note)
+
+    # ------------------------------------------------------------ wiring
     def register(self):
         bot = self.bot
 
@@ -505,101 +672,126 @@ class Manager:
         async def on_message(event):
             if not await self.allowed(event):
                 return
+            chat = event.chat_id
             text = (event.raw_text or "").strip()
             cmd = text.split()[0].lower().split("@")[0] if text.startswith("/") else ""
-            respond = event.reply
 
             if cmd == "/cancel":
+                await self.clean(event)
                 had = bool(self.login)
                 await self.cancel_login()
-                return await event.reply("❌ Cancelled." if had else "Nothing to cancel.", buttons=Button.clear())
+                return await self.view_menu(chat, note="✖️ Cancelled." if had else "")
             if self.login and not cmd:
                 return await self.login_step(event)
-            if cmd in ("/start", "/menu", "/help"):
-                return await respond(HELP, buttons=panel())
+            await self.clean(event)
+            if not cmd and (emoji.extract(event.message) or PACK_RE.search(text)):
+                return await self.save_emojis(event)
             if cmd == "/login":
-                return await self.begin_login(respond)
+                return await self.begin_login(chat)
             if cmd == "/logout":
-                return await respond("Log out your account from the userbot?",
-                                     buttons=[[Button.inline("Yes, log out", b"m:logout_yes", style="danger"),
-                                               Button.inline("No", b"m:status")]])
-            if cmd == "/status":
-                return await self.do_status(respond)
-            if cmd == "/run":
-                return await self.do_run(respond)
-            if cmd == "/stop":
-                return await self.do_stop(respond)
-            if cmd == "/restart":
-                return await self.do_restart(respond)
+                return await self.show(chat, "🚪 **Log out** your account from the userbot?",
+                                       [[self.btn("✅", "Yes, log out", "m:logout_yes"), self.back()]])
+            if cmd in ("/run", "/stop", "/restart"):
+                return await self.control(cmd[1:], chat)
             if cmd == "/logs":
-                return await self.do_logs(respond, event)
+                return await self.view_logs(chat)
             if cmd == "/vars":
-                return await self.do_vars(respond)
+                return await self.view_vars(chat)
+            if cmd in ("/emoji", "/pemoji"):
+                return await self.view_emoji(chat)
+            if cmd == "/help":
+                return await self.show(chat, HELP, [[self.back()]])
             if cmd == "/setvar":
                 parts = text.split(maxsplit=2)
-                try:
-                    await event.delete()  # the value may be a secret
-                except Exception:
-                    pass
                 if len(parts) < 3 or not VAR_RE.match(parts[1].upper()):
-                    return await event.respond("Usage: `/setvar KEY value` (KEY like `GEMINI_API_KEY`)")
+                    return await self.view_vars(chat, note="Usage: `/setvar KEY value`")
                 key = parts[1].upper()
                 if key in BLOCKED_VARS:
-                    return await event.respond(f"`{key}` can't be set here.")
+                    return await self.view_vars(chat, note=f"`{key}` can't be set here.")
                 self.store.data.setdefault("env", {})[key] = parts[2].strip()
                 self.store.save()
-                return await event.respond(f"✅ `{key}` saved (`{mask(parts[2].strip())}`). Press **Restart** to apply.",
-                                           buttons=panel())
+                return await self.view_vars(chat, note=f"✅ `{key}` saved. Tap **Restart** to use it.")
             if cmd == "/delvar":
                 parts = text.split()
                 key = parts[1].upper() if len(parts) > 1 else ""
-                if self.store.data.get("env", {}).pop(key, None) is None:
-                    return await respond("Not found. See /vars")
+                gone = self.store.data.get("env", {}).pop(key, None) is not None
                 self.store.save()
-                return await respond(f"🗑 `{key}` removed. Press **Restart** to apply.", buttons=panel())
-            if cmd:
-                return await respond("Unknown command. /help")
+                return await self.view_vars(chat, note=f"🗑 `{key}` removed." if gone else "Not found.")
+            return await self.view_menu(chat)  # /start, /menu, /status, anything else
 
         @bot.on(events.CallbackQuery(pattern=rb"^m:"))
         async def on_button(event):
             if not await self.allowed(event):
                 return
+            chat = event.chat_id
             action = event.data.decode()[2:]
-            await event.answer()
+            answer = ""
+            if action in ("menu", "joined"):
+                await self.view_menu(chat, event)
+            elif action in ("run", "stop", "restart"):
+                await event.answer("⏳ Working…")
+                return await self.control(action, chat, event)
+            elif action == "login":
+                await self.begin_login(chat, event)
+            elif action == "cancel":
+                await self.cancel_login()
+                await self.view_menu(chat, event, note="✖️ Cancelled.")
+            elif action == "logout":
+                await self.show(chat, "🚪 **Log out** your account from the userbot?",
+                                [[self.btn("✅", "Yes, log out", "m:logout_yes"), self.back()]], event)
+            elif action == "logout_yes":
+                await event.answer("⏳ Logging out…")
+                note = await self.do_logout()
+                return await self.view_menu(chat, event, note=note)
+            elif action == "logs":
+                await self.view_logs(chat, event)
+            elif action == "logfile":
+                await self.send_logfile(chat)
+            elif action == "close":
+                await self.drop(chat, event.message_id)
+            elif action == "settings":
+                await self.view_settings(chat, event)
+            elif action == "help":
+                await self.show(chat, HELP, [[self.back("m:settings")]], event)
+            elif action == "vars":
+                await self.view_vars(chat, event)
+            elif action == "emoji":
+                await self.view_emoji(chat, event)
+            elif action in ("emoji_on", "emoji_off"):
+                on = action == "emoji_on"
+                self.store.data.update(emoji_on=on, icons_on=on, emoji_error=None)
+                self.store.save()
+                await self.view_emoji(chat, event)
+            elif action == "emoji_clear":
+                self.store.data["emoji"] = {}
+                self.store.save()
+                await self.view_emoji(chat, event, note="🗑 Cleared.")
+            try:
+                await event.answer(answer)
+            except Exception:
+                pass
 
-            async def respond(text, **kw):
-                return await event.respond(text, **kw)
-
-            actions = {
-                "status": lambda: self.do_status(respond),
-                "run": lambda: self.do_run(respond),
-                "stop": lambda: self.do_stop(respond),
-                "restart": lambda: self.do_restart(respond),
-                "logs": lambda: self.do_logs(respond, event),
-                "vars": lambda: self.do_vars(respond),
-                "login": lambda: self.begin_login(respond),
-                "logout_yes": lambda: self.do_logout(respond),
-                "help": lambda: respond(HELP, buttons=panel()),
-                "logout": lambda: respond("Log out your account from the userbot?",
-                                          buttons=[[Button.inline("Yes, log out", b"m:logout_yes", style="danger"),
-                                                    Button.inline("No", b"m:status")]]),
-            }
-            if action in actions:
-                await actions[action]()
+    async def control(self, action, chat, event=None):
+        if action == "stop":
+            await self.runner.stop()
+            note = "⏹ Stopped."
+        else:
+            if action == "restart":
+                await self.runner.stop()
+            ok, msg = await self.start_userbot()
+            note = ("🔄 Restarted." if action == "restart" else "▶️ Started.") if ok else f"❌ {msg}"
+        await self.view_menu(chat, event, note=note)
 
     async def boot(self):
         if not OWNER_ID:
             log("OWNER_ID is not set - open the bot and send /start to see your id.")
             return
         if self.store.session:
-            ok, msg = await self.start_userbot()
+            ok, _ = await self.start_userbot()
             if ok:
-                await self.tell(f"🟢 **OWNER Manager online.** Userbot started as {self.account_text()}.",
-                                buttons=panel())
-                return
+                return await self.tell("🟢 **Manager online.**")
         self.logged_out = True
-        await self.tell("🔴 **OWNER Manager online.** Not logged in - press **Login** to connect your account.",
-                        buttons=panel())
+        await self.tell("🔴 **Manager online.** Tap **Login** to connect your account.")
 
 
 async def amain():
