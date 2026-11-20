@@ -78,6 +78,17 @@ async def _(e):
         text = text.strip()
     if not put:
         return await e.eor(get_string("wspr_3"))
+    try:
+        user = await e.client.get_entity(int(put) if put.lstrip("-").isdigit() else put)
+        if not isinstance(user, types.User):
+            raise ValueError("not a user")
+    except Exception:
+        return await e.eor(
+            f"`User {put} not found.`\nCheck the @username (it may have changed), "
+            "or reply to their message with `.wspr <message>`.",
+            time=10,
+        )
+    put = str(user.id)
     if len(text) > ALERT_LIMIT:
         return await e.eor(
             f"`Whisper too long ({len(text)}/{ALERT_LIMIT} characters). Telegram allows {ALERT_LIMIT}.`",
@@ -121,8 +132,8 @@ async def _(e):
             text="You Didn't Type Username or id.",
         )
         return await e.answer([sur])
-    except ValueError as er:
-        LOGS.exception(er)
+    except Exception as er:
+        LOGS.info(f"wspr: {er}")
         sur = await e.builder.article(
             title="User Not Found",
             description="Make sure username or id is correct.",

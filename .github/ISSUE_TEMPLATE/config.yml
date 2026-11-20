@@ -1,8 +1,5 @@
 blank_issues_enabled: true
 contact_links:
-  - name: Ultroid Support
-    url: https://t.me/UltroidSupportChat
-    about: Please drop your doubts or queries there for an immediate response.
-  - name: Documentation
-    url: https://ultroid.tech/
-    about: Basic documentation for setting up.
+  - name: Setup guide
+    url: https://github.com/Ownermood/OWNER-Assistant/blob/main/SETUP.md
+    about: Step-by-step setup (Docker / VPS / Termux).
