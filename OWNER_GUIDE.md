@@ -95,7 +95,7 @@ Key ek baar set karo (Saved Messages mein bhejo, phir message delete karo):
 | Convert | (reply karke) `.convert sticker` |
 | Photo se text | (reply karke) `.ocr` (key: `OCR_API`) |
 | Code ki photo | `.carbon print("hello")` |
-| Text se awaaz | `.tts en | Good morning` |
+| Text se awaaz | `.tts en \| Good morning` |
 
 ---
 
