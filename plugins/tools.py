@@ -340,16 +340,20 @@ async def _(e):
 
 
 
+SANGMATA = "@SangMata_beta_bot"
+
+
 def sanga_seperator(sanga_list):
+    """Split SangMata's reply into (names, usernames); None if format unknown."""
     string = "".join(info[info.find("\n") + 1 :] for info in sanga_list)
     string = re.sub(r"^$\n", "", string, flags=re.MULTILINE)
     try:
         name, username = string.split("Usernames**")
         name = name.split("Names")[1]
-    except ValueError:
-        name = "No Names Found"
-        username = "No Usernames Found"
-    return name, username
+    except (ValueError, IndexError):
+        return None, None
+    clean = lambda t: t.strip().strip("*").strip() or "None"
+    return clean(name), clean(username)
 
 
 def mentionuser(name, userid):
@@ -361,65 +365,70 @@ def mentionuser(name, userid):
     fullsudo=True,
 )
 async def sangmata(event):
-    "To get name/username history."
+    "To get name/username history (by reply, user id or username)."
     cmd = event.pattern_match.group(1)
-    user = event.pattern_match.group(2)
+    user = event.pattern_match.group(2).strip()
     reply = await event.get_reply_message()
     if not user and reply:
         user = str(reply.sender_id)
     if not user:
-        await event.edit(
-            "`Reply to  user's text message to get name/username history or give userid/username`",
+        return await event.eor(
+            "`Reply to a user's message, or give a user id / username.`", time=10
         )
-        await asyncio.sleep(10)
-        return await event.delete()
 
-    try:
-        if user.isdigit():
-            userinfo = await ultroid_bot.get_entity(int(user))
-        else:
-            userinfo = await ultroid_bot.get_entity(user)
-    except ValueError:
-        userinfo = None
-    if not isinstance(userinfo, types.User):
-        await event.edit("`Can't fetch the user...`")
-        await asyncio.sleep(10)
-        return await event.delete()
-
-    await event.edit("`Processing...`")
-    async with event.client.conversation("@SangMata_beta_bot") as conv:
+    msg = await event.eor("`Processing...`")
+    user_id, user_name = None, None
+    if user.lstrip("-").isdigit():
+        # An id works even if this account has never seen the user:
+        # SangMata only needs the number.
+        user_id = int(user)
         try:
-            await conv.send_message(f"{userinfo.id}")
-        except YouBlockedUserError:
-            return await event.edit("`Please unblock @SangMata_beta_bot and try again`")
-            # await conv.send_message(f"{userinfo.id}")
-        responses = []
-        while True:
-            try:
-                response = await conv.get_response(timeout=2)
-            except asyncio.TimeoutError:
-                break
-            responses.append(response.text)
-        await event.client.send_read_acknowledge(conv.chat_id)
+            entity = await event.client.get_entity(user_id)
+            user_name = " ".join(filter(None, [entity.first_name, entity.last_name]))
+        except Exception:
+            pass
+    else:
+        try:
+            entity = await event.client.get_entity(user)
+        except Exception:
+            entity = None
+        if not isinstance(entity, types.User):
+            return await msg.edit("`Can't find that user. Try their numeric id.`")
+        user_id = entity.id
+        user_name = " ".join(filter(None, [entity.first_name, entity.last_name]))
+
+    responses = []
+    try:
+        async with event.client.conversation(SANGMATA, timeout=60) as conv:
+            await conv.send_message(str(user_id))
+            wait = 15  # first answer can be slow
+            while True:
+                try:
+                    response = await conv.get_response(timeout=wait)
+                except asyncio.TimeoutError:
+                    break
+                if response.text:
+                    responses.append(response.text)
+                wait = 4
+            await event.client.send_read_acknowledge(conv.chat_id)
+    except YouBlockedUserError:
+        return await msg.edit(f"`Please unblock {SANGMATA} and try again.`")
+    except Exception as er:
+        return await msg.edit(f"`SangMata error: {er}`")
 
     if not responses:
-        await event.edit("`Bot can't fetch results`")
-        await asyncio.sleep(10)
-        await event.delete()
-    if "No records found" in responses or "No data available" in responses:
-        await event.edit("`The user doesn't have any record`")
-        await asyncio.sleep(10)
-        await event.delete()
+        return await msg.edit(f"`{SANGMATA} did not reply. Try again in a minute.`")
+    full = "\n".join(responses)
+    if "no records" in full.lower() or "no data" in full.lower():
+        return await msg.edit("`This user doesn't have any name/username history.`")
 
+    who = mentionuser(user_name or user_id, user_id)
     names, usernames = sanga_seperator(responses)
+    if names is None:
+        # Unknown reply format: show SangMata's own answer.
+        return await msg.edit(f"**➜ User :** {who}\n\n{full}"[:4000])
     check = (usernames, "Username") if cmd == "u" else (names, "Name")
-    user_name = (
-        f"{userinfo.first_name} {userinfo.last_name}"
-        if userinfo.last_name
-        else userinfo.first_name
-    )
-    output = f"**➜ User Info :**  {mentionuser(user_name, userinfo.id)}\n**➜ {check[1]} History :**\n{check[0]}"
-    await event.edit(output)
+    await msg.edit(f"**➜ User Info :** {who}\n**➜ {check[1]} History :**\n{check[0]}"[:4000])
 
 
 @ultroid_cmd(pattern="webshot( (.*)|$)")
