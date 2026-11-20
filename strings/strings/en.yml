@@ -152,10 +152,10 @@ tagnot_1: "{} tagged you in {}\n\n```{}```\n\n[📨 Message 📨]({})"
 tagnot_2: "{} tagged you in {}\n\n [📨 Message 📨]({})"
 
 # whisper
-wspr_1: "@{} secret msg for you.\nDelete your msg after reading.\nOr the next msg will not be updated."
+wspr_1: "🤫 @{} — a secret message for you.\nTap **Secret Msg** to read it (only you and the sender can open it)."
 wspr_2: "Message deleted"
 wspr_3: "Add some id or username too"
-wspr_4: "User {} Not Found\nSearch Again"
+wspr_4: "User {} not found.\nUse their @username or numeric ID (or reply to their message)."
 wspr_5: "You Can't do this"
 
 # afk
@@ -634,7 +634,7 @@ help_resize: " -\n\n•`{i}size <reply to media>`\n   To get size of it.\n\n•`
 help_schedulemsg: " -\n\n•`{i}schedule <text/reply to msg> <time>`\n    In time u can use second as number, or like 1h or 1m\n    eg. `{i}schedule Hello 100` It deliver msg after 100 sec.\n    eg. `{i}schedule Hello 1h` It deliver msg after an hour.\n"
 help_search: " -\n\n• `{i}saavn <search query>`\n    Download songs from Saavn.\n\n• `{i}google <query>`\n    For doing google search.\n\n• `{i}github <username>`\n    Get full information of the users github profile.\n\n• `{i}img <query>`\n  `{i}img <query> ; <no of results>`\n    For doing Images search.\n\n• `{i}reverse`\n    Reply an Image or sticker to find its sauce.\n"
 help_snips: " -\n\n• `{i}addsnip <word><reply to a message>`\n    add the used word as snip relating to replied message.\n\n• `{i}remsnip <word>`\n    Remove the snip word..\n\n• `{i}listsnip`\n    list all snips.\n\n• Use :\n    type `$(ur snip word)` get setted reply.\n"
-help_specialtools: " -\n\n• `{i}wspr <username>`\n    Send secret message..\n\n• `{i}q <color-optional>`\n• `{i}q @username`\n• `{i}q r <color-optional>`\n• `{i}q count` : `multiple quotes`\n    Create quotes..\n\n• `{i}sticker <query>`\n    Search Stickers as Per ur Wish..\n\n• `{i}getaudio <reply to an audio>`\n    Download Audio To put in ur Desired Video/Gif.\n\n• `{i}addaudio <reply to Video/gif>`\n    It will put the above audio to the replied video/gif.\n\n• `{i}dob <date of birth>`\n    Put in dd/mm/yy Format only(eg .dob 01/01/1999).\n\n• `{i}wall <query>`\n    Search Hd Wallpaper as Per ur Wish..\n"
+help_specialtools: " -\n\n• `{i}wspr <@username/id> <message>`\n• `{i}wspr <message>` (reply to someone)\n    Secret message in any chat — only that person (and you) can open it. Max 200 characters. `{i}wspr @username` alone shows their profile card.\n\n• `{i}q <color-optional>`\n• `{i}q @username`\n• `{i}q r <color-optional>`\n• `{i}q count` : `multiple quotes`\n    Create quotes..\n\n• `{i}sticker <query>`\n    Search Stickers as Per ur Wish..\n\n• `{i}getaudio <reply to an audio>`\n    Download Audio To put in ur Desired Video/Gif.\n\n• `{i}addaudio <reply to Video/gif>`\n    It will put the above audio to the replied video/gif.\n\n• `{i}dob <date of birth>`\n    Put in dd/mm/yy Format only(eg .dob 01/01/1999).\n\n• `{i}wall <query>`\n    Search Hd Wallpaper as Per ur Wish..\n"
 help_stickertools: " -\n\n• `{i}destroy <reply to animated sticker>`\n    To destroy the sticker.\n\n• `{i}tiny <reply to media>`\n    To create Tiny stickers.\n\n• `{i}kang <reply to image/sticker>`\n    Kang the sticker (add to your pack).\n\n• `{i}packkang <pack name>`\n    Kang the Complete sticker set (with custom name).\n\n• `{i}round <reply to any media>`\n    To extract round sticker.\n"
 help_sudo: " -\n\n• `{i}addsudo`\n    Add Sudo Users by replying to user or using <space> separated userid(s)\n\n• `{i}delsudo`\n    Remove Sudo Users by replying to user or using <space> separated userid(s)\n\n• `{i}listsudo`\n    List all sudo users.\n"
 help_tag: " -\n\n• `{i}tagall`\n    Tag Top 100 Members of chat.\n\n• `{i}tagadmins`\n    Tag Admins of that chat.\n\n• `{i}tagowner`\n    Tag Owner of that chat\n\n• `{i}tagbots`\n    Tag Bots of that chat.\n\n• `{i}tagrec`\n    Tag recently Active Members.\n\n• `{i}tagon`\n    Tag online Members(work only if privacy off).\n\n• `{i}tagoff`\n    Tag Offline Members(work only if privacy off).\n"

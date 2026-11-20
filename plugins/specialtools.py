@@ -7,8 +7,10 @@
 """
 ✘ Commands Available -
 
-• `{i}wspr <username>`
-    Send secret message..
+• `{i}wspr <@username/id> <message>`
+• `{i}wspr <message>` (reply to someone)
+    Secret message in any chat — only that person (and you) can open it.
+    Max 200 characters. `{i}wspr @username` alone shows their profile card.
 
 • `{i}q <color-optional>`
 • `{i}q @username`

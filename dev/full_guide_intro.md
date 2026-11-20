@@ -120,7 +120,7 @@ Crash report ke **"Last 5 commits"** mein bhi sabse naya merge dikhta hai.
 | Block / unblock | `.block` · `.unblock` |
 | Message bhejo | `.send @username Hello!` |
 | Baad mein bhejo | `.schedule Happy Birthday 🎂 1h` |
-| Whisper | `.wspr @username secret baat` |
+| Whisper (group mein bhi) | `.wspr @username secret baat` |
 | Save | (reply) `.save` |
 
 ### 🤖 AI
