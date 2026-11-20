@@ -108,4 +108,4 @@ async def gh_feeds(ult):
     msg = f"Showing {len(res)} feeds!" if res else "Nothing Found"
     await ult.answer(res, cache_time=5000, switch_pm=msg, switch_pm_param="start")
 
-InlinePlugin.update({"GɪᴛHᴜʙ ғᴇᴇᴅs": "gh"})
+InlinePlugin.update({"GitHub feeds": "gh"})

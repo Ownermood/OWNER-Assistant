@@ -4,22 +4,21 @@
 
 
 """
-✘ To Search Messages in chat easily :)
+📖 **Commands**
 
-✘ **CMD** :
->> {i}search (some_text)
->> {i}search -r (some_text) : 10
-    »» To search in Reverse order.
+• `{i}search <text>`
+    Find messages in this chat that have this text.
 
-✘ **Examples** :
-   •  `{i}search hello`
-   •  `{i}search -r Heroku : 10`
+• `{i}search -r <text> : <how many>`
+    Same, but start from the oldest messages.
+
+    Examples: `{i}search hello`   ·   `{i}search -r exam : 10`
 """
 
 
 @ultroid_cmd(pattern="search( -r|) ?(.*)")
 async def searcher(e):
-    eris = await e.eor("`Working..`")
+    eris = await e.eor("Working...")
     args = e.pattern_match.group(2)
     limit = 5
     if not args or len(args) < 2:

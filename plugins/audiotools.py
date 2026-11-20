@@ -53,7 +53,7 @@ async def vnc(e):
         )
     except Exception as er:
         LOGS.exception(er)
-        return await xxx.edit("`Failed to convert in Voice...`")
+        return await xxx.edit("Failed to convert in Voice.")
     await xxx.delete()
     os.remove(file.name)
     os.remove("out.opus")

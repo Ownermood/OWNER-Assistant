@@ -7,10 +7,10 @@
 
 
 """
-✘ Commands Available
+📖 **Commands**
 
-• `{i}icon <query>`
-    Icon search from flaticon.com and uploading as sticker.
+• `{i}icon <search>`
+    Find an icon on flaticon.com and send it as a sticker.
 """
 
 import os
@@ -25,7 +25,7 @@ from . import LOGS, ultroid_cmd, download_file, async_searcher, get_string
 async def www(e):
     a = e.pattern_match.group(1)
     if not a:
-        return await e.eor("Give some Text to Get Icon from Flaticon.com")
+        return await e.eor("Give some text to get Icon from Flaticon.com")
     tt = await e.eor(get_string("com_1"))
     query = a.replace(" ", "%20")
     try:
@@ -44,4 +44,4 @@ async def www(e):
         await tt.delete()
     except Exception as E:
         LOGS.info(E)
-        await tt.edit("`No Results Found`")
+        await tt.edit("No results found")

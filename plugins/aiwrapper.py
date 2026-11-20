@@ -6,30 +6,29 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}gemini <prompt>`
-    Get response from Google Gemini.
+• `{i}gemini <question>`
+    Ask Google Gemini.
 
-• `{i}antr <prompt>`
-    Get response from Anthropic Claude.
+• `{i}antr <question>`
+    Ask Anthropic Claude.
 
-• `{i}gpt <prompt>`
-    Get response from OpenAI GPT.
+• `{i}gpt <question>`
+    Ask OpenAI ChatGPT.
 
-• `{i}deepseek <prompt>`
-    Get response from DeepSeek AI.
+• `{i}deepseek <question>`
+    Ask DeepSeek.
 
-  Reply to a message to use its text as the prompt.
+    Example: `{i}gemini explain the doctrine of res judicata in 5 lines`
+    Tip: reply to a message to use its text as the question.
 
-Set API keys using:
-    • GEMINI_API_KEY / ANTHROPIC_KEY / OPENAI_API_KEY / DEEPSEEK_API_KEY
+**Setup (one time)** - add the key for the AI you want:
+    `{i}setdb GEMINI_API_KEY <key>` / `ANTHROPIC_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY`
 
-Set custom models using:
-    • OPENAI_MODEL: default: gpt-5-mini
-    • ANTHROPIC_MODEL: default: claude-opus-5-5
-    • GEMINI_MODEL: default: gemini-flash-latest
-    • DEEPSEEK_MODEL: default: deepseek-chat
+**Change the model (optional):**
+    OPENAI_MODEL (default gpt-5-mini), ANTHROPIC_MODEL (default claude-opus-5-5),
+    GEMINI_MODEL (default gemini-flash-latest), DEEPSEEK_MODEL (default deepseek-chat)
 """
 
 import time

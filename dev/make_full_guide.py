@@ -62,7 +62,7 @@ These run on your assistant bot — type them in any chat after `@YourAssistantB
 def items(help_text):
     """Turn Ultroid-style help into markdown bullet points."""
     text = (help_text or "").replace("{i}", ".")
-    text = re.sub(r"✘\s*Commands Available\s*-?", "", text)
+    text = re.sub(r"✘\s*Commands Available\s*-?|📖 \*\*Commands\*\*", "", text)
     text = re.sub(r"✘\s*\*\*(CMD|Examples)\*\*\s*:", "", text).replace("✘", "")
     out = []
     for chunk in re.split(r"\n\s*•", "\n" + text):

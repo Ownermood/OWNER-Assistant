@@ -189,7 +189,7 @@ async def _(e):
 )
 async def _(ult):
     if not ult.is_reply:
-        return await ult.eor("`Reply to a Media..`", time=5)
+        return await ult.eor("Reply to a photo or video.", time=5)
     match = ult.pattern_match.group(1).strip()
     if not ult.client._bot and match:
         try:
@@ -204,7 +204,7 @@ async def _(ult):
     elif reply.document and reply.document.thumbs:
         replfile = await reply.download_media(thumb=-1)
     else:
-        return await ult.eor("Reply to a Photo or Video..")
+        return await ult.eor("Reply to a photo or video.")
     mediain = mediainfo(reply.media)
     if "animated" in mediain:
         replfile = await con.convert(replfile, convert_to="mp4")
@@ -217,7 +217,7 @@ async def _(ult):
         if "pic" not in mediain:
             file = types.InputChatUploadedPhoto(video=file)
         await ult.client(EditPhotoRequest(chat, file))
-        await ult.eor("`Group Photo has Successfully Changed !`", time=5)
+        await ult.eor("✅ Group photo changed.", time=5)
     except Exception as ex:
         await ult.eor(f"Error occured.\n`{str(ex)}`", time=5)
     os.remove(replfile)

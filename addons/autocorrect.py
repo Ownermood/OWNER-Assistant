@@ -6,12 +6,12 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
 • `{i}autocorrect`
-    To on/off Autocorrect Feature (English messages only).
+    Turn autocorrect on or off. It fixes spelling in your English messages.
 
-  Messages ending with `..` are not corrected.
+    Messages that end with `..` are left as they are.
 """
 
 import asyncio
@@ -42,7 +42,7 @@ def _add_handler():
 @ultroid_cmd(pattern="autocorrect$", fullsudo=True)
 async def acc(e):
     if not TextBlob:
-        return await e.eor("`Install textblob to use autocorrect.`", time=5)
+        return await e.eor("Install textblob to use autocorrect.", time=5)
     if not udB.get_key("AUTOCORRECT"):
         udB.set_key("AUTOCORRECT", "True")
         _add_handler()

@@ -9,12 +9,13 @@
 
 
 """
-✘ Commands Available -
-• `{i}lyrics <search query>`
-    get lyrics of song.
+📖 **Commands**
 
-• `{i}song <search query>`
-    Search the song on YouTube and send its audio.
+• `{i}song <song name>`
+    Find the song on YouTube and send the audio.
+
+• `{i}lyrics <song name>`
+    Get the song's lyrics.
 """
 
 import asyncio
@@ -32,7 +33,7 @@ async def original(event):
     noob = event.pattern_match.group(1).strip()
     if not noob:
         return await event.eor("give query to search.")
-    ab = await event.eor("Getting lyrics..")
+    ab = await event.eor("Getting lyrics.")
     try:
         res = await async_searcher(
             LRCLIB,
@@ -44,7 +45,7 @@ async def original(event):
         return await ab.edit(f"`Lyrics service error: {er}`")
     song = next((x for x in res or [] if x.get("plainLyrics")), None)
     if not song:
-        return await ab.edit("`No Results Found`")
+        return await ab.edit("No results found")
     text = (
         f"**{song.get('trackName')}** - __{song.get('artistName')}__\n\n"
         f"{song['plainLyrics']}"
@@ -60,11 +61,11 @@ async def original(event):
 async def _(event):
     args = event.pattern_match.group(1).strip()
     if not args:
-        return await event.eor("`Enter song name`")
-    okla = await event.eor("`Searching...`")
+        return await event.eor("Enter song name")
+    okla = await event.eor("Searching...")
     url = await asyncio.to_thread(get_yt_link, args)
     if not url:
-        return await okla.edit("`Song not found.`")
+        return await okla.edit("Song not found.")
     ytd = {
         "prefer_ffmpeg": True,
         "addmetadata": True,
@@ -73,5 +74,5 @@ async def _(event):
         "format": "bestaudio",
         "outtmpl": "%(id)s.m4a",
     }
-    await okla.edit("`Downloading...`")
+    await okla.edit("Downloading...")
     await download_yt(okla, url, ytd)

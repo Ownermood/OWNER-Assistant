@@ -6,13 +6,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}setstory <reply media>`
-    Set replied media as your story.
+• `{i}setstory` (reply to a photo or video)
+    Post it as your Telegram story.
 
-• `{i}storydl <username/reply user/story link>`
-    Download and upload user stories or specific story from link!
+• `{i}storydl <username or story link>` (or reply to someone)
+    Download someone's stories, or one story from its link.
 """
 
 import os

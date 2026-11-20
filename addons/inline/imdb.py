@@ -113,17 +113,17 @@ async def inline_imdb_command(event):
         LOGS.info(f"QUERY\n{movie_name}")
     except IndexError:
         indexarticle = event.builder.article(
-            title="Sᴇᴀʀᴄʜ Sᴏᴍᴇᴛʜɪɴɢ",
+            title="Search Something",
             thumb=wb(imdbp, 0, "image/jpeg", []),
-            text="**Iᴍᴅʙ Sᴇᴀʀᴄʜ**\n\nʏᴏᴜ ᴅɪᴅɴ'ᴛ sᴇᴀʀᴄʜ ᴀɴʏᴛʜɪɴɢ",
+            text="**Imdb Search**\n\nyou didn't search anything",
             buttons=[
                 Button.switch_inline(
-                    "Sᴇᴀʀᴄʜ Aɢᴀɪɴ",
+                    "Search Again",
                     query="imdb ",
                     same_peer=True,
                 ),
                 Button.switch_inline(
-                    "Sᴇᴀʀᴄʜ Bʏ Yᴇᴀʀ",
+                    "Search By Year",
                     query="imdb IF y= 2024 ",
                     same_peer=True,
                 ),
@@ -157,23 +157,23 @@ async def inline_imdb_command(event):
             BoxOffice = movie_data.get("BoxOffice", "")
             imdbID = movie_data.get("imdbID", "")
             movie_details = (
-                f"**Tɪᴛʟᴇ:** {title}\n"
-                f"**Yᴇᴀʀ:** `{year}`\n"
-                f"**Rᴀᴛᴇᴅ:** `{rated}`\n"
-                f"**Rᴇʟᴇᴀsᴇᴅ:** {released}\n"
-                f"**Rᴜɴᴛɪᴍᴇ:** `{runtime}`\n"
-                f"**Gᴇɴʀᴇ:** {genre}\n"
-                f"**Dɪʀᴇᴄᴛᴏʀ:** {director}\n"
-                f"**Aᴄᴛᴏʀs:** {actors}\n"
-                f"**Pʟᴏᴛ:** {plot}\n"
-                f"**Lᴀɴɢᴜᴀɢᴇ:** `{language}`\n"
-                f"**Cᴏᴜɴᴛʀʏ:** {country}\n"
-                f"**Aᴡᴀʀᴅs:** {awards}\n"
-                f"**Rᴀᴛɪɴɢs:** {ratings_str}\n"
-                f"**IMDʙ Rᴀᴛɪɴɢ:** `{imdbRating}`\n"
-                f"**IMDʙ Lɪɴᴋ:** https://www.imdb.com/title/{imdbID}\n"
-                f"**ɪᴍᴅʙVᴏᴛᴇs:** `{imdbVotes}`\n"
-                f"**BᴏxOғғɪᴄᴇ:** `{BoxOffice}`"
+                f"**Title:** {title}\n"
+                f"**Year:** `{year}`\n"
+                f"**Rated:** `{rated}`\n"
+                f"**Released:** {released}\n"
+                f"**Runtime:** `{runtime}`\n"
+                f"**Genre:** {genre}\n"
+                f"**Director:** {director}\n"
+                f"**Actors:** {actors}\n"
+                f"**Plot:** {plot}\n"
+                f"**Language:** `{language}`\n"
+                f"**Country:** {country}\n"
+                f"**Awards:** {awards}\n"
+                f"**Ratings:** {ratings_str}\n"
+                f"**IMDb Rating:** `{imdbRating}`\n"
+                f"**IMDb Link:** https://www.imdb.com/title/{imdbID}\n"
+                f"**imdbVotes:** `{imdbVotes}`\n"
+                f"**BoxOffice:** `{BoxOffice}`"
             )
     except Exception as er:
         LOGS.info(f"Exception: {er}")
@@ -193,17 +193,17 @@ async def inline_imdb_command(event):
         return await event.answer(
             [
                 await event.builder.article(
-                    title="Nᴏ ʀᴇsᴜʟᴛs ғᴏᴜɴᴅ",
-                    text=f"**IMDʙ**\nTʀʏ ᴀɴᴏᴛʜᴇʀ sᴇᴀʀᴄʜ",
+                    title="No results found",
+                    text=f"**IMDb**\nTry another search",
                     thumb=wb(imdbp, 0, "image/jpeg", []),
                     buttons=[
                         Button.switch_inline(
-                            "Sᴇᴀʀᴄʜ Aɢᴀɪɴ",
+                            "Search Again",
                             query="imdb ",
                             same_peer=True,
                         ),
                             Button.switch_inline(
-                            "Sᴇᴀʀᴄʜ Bʏ Yᴇᴀʀ",
+                            "Search By Year",
                             query=f"imdb {movie_name} y= ",
                             same_peer=True,
                         ),
@@ -217,10 +217,10 @@ async def inline_imdb_command(event):
         LOGS.info(f"Exception: {er}")
         return
 
-    txt = f"**Tɪᴛʟᴇ:** {title}\n**Rᴇʟᴇᴀsᴇᴅ:** {released}\n**Cᴏᴜɴᴛʀʏ:** {country}"
+    txt = f"**Title:** {title}\n**Released:** {released}\n**Country:** {country}"
     button = [
-        [Button.inline("Fᴜʟʟ Dᴇᴛᴀɪʟs", data=f"plot_button:{plot_id}")],
-        [Button.switch_inline("Sᴇᴀʀᴄʜ Aɢᴀɪɴ", query="imdb ", same_peer=True)],
+        [Button.inline("Full Details", data=f"plot_button:{plot_id}")],
+        [Button.switch_inline("Search Again", query="imdb ", same_peer=True)],
     ]
 
     article = await event.builder.article(
@@ -228,7 +228,7 @@ async def inline_imdb_command(event):
         text=txt,
         title=f"{title}",
         include_media=True,
-        description=f"{released}\nɪᴍᴅʙ: {imdbRating}\nLᴀɴɢᴜᴀɢᴇ: {language}",
+        description=f"{released}\nimdb: {imdbRating}\nLanguage: {language}",
         link_preview=False,
         thumb=wb(poster_url, 0, "image/jpeg", []),
         content=wb(poster_url, 0, "image/jpeg", []),
@@ -288,7 +288,7 @@ async def extended_plot_button_clicked(event):
     fullplot = ext_plot.get("Plot", "")
 
     if fullplot:
-        extended_plot = f"**Exᴛᴇɴᴅᴇᴅ Pʟᴏᴛ:** {fullplot}"
+        extended_plot = f"**Extended Plot:** {fullplot}"
         btns = [
             [Button.inline("Back", data=f"imdb_back_button:{plot_id}")],
         ]

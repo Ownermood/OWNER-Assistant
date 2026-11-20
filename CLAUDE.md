@@ -160,6 +160,15 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   account. Say this plainly if asked again. Also #35: manager persists panel ids in
   the store so a restart deletes the old 'Manager online' panel instead of
   stacking a new one.
+- **Text style (#42, owner asked "smooth English, easy to understand")**: all
+  user-facing text is plain friendly English - short sentences, say what to do
+  next, give an example in help. No small-caps fonts, no whole message in
+  `code` backticks, no "u/ur/plz/msg", no "him/his" (use "them"), no Title Case
+  On Every Word. Help format: `• \`{i}cmd <arg>\` (reply to ...)` + one plain
+  line + `Example:`. Official help lives in `strings/strings/en.yml`
+  (`help_<plugin>`, wins over the docstring); addons and the rest use the
+  module docstring starting with `📖 **Commands**`. Other 24 language files
+  were NOT rewritten (they still hold old translations).
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 

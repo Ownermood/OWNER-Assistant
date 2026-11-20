@@ -326,7 +326,7 @@ async def hehe(args):
                 await conv.get_response()
                 await ultroid_bot.send_read_acknowledge(conv.chat_id)
         else:
-            await xx.edit("`Brewing a new Pack...`")
+            await xx.edit("Brewing a new pack.")
             async with ultroid_bot.conversation("Stickers") as conv:
                 await conv.send_message(cmd)
                 await conv.get_response()

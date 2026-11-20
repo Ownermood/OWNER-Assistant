@@ -1,10 +1,10 @@
 # Ported Plugin
 
 """
-✘ Commands Available -
+📖 **Commands**
 
 • `{i}waifu <text>`
-    paste text on random stickers.
+    Put your text on a random anime sticker.
 """
 
 import re

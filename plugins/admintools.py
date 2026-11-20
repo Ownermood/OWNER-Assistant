@@ -168,7 +168,7 @@ async def kck(ult):
     if "kickme" in ult.text:
         return
     if ult.is_private:
-        return await ult.eor("`Use this in Group/Channel.`", time=5)
+        return await ult.eor(get_string("py_d3"), time=5)
     ml = ult.text.split(" ", maxsplit=1)[0]
     xx = await ult.eor(get_string("com_1"))
     something = await get_uinfo(ult)
@@ -243,15 +243,15 @@ async def pin(msg):
         return await eor(msg, get_string("pin_1"))
     me = await msg.get_reply_message()
     if me.is_private:
-        text = "`Pinned.`"
+        text = "📌 Pinned."
     else:
-        text = f"Pinned [This Message]({me.message_link}) !"
+        text = f"📌 Pinned [this message]({me.message_link})."
     try:
         await msg.client.pin_message(msg.chat_id, me.id, notify=False)
     except BadRequestError:
         return await eor(msg, get_string("adm_2"))
     except Exception as e:
-        return await eor(msg, f"**ERROR:**`{e}`")
+        return await eor(msg, f"😕 Couldn't do that: `{e}`")
     await eor(msg, text)
 
 
@@ -274,8 +274,8 @@ async def unp(ult):
     except BadRequestError:
         return await xx.edit(get_string("adm_2"))
     except Exception as e:
-        return await xx.edit(f"**ERROR:**`{e}`")
-    await xx.edit("`Unpinned!`")
+        return await xx.edit(f"😕 Couldn't do that: `{e}`")
+    await xx.edit("✅ Unpinned.")
 
 
 @ultroid_cmd(
@@ -288,15 +288,15 @@ async def unp(ult):
 async def pin_message(ult):
     match = ult.pattern_match.group(1).strip()
     if not ult.is_reply:
-        return await ult.eor("`Reply to message..`", time=6)
+        return await ult.eor("Reply to the message you want to pin.", time=6)
     if not match:
-        return await ult.eor("`Please provide time..`", time=8)
+        return await ult.eor("For how long? Example: `.tpin 1h`", time=8)
     msg = await ult.eor(get_string("com_1"))
     msg_id = ult.reply_to_msg_id
     try:
         time = ban_time(match)
         await ult.client.pin_message(ult.chat_id, msg_id)
-        await msg.eor(f"`pinned for time` `{time}`", time=8)
+        await msg.eor(f"📌 Pinned for {time}.", time=8)
     except Exception as er:
         return await msg.edit(str(er))
     await asyncio.sleep(time)
@@ -327,7 +327,7 @@ async def fastpurger(purg):
         ):
             await msg.delete()
             p += 0
-        return await eor(purg, f"Purged {p} Messages! ", time=5)
+        return await eor(purg, f"🧹 Deleted {p} messages.", time=5)
     if not purg.reply_to_msg_id:
         return await eor(purg, get_string("purge_1"), time=10)
     try:
@@ -337,7 +337,7 @@ async def fastpurger(purg):
 
     except Exception as er:
         LOGS.info(er)
-    await purg.eor("__Fast purge complete!__", time=5)
+    await purg.eor("🧹 Done deleting.", time=5)
 
 
 @ultroid_cmd(
@@ -356,12 +356,12 @@ async def fastpurgerme(purg):
         ):
             await mm.delete()
             mp += 1
-        await eor(purg, f"Purged {mp} Messages!", time=5)
+        await eor(purg, f"🧹 Deleted {mp} messages.", time=5)
         return
     elif not purg.reply_to_msg_id:
         return await eod(
             purg,
-            "`Reply to a message to purge from or use it like ``purgeme <num>`",
+            "Reply to the message to start from, or give a number. Example: `.purgeme 10`",
             time=10,
         )
     chat = await purg.get_input_chat()
@@ -375,7 +375,7 @@ async def fastpurgerme(purg):
     if msgs:
         await purg.client.delete_messages(chat, msgs)
     await purg.eor(
-        "__Fast purge complete!__\n**Purged** `" + str(len(msgs)) + "` **messages.**",
+        "🧹 Deleted `" + str(len(msgs)) + "` messages.",
         time=5,
     )
 
@@ -436,9 +436,9 @@ async def get_all_pinned(event):
         c += 1
 
     if c == 1:
-        m = f"<b>The pinned message in {chat_name}:</b>\n\n"
+        m = f"<b>📌 Pinned message in {chat_name}:</b>\n\n"
     else:
-        m = f"<b>List of pinned message(s) in {chat_name}:</b>\n\n"
+        m = f"<b>📌 Pinned messages in {chat_name}:</b>\n\n"
 
     if not a:
         return await eor(x, get_string("listpin_1"), time=5)
@@ -453,7 +453,7 @@ async def get_all_pinned(event):
 async def autodelte(ult):
     match = ult.pattern_match.group(1).strip()
     if not match or match not in ["24h", "7d", "1m", "off"]:
-        return await ult.eor("`Please Use in Proper Format..`", time=5)
+        return await ult.eor("Use one of: `24h`, `7d`, `1m` or `off`. Example: `.autodelete 24h`", time=5)
     if match == "24h":
         tt = 3600 * 24
     elif match == "7d":
@@ -466,6 +466,6 @@ async def autodelte(ult):
         await ult.client(SetHistoryTTLRequest(ult.chat_id, period=tt))
     except ChatNotModifiedError:
         return await ult.eor(
-            f"Auto Delete Setting is Already same to `{match}`", time=5
+            f"Auto-delete is already set to `{match}`.", time=5
         )
-    await ult.eor(f"Auto Delete Status Changed to `{match}` !")
+    await ult.eor(f"✅ Auto-delete is now `{match}`.")

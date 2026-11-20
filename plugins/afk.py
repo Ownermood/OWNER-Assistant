@@ -53,7 +53,7 @@ async def set_afk(event):
                 media = upload_file(file)
             else:
                 media = reply.file.id
-    await event.eor("`Done`", time=2)
+    await event.eor("✅ Done", time=2)
     add_afk(text, media_type, media)
     ultroid_bot.add_handler(remove_afk, events.NewMessage(outgoing=True))
     ultroid_bot.add_handler(

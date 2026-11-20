@@ -2,11 +2,10 @@
 # Part of OWNER Assistant (based on Ultroid, AGPL-3.0).
 
 """
-✘ Commands Available -
+📖 **Commands**
 
 • `{i}propose <name>` (or reply to someone)
-    A long, flirty proposal story 💍 — walk-up, ring, a dot-by-dot rose,
-    a beating heart, pick-up lines and the big question.
+    A long, flirty proposal story 💍 - walk-up, ring, a rose drawn dot by dot, a beating heart, pick-up lines and the big question.
 
 • `{i}love <name>`
     A heart drawn dot by dot that comes alive and beats for them ❤️
@@ -17,7 +16,7 @@
 • `{i}hearts`
     It's raining hearts 💕
 
-• `{i}lovecalc <name1> <name2>`
+• `{i}lovecalc <name 1> <name 2>`
     The (totally scientific) love meter 💘
 """
 
@@ -411,7 +410,7 @@ async def hearts(event):
 async def lovecalc(event):
     names = event.pattern_match.group(1).strip().split()
     if len(names) < 2:
-        return await event.eor("`Give two names: .lovecalc Romeo Juliet`")
+        return await event.eor("Give two names: .lovecalc Romeo Juliet")
     a, b = _clean(names[0]), _clean(" ".join(names[1:]))
     seed = "|".join(sorted([a.lower(), b.lower()]))
     pct = 40 + int(hashlib.md5(seed.encode()).hexdigest(), 16) % 61
@@ -466,12 +465,12 @@ async def funuser(event):
         try:
             uid = int(rest)
         except ValueError:
-            return await event.eor("`Give the numeric id: .funuser del 123456`")
+            return await event.eor("Give the numeric id: .funuser del 123456")
         if uid in ids:
             ids.remove(uid)
             udB.set_key("FUN_USERS", ids)
             return await event.eor("🗑 `Removed. Now {} allowed.`".format(len(ids)))
-        return await event.eor("`That id is not in the list.`")
+        return await event.eor("That id is not in the list.")
 
     if low.startswith("add"):
         rest = arg.split(maxsplit=1)[1].strip() if len(arg.split()) > 1 else ""
@@ -485,11 +484,11 @@ async def funuser(event):
                 try:
                     uid = (await event.client.get_entity(rest)).id
                 except Exception:
-                    return await event.eor("`Couldn't find that user. Reply to them, or give a valid @username / id.`")
+                    return await event.eor("Couldn't find that user. Reply to them, or give a valid @username / id.")
         if not uid:
-            return await event.eor("`Reply to the person, or: .funuser add @username (or their id).`")
+            return await event.eor("Reply to the person, or: .funuser add @username (or their id).")
         if uid in ids:
-            return await event.eor("`Already added.`")
+            return await event.eor("Already added.")
         ids.append(uid)
         udB.set_key("FUN_USERS", ids)
         return await event.eor(

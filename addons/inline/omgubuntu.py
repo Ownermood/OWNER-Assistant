@@ -69,4 +69,4 @@ async def omgubuntu(ult):
     _OMG[match] = res
 
 
-InlinePlugin.update({"OᴍɢUʙᴜɴᴛᴜ": "omgu cutefish"})
+InlinePlugin.update({"OmgUbuntu": "omgu cutefish"})

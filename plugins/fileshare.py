@@ -35,17 +35,17 @@ async def filestoreplg(event):
 async def _(event):
     match = event.pattern_match.group(1)
     if not match:
-        return await event.eor("`Give stored film's link to delete.`", time=5)
+        return await event.eor("Give stored film's link to delete.", time=5)
     match = match.split("?start=")
     botusername = match[0].split("/")[-1]
     if botusername != asst.me.username:
         return await event.eor(
-            "`Message/Media of provided link was not stored by this bot.`", time=5
+            "Message/media of provided link was not stored by this bot.", time=5
         )
     msg_id = get_stored_msg(match[1])
     if not msg_id:
         return await event.eor(
-            "`Message/Media of provided link was already deleted.`", time=5
+            "Message/media of provided link was already deleted.", time=5
         )
     del_stored(match[1])
     await ultroid_bot.delete_messages(udB.get_key("LOG_CHANNEL"), int(msg_id))

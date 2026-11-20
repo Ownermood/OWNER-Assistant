@@ -5,13 +5,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
 • `{i}mencode <text>`
-   Encode the given text to Morse Code.
+    Turn text into Morse code.
 
-• `{i}mdecode <text>`
-   Decode the given text from Morse Code.
+• `{i}mdecode <Morse code>`
+    Turn Morse code back into text.
 """
 
 from . import ultroid_cmd

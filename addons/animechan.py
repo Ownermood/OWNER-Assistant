@@ -3,9 +3,10 @@
 # This file is a part of < https://github.com/TeamUltroid/UltroidAddons/>
 
 """
-Fetch Random anime quotes
+📖 **Commands**
 
-Command : `{i}aniquote`
+• `{i}aniquote`
+    Get a random anime quote.
 """
 
 from . import ultroid_cmd, async_searcher
@@ -25,4 +26,4 @@ async def _(ult):
         results += f" — __{resp['character']['name']} ({resp['anime']['name']})__"
         return await u.edit(results)
     except Exception:
-        await u.edit("`Something went wrong LOL ...`")
+        await u.edit("Something went wrong LOL ...")

@@ -11,7 +11,7 @@
 5. [API keys (optional)](#5-api-keys-optional)
 6. [Safety rules](#6-safety-rules)
 7. [Problem aaye to](#7-problem-aaye-to)
-8. Every command — official plugins (~449 entries total)
+8. Every command — official plugins (~441 entries total)
 9. Every command — extra addons
 10. For Claude / developers (technical handoff)
 
@@ -231,587 +231,592 @@ Telegram mein **Saved Messages** mein bhejo, phir message **delete** karo. Resta
 
 **aiwrapper**
 
-- `.gemini <prompt>` — Get response from Google Gemini.
-- `.antr <prompt>` — Get response from Anthropic Claude.
-- `.gpt <prompt>` — Get response from OpenAI GPT.
-- `.deepseek <prompt>` — Get response from DeepSeek AI. Reply to a message to use its text as the prompt. Set API keys using:
-- GEMINI_API_KEY / ANTHROPIC_KEY / OPENAI_API_KEY / DEEPSEEK_API_KEY — Set custom models using:
-- OPENAI_MODEL: default: gpt-5-mini
-- ANTHROPIC_MODEL: default: claude-opus-5-5
-- GEMINI_MODEL: default: gemini-flash-latest
-- DEEPSEEK_MODEL: default: deepseek-chat
+- `.gemini <question>` — Ask Google Gemini.
+- `.antr <question>` — Ask Anthropic Claude.
+- `.gpt <question>` — Ask OpenAI ChatGPT.
+- `.deepseek <question>` — Ask DeepSeek. Example: `.gemini explain the doctrine of res judicata in 5 lines` Tip: reply to a message to use its text as the question. **Setup (one time)** - add the key for the AI you want: `.setdb GEMINI_API_KEY <key>` / `ANTHROPIC_KEY` / `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` **Change the model (optional):** OPENAI_MODEL (default gpt-5-mini), ANTHROPIC_MODEL (default claude-opus-5-5), GEMINI_MODEL (default gemini-flash-latest), DEEPSEEK_MODEL (default deepseek-chat)
 
 **chatbot**
 
-- `.addai <reply to user/give username/userid>` — Add a AI ChatBot to reply to that user.
-- `.remai <reply to user/give username/userid>` — Remove the AI ChatBot.
-- `.repai <reply to user/give a message>` — Reply to the user with a message by an AI.
-- `.listai` — List the currently AI added users.
+- `.addai` (reply, or add @username) — Let AI reply to this person for you.
+- `.remai` (reply, or add @username) — Stop AI replies for them.
+- `.repai` (reply to a message) — Send one AI-written reply to that message.
+- `.listai` — See who has AI replies on.
 
 ### 👮 Group management
 
 **admintools**
 
-- `.promote <reply to user/userid/username>`
-- `.demote` — Promote/Demote the user in the chat.
-- `.ban <reply to user/userid/username> <reason>`
-- `.unban` — Ban/Unban the user from the chat.
-- `.kick <reply to user/userid/username> <reason>` — Kick the user from the chat.
-- `.pin <reply to message>` — Pin the message in the chat
-- `.tpin <time> <temp pin message>`
-- `.unpin (all) <reply to message>` — Unpin the messages in the chat.
-- `.pinned` — Get pinned message in the current chat.
-- `.listpinned` — Get all pinned messages in current chat
-- `.autodelete <24h/7d/1m/off>` — Enable Auto Delete Messages in Chat.
-- `.purge <reply to message>` — Purge all messages from the replied message.
-- `.purgeme <reply to message>` — Purge Only your messages from the replied message.
-- `.purgeall` — Delete all msgs of replied user.
+- `.promote` (reply, or add @username) — Make someone an admin.
+- `.demote` (reply, or add @username) — Remove someone as admin.
+- `.ban <reason>` (reply, or add @username) — Ban someone from the group.
+- `.unban` (reply, or add @username) — Let a banned person join again.
+- `.kick <reason>` (reply, or add @username) — Remove someone. They can join again later.
+- `.pin` (reply to a message) — Pin that message.
+- `.tpin <time> <message>` — Pin a message for a short time only.
+- `.unpin` (reply) or `.unpin all` — Unpin one message, or all of them.
+- `.pinned` — Show the pinned message.
+- `.listpinned` — Show all pinned messages.
+- `.autodelete <24h / 7d / 1m / off>` — Delete new messages in this chat automatically after that time.
+- `.purge` (reply to a message) — Delete every message from that one down to now.
+- `.purgeme` (reply to a message) — Same, but only your own messages.
+- `.purgeall` (reply to someone) — Delete all messages from that person.
 
 **mute**
 
-- `.mute <reply to msg/ user id>` — Mute user in current chat.
-- `.unmute <reply to msg/ user id>` — Unmute user in current chat.
-- `.dmute <reply to msg/ user id>` — Mute user in current chat by deleting msgs.
-- `.undmute <reply to msg/ use id>` — Unmute dmuted user in current chat.
-- `.tmute <time> <reply to msg/ use id>` — s- seconds m- minutes h- hours d- days Mute user in current chat with time.
+- `.mute` (reply, or add user ID) — Stop someone from sending messages here.
+- `.unmute` (reply, or add user ID) — Let them talk again.
+- `.dmute` (reply, or add user ID) — Mute someone by deleting every message they send.
+- `.undmute` (reply, or add user ID) — Stop that.
+- `.tmute <time>` (reply, or add user ID) — Mute for a while. Use s, m, h or d. Example: `.tmute 2h`
 
 **warn**
 
-- `.warn <reply to user> <reason>` — Gives Warn.
-- `.resetwarn <reply to user>` — To reset All Warns.
-- `.warns <reply to user>` — To Get List of Warnings of a user.
-- `.setwarn <warn count> | <ban/mute/kick>` — Set Number in warn count for warnings After putting ' | ' mark put action like ban/mute/kick Its Default 3 kick Example : `setwarn 5 | mute`
+- `.warn <reason>` (reply to someone) — Give a warning. Too many warnings and they get punished.
+- `.resetwarn` (reply to someone) — Clear all their warnings.
+- `.warns` (reply to someone) — See their warnings.
+- `.setwarn <number> | <ban / mute / kick>` — Choose how many warnings are allowed and what happens after. Example: `.setwarn 5 | mute` Default: 3 warnings, then kick.
 
 **locks**
 
-- `.lock <msgs/media/sticker/gif/games/inline/polls/invites/pin/changeinfo>` — Lock the Used Setting in Used Group.
-- `.unlock <msgs/media/sticker/gif/games/inline/polls/invites/pin/changeinfo>` — UNLOCK the Used Setting in Used Group.
+- `.lock <what>` — Stop members from sending this in the group.
+- `.unlock <what>` — Allow it again. You can lock: msgs, media, sticker, gif, games, inline, polls, invites, pin, changeinfo Example: `.lock sticker`
 
 **antiflood**
 
-- `.setflood <integer>` — Set flood limit in a chat.
-- `.remflood` — Remove flood limit from a chat.
-- `.getflood` — Get flood limit of a chat.
+- `.setflood <number>` — Mute people who send more than this many messages in a row. Example: `.setflood 5`
+- `.remflood` — Turn the flood limit off.
+- `.getflood` — See the current flood limit.
 
 **autoban**
 
-- `.autokick <on/off>` — on - To enable. off - To disable. Automatically kick new joined users from the group.
+- `.autokick on` / `.autokick off` — Automatically remove everyone who joins the group.
 
 **blacklist**
 
-- `.blacklist <word/all words with a space>` — blacklist the choosen word in that chat.
-- `.remblacklist <word>` — Remove the word from blacklist..
-- `.listblacklist` — list all blacklisted words. 'if a person uses blacklist Word his/her msg will be deleted' 'And u Must be Admin in that Chat'
+- `.blacklist <word>` — Delete any message in this chat that has this word. You can give many words with spaces.
+- `.remblacklist <word>` — Remove a word from the list.
+- `.listblacklist` — See all blocked words. You must be an admin in the chat for this to work.
 
 **greetings**
 
-- `.setwelcome <message/reply to message>` — Set welcome message in the current chat.
-- `.clearwelcome` — Delete the welcome in the current chat.
-- `.getwelcome` — Get the welcome message in the current chat. ---- GoodByes ----
-- `.setgoodbye <message/reply to message>` — Set goodbye message in the current chat.
-- `.cleargoodbye` — Delete the goodbye in the current chat.
-- `.getgoodbye` — Get the goodbye message in the current chat.
-- `.thankmembers on/off` — Send a thank you sticker on hitting a members count of 100*x in your groups.
+- **Welcome**
+- `.setwelcome <message>` (or reply to a message) — Greet new members with this message.
+- `.getwelcome` — See the welcome message.
+- `.clearwelcome` — Delete it. **Goodbye**
+- `.setgoodbye <message>` (or reply to a message) — Send this when someone leaves.
+- `.getgoodbye` — See the goodbye message.
+- `.cleargoodbye` — Delete it.
+- `.thankmembers on` / `off` — Send a thank-you sticker every time the group reaches another 100 members.
 
 **filter**
 
-- `.addfilter <word><reply to a message>` — add the used word as filter relating to replied message.
-- `.remfilter <word>` — Remove the filtered user..
-- `.listfilter` — list all filters.
+- `.addfilter <word>` (reply to a message) — When someone says this word in the chat, I reply with that message. Example: `.addfilter hello`
+- `.remfilter <word>` — Delete a filter.
+- `.listfilter` — See all filters in this chat.
 
 **notes**
 
-- `.addnote <word><reply to a message>` — add note in the used chat with replied message and choosen word.
-- `.remnote <word>` — Remove the note from used chat.
-- `.listnote` — list all notes.
-- Use : — set notes in group so all can use it. type `#(Keyword of note)` to get it
+- `.addnote <word>` (reply to a message) — Save a note in this chat. Anyone can get it by typing `#word`. Example: `.addnote rules`  →  type `#rules`
+- `.remnote <word>` — Delete a note.
+- `.listnote` — See all notes in this chat.
 
 **snips**
 
-- `.addsnip <word><reply to a message>` — add the used word as snip relating to replied message.
-- `.remsnip <word>` — Remove the snip word..
-- `.listsnip` — list all snips.
-- Use : — type `$(ur snip word)` get setted reply.
+- `.addsnip <word>` (reply to a message) — Save a quick reply. Type `$word` anywhere to send it. Example: `.addsnip hi`  →  type `$hi`
+- `.remsnip <word>` — Delete a snip.
+- `.listsnip` — See all snips.
 
 **nightmode**
 
-- At Night it will turn off everyone permission to send message in  an all groups which you added via `.addnight` — And Turn On auto at morning
-- `.addnm` — Add NightMode To Add Group To Auto Night Mode.
-- `.remnm` — Remove NightMode To remove Group From Auto Night Mode
-- `.listnm` — List NightMode To Get All List of Groups where NightMode Active.
-- `.nmtime <close hour> <close min> <open hour> <open min>` — NightMode Time By Default Its close 00:00 , open 07:00 Use 24hr format Ex- `nmtime 01 00 06 30`
+- Night mode closes your groups at night (nobody can send messages) and opens them again in the morning.
+- `.addnm` — Add this group to night mode.
+- `.remnm` — Remove this group from night mode.
+- `.listnm` — See all groups with night mode.
+- `.nmtime <close hour> <close minute> <open hour> <open minute>` — Choose the times (24-hour clock). Default: close 00:00, open 07:00. Example: `.nmtime 23 00 06 30` closes at 11 PM and opens at 6:30 AM.
 
 **cleanaction**
 
-- `.addclean` — Clean all Upcoming action msg in added chat like someone joined/left/pin etc.
-- `.remclean` — Remove chat from database.
-- `.listclean` — To get list of all chats where its activated.
+- `.addclean` — In this chat, delete service messages like 'X joined', 'X left' or 'X pinned a message'.
+- `.remclean` — Stop doing that here.
+- `.listclean` — See the chats where it's on.
 
 **forcesubscribe**
 
-- `.fsub <chat username><id>` — Enable ForceSub in Used Chat !
-- `.checkfsub` — Check/Get Active ForceSub Setting of Used Chat.
-- `.remfsub` — Remove ForceSub from Used Chat ! Note - You Need to be Admin in Both Channel/Chats in order to Use ForceSubscribe.
+- `.fsub <channel username or ID>` — New members must join this channel before they can talk in this group.
+- `.checkfsub` — See which channel is set for this group.
+- `.remfsub` — Turn force-join off for this group. You must be an admin in both the group and the channel.
 
 **nsfwfilter**
 
-- `.addnsfw <ban/mute/kick>` — If someone sends 18+ content it will be deleted and action will be taken.
-- `.remnsfw` — Remove Chat from nsfw filtering.
+- `.addnsfw <ban / mute / kick>` — Delete 18+ pictures in this group and punish the sender. Example: `.addnsfw mute`
+- `.remnsfw` — Turn the 18+ filter off.
 
 **profanityfilter**
 
-- `.addprofanity` — If someone sends bad word in a chat, Then bot will delete that message.
-- `.remprofanity` — From chat from Profanity list.
+- `.addprofanity` — Delete messages with bad words in this chat.
+- `.remprofanity` — Turn that off.
 
 **tag**
 
-- `.tagall` — Tag Top 100 Members of chat.
-- `.tagadmins` — Tag Admins of that chat.
-- `.tagowner` — Tag Owner of that chat
-- `.tagbots` — Tag Bots of that chat.
-- `.tagrec` — Tag recently Active Members.
-- `.tagon` — Tag online Members(work only if privacy off).
-- `.tagoff` — Tag Offline Members(work only if privacy off).
+- `.tagall` - tag up to 100 members
+- `.tagadmins` - tag the admins
+- `.tagowner` - tag the group owner
+- `.tagbots` - tag the bots
+- `.tagrec` - tag recently active members
+- `.tagon` - tag members who are online
+- `.tagoff` - tag members who are offline — Online/offline only works for people who show their last seen. ⚠️ Don't tag too often - people get annoyed and may report you.
 
 **polls**
 
-- `.poll <question> ; <option> ; <option>` — Get the Anonymous Poll with Given Options
-- `.poll <question> ; <option> ; <option> | <type>` — Get the poll specified with desired type! type should be any of  `public`,  `multiple` or `quiz`
-- `.poll <question> ; <option> ; <option> | quiz_<answerno>` — Get the quiz poll where answerno is the number of option which is correct
+- `.poll <question> ; <option> ; <option>` — Make a poll. Example: `.poll Tea or coffee? ; Tea ; Coffee`
+- Add `| <type>` at the end to change the kind of poll: — `| public` - show who voted `| multiple` - allow more than one answer `| quiz_2` - a quiz where option 2 is correct
 
 **globaltools**
 
-- `.gban <reply user/ username>`
-- `.ungban` — Ban/Unban Globally.
-- `.gstat <reply to user/userid/username>` — Check if user is GBanned.
-- `.listgban` : List all GBanned users.
-- `.gmute` | `.ungmute` <reply user/ username> — Mute/UnMute Globally.
-- `.gkick <reply/username>` `Globally Kick User`
-- `.gcast <text/reply>` `Globally Send msg in all grps`
-- `.gadmincast <text/reply>` `Globally broadcast in your admin chats`
-- `.gucast <text/reply>` `Globally send msg in all pm users`
-- `.gblacklist <chat id/username/nothing (for current chat)` — Add chat to blacklist and ignores global broadcast.
-- `.ungblacklist` `Remove the chat from blacklist.`
-- `.gpromote <reply to user> <channel/group/all> <rank>` — globally promote user where you are admin - Set whether To promote only in groups/channels/all. Eg- `gpromote group boss` ~ promotes user in all grps. `gpromote @username all sar` ~ promote the user in all group & channel
-- `.gdemote` - `demote user globally`
+- These work in every group where you're an admin.
+- `.gban` / `.ungban` (reply, or add @username) — Ban or unban someone everywhere.
+- `.gstat` (reply, or add @username) — Check if someone is globally banned.
+- `.listgban` — See everyone you've globally banned.
+- `.gmute` / `.ungmute` (reply, or add @username) — Mute or unmute someone everywhere.
+- `.gkick` (reply, or add @username) — Kick someone from every group.
+- `.gcast <text>` (or reply) — Send a message to all your groups.
+- `.gadmincast <text>` (or reply) — Send it only to groups where you're an admin.
+- `.gucast <text>` (or reply) — Send it to all your private chats. ⚠️ Sending to many chats at once can get your account limited. Use it rarely.
+- `.gblacklist` (or `.gblacklist <chat>`) — Skip this chat in all global messages.
+- `.ungblacklist` — Stop skipping it.
+- `.gpromote <group / channel / all> <title>` (reply to someone) — Make someone an admin everywhere you can. Example: `.gpromote group boss`
+- `.gdemote` (reply to someone) — Remove them as admin everywhere.
 
 **chats**
 
-- `.delchat <optional- username/id>` — Delete the group this cmd is used in.
-- `.getlink`
-- `.getlink r` - `create link with admin approval`
-- `.getlink r title_here` - `admin approval with link title`
-- `.getlink 10` - `usage limit in new link` — Get link of group this cmd is used in.
-- `.create (g|b|c) <group_name> ; <optional-username>` — Create group woth a specific name. g - megagroup/supergroup b - small group c - channel
-- `.setgpic <reply to Photo><chat username>` — Set Profile photo of Group.
-- `.delgpic <chat username -optional>` — Delete Profile photo of Group.
-- `.unbanall` — Unban all Members of a group.
-- `.rmusers` — Remove users specifically.
+- `.delchat` (or `.delchat <username/id>`) — Delete this group (you must be its owner).
+- `.getlink` — Get an invite link for this group.
+- `.getlink r` - link where admins must approve joins
+- `.getlink r <title>` - same, with a link title
+- `.getlink 10` - link that only 10 people can use
+- `.create g <name>` - make a new group
+- `.create c <name>` - make a new channel
+- `.create b <name>` - make a small basic group — Add `; <username>` at the end to give it a public username.
+- `.setgpic` (reply to a photo) — Change the group's photo.
+- `.delgpic` — Remove the group's photo.
+- `.unbanall` — Unban everyone in the group.
+- `.rmusers` — Remove members by type (deleted accounts, bots, etc.).
 
 ### 🛡️ Privacy, DM & profile
 
 **pmpermit**
 
-- `.a` or `.approve` — Approve someone to PM.
-- `.da` or `.disapprove` — Disapprove someone to PM.
-- `.block` — Block someone.
-- `.unblock` | `.unblock all` — Unblock someone.
-- `.nologpm` — Stop logging messages from the user.
-- `.logpm` — Start logging messages from the user.
-- `.startarchive` — Archive new PMs.
-- `.stoparchive` — Don't archive new PMs.
-- `.cleararchive` — Unarchive all chats.
-- `.listapproved` — List all approved PMs.
+- PM security: strangers can't keep messaging you until you approve them.
+- `.a` or `.approve` — Allow this person to message you.
+- `.da` or `.disapprove` — Take that permission back.
+- `.block` / `.unblock` — Block or unblock someone.
+- `.unblock all` — Unblock everyone.
+- `.logpm` / `.nologpm` — Start or stop saving this person's messages in your log group.
+- `.startarchive` / `.stoparchive` — Move new PMs to the archive, or stop doing that.
+- `.cleararchive` — Take all chats out of the archive.
+- `.listapproved` — See everyone you've approved.
 
 **afk**
 
-- `.afk <optional reason>` — AFK means away from keyboard, After this is activated, if someone tags or messages you, he/she would get an automated reply from the bot. (Note : Set a media file in afk messages by replying to any media with `.afk <reason>`).
+- `.afk <reason (optional)>` — Turn on away mode. If someone messages or tags you, they get an automatic reply. Send any message to turn it off. Example: `.afk studying for exams` Tip: reply to a photo or GIF with `.afk <reason>` to show it in the reply.
 
 **profile**
 
-- `.setname <first name // last name>` — Change your profile name.
-- `.setbio <bio>` — Change your profile bio.
-- `.setpic <reply to pic>` — Change your profile pic.
-- `.delpfp <n>(optional)` — Delete one profile pic, if no value given, else delete n number of pics.
-- `.poto <username>` — Upload the photo of Chat/User if Available.
+- `.setname <first name> // <last name>` — Change your name. Example: `.setname Rohit // Sharma`
+- `.setbio <text>` — Change your bio.
+- `.setpic` (reply to a photo) — Change your profile photo.
+- `.delpfp` (or `.delpfp <number>`) — Delete your latest profile photo (or that many photos).
+- `.poto <username>` — Get someone's profile photo.
 
 **autopic**
 
-- `.autopic <search query>` — Change your profile pic every few minutes with images of the query.
-- `.autopic` — Stop AutoPic.
-- Use `.setdb SLEEP_TIME <seconds>` to change the delay.
+- `.autopic <topic>` — Change your profile photo every few minutes with pictures of that topic. Example: `.autopic mountains`
+- `.autopic` — Stop it.
+- To change how often: `.setdb SLEEP_TIME <seconds>`
 
 **echo**
 
-- `.addecho <reply to anyone>` — Start Auto Echo message of Replied user.
-- `.remecho <reply to anyone>` — Turn It off
-- `.listecho <reply to anyone>` — To Get list.
+- `.addecho` (reply to someone) — Repeat everything this person says.
+- `.remecho` (reply to someone) — Stop repeating them.
+- `.listecho` — See who is being echoed.
 
 **fakeaction**
 
-- `.ftyping <time/in secs>` — `Show Fake Typing in current chat.`
-- `.faudio <time/in secs>` — `Show Fake Recording Action in current chat.`
-- `.fvideo <time/in secs>` — `Show Fake video action in current chat.`
-- `.fgame <time/in secs>` — `Show Fake Game Playing Action in current chat.`
-- `.fsticker <time/in secs>` — `Show Fake sticker choosing Action in current chat.`
-- `.flocation <time/in secs>` — `Show Fake location Action in current chat.`
-- `.fcontact <time/in secs>` — `Show Fake contact choosing Action in current chat.`
-- `.fround <time/in secs>` — `Show Fake video message action in current chat.`
-- `.fphoto <time/in secs>` — `Show Fake sending photo in current chat.`
-- `.fdocument <time/in secs>` — `Show Fake sending document in current chat.`
+- Show a fake status at the top of the chat for some seconds. — Example: `.ftyping 30` shows 'typing...' for 30 seconds.
+- `.ftyping <seconds>` - typing...
+- `.faudio <seconds>` - recording audio...
+- `.fvideo <seconds>` - sending video...
+- `.fgame <seconds>` - playing a game...
+- `.fsticker <seconds>` - choosing a sticker...
+- `.flocation <seconds>` - sending location...
+- `.fcontact <seconds>` - choosing a contact...
+- `.fround <seconds>` - recording a video message...
+- `.fphoto <seconds>` - sending a photo...
+- `.fdocument <seconds>` - sending a file...
 
 **schedulemsg**
 
-- `.schedule <text/reply to msg> <time>` — In time u can use second as number, or like 1h or 1m eg. `.schedule Hello 100` It deliver msg after 100 sec. eg. `.schedule Hello 1h` It deliver msg after an hour.
+- `.schedule <message> <time>` (or reply to a message) — Send a message later. Time can be seconds (`100`), minutes (`10m`) or hours (`1h`). Example: `.schedule Hello 1h`
 
 **other**
 
-- `.send <username/id> <reply/type>` — send message to User/Chat.
-- `.fwdreply <reply to msg>` — Reply to someone's msg by forwarding it in private.
-- `.save <reply message>` — Save that replied msg to ur saved messages box.
-- `.fsave <reply message>` — Forward that replied msg to ur saved messages.
+- `.send <username / id> <message>` (or reply to a message) — Send a message to another chat.
+- `.fwdreply` (reply to a message) — Reply to that person in your private chat with them.
+- `.save` (reply to a message) — Copy it to your Saved Messages.
+- `.fsave` (reply to a message) — Forward it to your Saved Messages.
 
 **extra**
 
-- `.del <reply to message>` — Delete the replied message.
-- `.edit <new message>` — Edit your last message or replied msg.
-- `.copy <reply to message>` — Copy replied message / media.
-- `.reply` — Reply the last sent msg to replied user.
+- `.del` (reply to a message) — Delete that message.
+- `.edit <new text>` — Edit your last message (or the one you reply to).
+- `.copy` (reply to a message) — Send a copy of that message or file.
+- `.reply` (reply to someone) — Make your last message a reply to them.
 
 ### 📢 Channels & broadcast
 
 **channelhacks**
 
-- 🔹 `.shift <from channel> | <to channel>` — This will transfer all old post from channel A to channel B. (u can use username or id of channel too) example : `.shift @abc | @xyz` [note - this (' | ') sign is nessesary] 🔹 For auto-posting/forwarding all new message from any source channel to any destination channel. `.asource <channel username or id>` This add source channel to database `.dsource <channel username or id>` This remove source channels from database `.listsource <channel username or id>` Show list of source channels `.adest <channel username or id>` This add Ur channels to database `.ddest <channel username or id>` This Remove Ur channels from database `.listdest <channel username or id>` Show List of Ur channels 'you can set many channels in database' 'For activating auto-post use `.setdb AUTOPOST True` '
+- 🔹 **Copy old posts**
+- `.shift <from channel> | <to channel>` — Copy all old posts from one channel to another. Example: `.shift @abc | @xyz` (the ` | ` is needed) 🔹 **Auto-forward new posts** New posts in a *source* channel are copied to your *destination* channels.
+- `.asource <channel>` - add a source channel
+- `.dsource <channel>` - remove a source channel
+- `.listsource` - see source channels
+- `.adest <channel>` - add a destination channel
+- `.ddest <channel>` - remove a destination channel
+- `.listdest` - see destination channels — You can add many channels. Use a username or ID. To turn auto-forwarding on: `.setdb AUTOPOST True`
 
 **broadcast**
 
-- `.addch <id/reply to list/none>` — Add chat to database. Adds current chat if no id specified.
-- `.remch <all/id/none>` — Removes the specified chat (current chat if none specified), or all chats.
-- `.broadcast <reply to msg>` — Send the replied message to all chats in database.
-- `.forward <reply to msg>` — Forward the message to all chats in database.
-- `.listchannels` — To get list of all added chats.
+- `.addch` (or `.addch <chat id>`) — Add this chat (or the given one) to your broadcast list.
+- `.remch` / `.remch <chat id>` / `.remch all` — Remove this chat, the given one, or all chats from the list.
+- `.broadcast` (reply to a message) — Send that message to every chat in your list.
+- `.forward` (reply to a message) — Forward that message to every chat in your list.
+- `.listchannels` — See your list.
 
 ### 📥 Download & upload
 
 **youtube**
 
-- `.yta <(youtube/any) link>` — Download audio from the link.
-- `.ytv <(youtube/any) link>` — Download video  from the link.
-- `.ytsa <(youtube) search query>` — Search and download audio from youtube.
-- `.ytsv <(youtube) search query>` — Search and download video from youtube.
-- `.ytcookies <reply to cookies.txt>` — Fix "Sign in to confirm you're not a bot". Export YouTube cookies (cookies.txt, Netscape format) from a browser logged in to a spare Google account, send the file, reply to it with this command. `.ytcookies` = status · `.ytcookies del` = remove.
+- `.yta <link>` — Download the audio from a YouTube (or other) link.
+- `.ytv <link>` — Download the video from a link.
+- `.ytsa <song name>` — Search YouTube and send the audio. Example: `.ytsa believer`
+- `.ytsv <video name>` — Search YouTube and send the video.
+- `.ytcookies` (reply to a cookies.txt file) — Fix the "Sign in to confirm you're not a bot" error. Export YouTube cookies (cookies.txt) from a browser logged in to a spare Google account, send the file here and reply to it with this command. `.ytcookies` - see status   ·   `.ytcookies del` - remove them
 
 **downloadupload**
 
-- `.ul <path/to/file>` — Upload files on telegram. Use following arguments before or after filename as per requirement: `--stream` to upload as stream. `--delete` to delete file after uploading. `--no-thumb` to upload without thumbnail.
-- `.dl <filename(optional)>` — Reply to file to download.
-- `.download <DDL> (| filename)` — Download using DDL. Will autogenerate filename if not given.
+- `.ul <path to file>` — Send a file from the server to Telegram. Extra options (add before or after the path): `--stream` - send as a playable video/audio `--delete` - delete the file after sending `--no-thumb` - send without a cover image
+- `.dl <file name (optional)>` (reply to a file) — Save a Telegram file to the server.
+- `.download <link> | <file name (optional)>` — Download a file from a direct link.
 
 **gdrive**
 
-- `.gdul <reply/file name>` — Reply to file to upload on Google Drive. Add file name to upload on Google Drive.
-- `.gdown <file id/link> | <filename>` — Download from Gdrive link or file id.
-- `.gdsearch <file name>` — Search file name on Google Drive and get link.
-- `.gdlist` — List all GDrive files.
-- `.gdfolder` — Link to your Google Drive Folder. If added then all files will be uploaded in this folder.
+- `.gdul` (reply to a file) or `.gdul <file path>` — Upload a file to your Google Drive.
+- `.gdown <link or file ID> | <file name (optional)>` — Download a file from Google Drive.
+- `.gdsearch <name>` — Search your Google Drive and get links.
+- `.gdlist` — List all your Google Drive files.
+- `.gdfolder` — Get the link to your upload folder. If one is set, every upload goes there.
 
 **webupload**
 
-- `.webupload` — Upload files on another server.
+- `.webupload` (reply to a file) — Upload a file to a website and get a download link.
 
 **fileshare**
 
-- `.store <reply_to_message>` — Store the replied message/media and generate a shareable link to that file, to be accessed via your assistant bot!
-- `.delstored <link of stored file>` — Delete stored file.
-- `.liststored` — Get all stored messages.
-- Go Inline with your assistant bot with `filestore` to see stored files in inline.
+- `.store` (reply to a message or file) — Save it and get a share link. Anyone with the link can get it from your assistant bot.
+- `.delstored <link>` — Delete a stored file.
+- `.liststored` — See all your stored files.
+- Type your assistant bot's username and then `filestore` in any chat to see them there.
 
 **ziptools**
 
-- `.zip <reply to file>` — zip the replied file To set password on zip: `.zip <password>` reply to file
-- `.unzip <reply to zip file>` — unzip the replied file.
-- `.azip <reply to file>` — add file to batch for batch upload zip
-- `.dozip` — upload batch zip the files u added from `.azip` To set Password: `.dozip <password>`
+- `.zip` (reply to a file) — Put the file in a .zip. Add a password: `.zip <password>`
+- `.unzip` (reply to a .zip file) — Open a .zip and send the files inside.
+- `.addzip` (reply to a file) — Add a file to a list to zip together later.
+- `.dozip` — Zip all files you added with `.addzip`. Add a password: `.dozip <password>`
 
 ### 🖼️ Media, stickers & images
 
 **stickertools**
 
-- `.destroy <reply to animated sticker>` — To destroy the sticker.
-- `.tiny <reply to media>` — To create Tiny stickers.
-- `.kang <reply to image/sticker>` — Kang the sticker (add to your pack).
-- `.packkang <pack name>` — Kang the Complete sticker set (with custom name).
-- `.round <reply to any media>` — To extract round sticker.
+- `.kang` (reply to a photo or sticker) — Add it to your own sticker pack.
+- `.packkang <pack name>` (reply to a sticker) — Copy the whole sticker pack into a new pack of yours.
+- `.tiny` (reply to a photo or sticker) — Make a tiny sticker.
+- `.round` (reply to a photo or video) — Make a round sticker.
+- `.destroy` (reply to an animated sticker) — Mess up an animated sticker for fun.
 
 **converter**
 
-- `.convert <gif/img/sticker/webm>` — Reply to media to convert it into gif / image / webm / normal sticker.
-- `.doc <filename.ext>` — Reply to a text msg to save it in a file.
-- `.open` — Reply to a file to reveal it's text.
-- `.rename <file name with extension>` — Rename the file
-- `.thumbnail <reply to image/thumbnail file>` — Upload Your file with your custom thumbnail.
+- `.convert <gif / img / sticker / webm>` (reply to media) — Change a photo, sticker or video into another type. Example: `.convert gif`
+- `.doc <file name>` (reply to a text message) — Save the text as a file. Example: `.doc notes.txt`
+- `.open` (reply to a file) — Show the text inside a file.
+- `.rename <new name>` (reply to a file) — Rename a file. Include the extension, like `.pdf`.
+- `.thumbnail` (reply to an image) — Use this image as the cover for files you upload.
 
 **imagetools**
 
-- `.border <reply to photo/sticker>` — To create border around that media.. Ex - `.border 12,22,23` - `.border 12,22,23 ; width (in number)`
-- `.grey <reply to any media>` — To make it black nd white.
-- `.color <reply to any Black nd White media>` — To make it Colorfull.
-- `.toon <reply to any media>` — To make it toon.
-- `.danger <reply to any media>` — To make it look Danger.
-- `.negative <reply to any media>` — To make negative image.
-- `.blur <reply to any media>` — To make it blurry.
-- `.quad <reply to any media>` — create a Vortex.
-- `.mirror <reply to any media>` — To create mirror pic.
-- `.flip <reply to any media>` — To make it flip.
-- `.sketch <reply to any media>` — To draw its sketch.
-- `.blue <reply to any media>` — just cool.
-- `.csample <color name /color code>` — example : `.csample red` `.csample #ffffff`
-- `.pixelator <reply image>` — Create a Pixelated Image..
+- Reply to a photo or sticker with any of these:
+- `.border` - add a border — Example: `.border 12,22,23 ; 5` (colour as R,G,B ; width)
+- `.grey` - black and white
+- `.color` - add colour to a black and white photo
+- `.toon` - cartoon look
+- `.danger` - red danger look
+- `.negative` - negative colours
+- `.blur` - blur it
+- `.quad` - swirl effect
+- `.mirror` - mirror image
+- `.flip` - flip upside down
+- `.sketch` - pencil sketch
+- `.blue` - blue look
+- `.pixelator` - pixel look
+- `.csample <colour>` — Show a sample of a colour. Example: `.csample red` or `.csample #ffffff`
 
 **logo**
 
-- `.logo <text>` — Generate a logo of the given Text Or Reply To image , to write ur text on it. Or Reply To Font File, To write with that font.
+- `.logo <text>` — Make a logo with your text. Reply to a photo to write the text on it. Reply to a font file to use that font.
 
 **glitch**
 
-- `.glitch <reply to media>` — gives a glitchy gif.
+- `.glitch` (reply to a photo or sticker) — Make a glitchy GIF from it.
 
 **giftools**
 
-- `.invertgif` — Make Gif Inverted(negative).
-- `.bwgif` — Make Gif black and white
-- `.rvgif` — Reverse a gif
-- `.vtog` — Reply To Video , It will Create Gif Video to Gif
-- `.gif <query>` — Send video regarding to query.
+- `.invertgif` (reply to a GIF) — Invert the colours.
+- `.bwgif` (reply to a GIF) — Make it black and white.
+- `.rvgif` (reply to a GIF) — Play it backwards.
+- `.vtog` (reply to a video) — Turn a video into a GIF.
+- `.gif <search>` — Find and send a GIF. Example: `.gif happy dance`
 
 **videotools**
 
-- `.sample <duration in seconds>` — Creates Short sample of video..
-- `.vshots <number of shots>` — Creates screenshot of video..
-- `.vtrim <start time> - <end time> in seconds` — Crop a Lengthy video..
+- `.sample <seconds>` (reply to a video) — Make a short clip from the video.
+- `.vshots <number>` (reply to a video) — Take that many screenshots from the video.
+- `.vtrim <start> - <end>` (reply to a video) — Cut the video. Times are in seconds. Example: `.vtrim 10 - 40`
 
 **audiotools**
 
-- `.makevoice <reply to audio>` — creates a voice note from Audio. `.atrim <from time> - <to time>` trim audio as per given time. time must be in seconds. `.atrim 50-70` `.extractaudio <reply to media>` To extract the audio from it.
+- `.makevoice` (reply to an audio) — Turn an audio file into a voice note.
+- `.atrim <start>-<end>` — Cut an audio. Times are in seconds. Example: `.atrim 50-70`
+- `.extractaudio` (reply to a video) — Get the sound from a video as an audio file.
 
 **compressor**
 
-- `.compress <reply to video>` — Compress the video (default CRF 27).
-- `.compress <crf> <reply to video>` — Lower CRF = better quality, bigger file (e.g. `.compress 23`).
-- `.compress <crf> stream` — Upload the result as a streamable video.
+- `.compress` (reply to a video) — Make a video smaller.
+- `.compress <number>` (reply to a video) — Choose the quality. Lower number = better quality but bigger file. Default is 27. Example: `.compress 23`
+- `.compress <number> stream` — Send the result as a playable video.
 
 **mediatools**
 
-- `.mediainfo <reply to media>` — To get info about it.
-- `.rotate <degree/angle> <reply to media>` — Rotate any video/photo/media.. Note : for video it should be angle of 90's
+- `.mediainfo` (reply to a file) — See details like size, length and quality.
+- `.rotate <degrees>` (reply to a photo/video) — Turn it. For videos use 90, 180 or 270.
 
 **resize**
 
-- `.size <reply to media>` — To get size of it.
-- `.resize <number> <number>` — To resize image on x, y axis. eg. `.resize 690 960`
+- `.size` (reply to a photo) — See its width and height.
+- `.resize <width> <height>` (reply to a photo) — Change its size. Example: `.resize 690 960`
 
 **qrcode**
 
-- `.qrcode <text/reply to text>` — `Makes qrcode of text`
-- `.addqr <reply image> <text>` — `Makes qr of text and add it to image.`
-- `.qrdecode <reply to qrcode>` — `It decodes the qrcode.`
+- `.qrcode <text>` (or reply to a message) — Make a QR code.
+- `.addqr <text>` (reply to a photo) — Make a QR code and put it on the photo.
+- `.qrdecode` (reply to a QR code) — Read what the QR code says.
 
 **pdftools**
 
-- `.pdf <page num> <reply to pdf file>` — Extract & send page as an Image.(note-: For extracting all pages, just use .pdf) to upload selected range `.pdf 1-7`
-- `.pdtext <page num> <reply to pdf file>` — Extract Text From the Pdf.(note-: For Extraction all text just use .pdtext) to extract selected pages `.pdf 1-7`
-- `.pdscan <reply to image>` — It scan, crop & send image(s) as pdf.
-- `.pdsave <reply to image/pdf>` — It scan, crop & save file to merge. you can merge many pages in a single pdf.
-- `.pdsend ` — Merge & send the pdf, collected from .pdsave.
+- `.pdf` (reply to a PDF) — Send every page as an image. `.pdf 3` - only page 3   ·   `.pdf 1-7` - pages 1 to 7
+- `.pdtext` (reply to a PDF) — Get the text from the PDF. `.pdtext 3` - only page 3   ·   `.pdtext 1-7` - pages 1 to 7
+- `.pdscan` (reply to a photo) — Scan a photo of a page (crop and clean it) and send it as a PDF.
+- `.pdsave` (reply to a photo or PDF) — Scan it and keep it aside, so you can join many pages into one PDF.
+- `.pdsend` — Join all the pages you saved with `.pdsave` and send one PDF.
 
 **beautify**
 
-- `.carbon <text/reply to msg/reply to document>` — Carbonise the text with default settings.
-- `.rcarbon <text/reply to msg/reply to document>` — Carbonise the text, with random bg colours.
-- `.ccarbon <color ><text/reply to msg/reply to document>` — Carbonise the text, with custom bg colours.
-- `.rayso <opt-theme> <text>/<reply to message>` — `.rayso list` - `Get list of themes.`
+- `.carbon <text>` (or reply to a message or text file) — Turn text or code into a nice-looking image.
+- `.rcarbon <text>` — Same, with a random background colour.
+- `.ccarbon <colour> <text>` — Same, with the colour you choose. Example: `.ccarbon red hello`
+- `.rayso <theme> <text>` (or reply to a message) — Another code-image style.
+- `.rayso list` — See the themes.
 
 **writer**
 
-- `.write <text or reply to text>` — It will write on a paper.
-- `.image <text or reply to html or any doc file>` — Write a image from html or any text.
+- `.write <text>` (or reply to a message) — Write the text on a page, like handwriting.
+- `.image <text>` (or reply to text or an HTML file) — Turn text or HTML into an image.
 
 **fontgen**
 
-- `.font <font name> : <text>` — Generate different fonts for the text.
-- `.font` — To get list of fonts
+- `.font <font name> : <text>` — Write text in a fancy font. Example: `.font bold : hello`
+- `.font` — See all fonts.
 
 **unsplash**
 
-- .unsplash <search query> ; <no of pics> — Unsplash Image Search.
+- `.unsplash <search> ; <how many>` — Get free photos from Unsplash. Example: `.unsplash beach ; 3`
 
 ### 🔎 Search & info
 
 **search**
 
-- `.saavn <search query>` — Download songs from Saavn.
-- `.google <query>` — For doing google search.
-- `.github <username>` — Get full information of the users github profile.
-- `.img <query>` — `.img <query> ; <no of results>` For doing Images search.
-- `.reverse` — Reply an Image or sticker to find its sauce.
+- `.saavn <song>` — Download a song from JioSaavn.
+- `.google <search>` — Search Google.
+- `.github <username>` — See someone's GitHub profile.
+- `.img <search>`
+- `.img <search> ; <how many>` — Search for pictures. Example: `.img red rose ; 5`
+- `.reverse` (reply to a photo or sticker) — Find where a picture comes from.
 
 **words**
 
-- `.meaning <word>` — Get the meaning of the word.
-- `.synonym <word>` — Get all synonyms.
-- `.antonym <word>` — Get all antonyms.
-- `.ud <word>` — Fetch word defenition from urbandictionary.
+- `.meaning <word>` — Get the meaning of a word. Example: `.meaning eloquent`
+- `.synonym <word>` — Words with the same meaning.
+- `.antonym <word>` — Words with the opposite meaning.
+- `.ud <word>` — Look up slang on Urban Dictionary.
 
 **weather**
 
-- **Get Weather Data using OpenWeatherMap API** — ❍  Commands Available -
-- `.weather` <city name> — Shows the Weather of Cities
-- `.air` <city name> — Shows the Air Condition of Cities
+- `.weather <city>` — See the weather in a city. Example: `.weather Delhi`
+- `.air <city>` — See the air quality in a city. Needs an OpenWeatherMap API key: `.setdb OPENWEATHER_API <key>`
 
 **misc**
 
-- `.eod` — `Get Event of the Today`
-- `.pntrst <link/id>` — Download and send pinterest pins
-- `.gadget <search query>` — Gadget Search from Telegram.
-- `.randomuser` — Generate details about a random user.
-- `.ascii <reply image>` — Convert replied image into html.
+- `.eod` — See what happened on this day in history.
+- `.pntrst <link>` — Download a Pinterest pin.
+- `.gadget <name>` — Search for a phone or gadget.
+- `.randomuser` — Make up details for a random fake person.
+- `.ascii` (reply to a photo) — Turn a photo into ASCII art.
 
 **utilities**
 
-- `.kickme` : Leaves the group.
-- `.date` : Show Calender.
-- `.listreserved` — List all usernames (channels/groups) you own.
-- `.stats` : See your profile stats.
-- `.paste` - `Include long text / Reply to text file.`
-- `.info <username/userid/chatid>` — Reply to someone's msg.
-- `.invite <username/userid>` — Add user to the chat.
-- `.rmbg <reply to pic>` — Remove background from that picture.
-- `.telegraph <reply to media/text>` — Upload media/text to telegraph.
-- `.json <reply to msg>` — Get the json encoding of the message.
-- `.suggest <reply to message> or <poll title>` — Create a Yes/No poll for the replied suggestion.
-- `.ipinfo <ipAddress>` : Get info about that IP address.
-- `.cpy <reply to message>` — Copy the replied message, with formatting. Expires in 24hrs.
-- `.pst` — Paste the copied message, with formatting.
-- `.thumb <reply file>` : Download the thumbnail of the replied file.
-- `.getmsg <message link>` — Get messages from chats with forward/copy restrictions.
+- `.info` (reply, or add username/ID) — See details about a person or chat.
+- `.stats` — See how many chats, groups and channels you have.
+- `.date` — Show today's date and a calendar.
+- `.kickme` — Leave this group.
+- `.invite <username / id>` — Add someone to this group.
+- `.listreserved` — See the public usernames (groups/channels) you own.
+- `.paste <text>` (or reply to a text file) — Upload long text and get a link.
+- `.telegraph` (reply to a photo or text) — Upload it to Telegraph and get a link.
+- `.rmbg` (reply to a photo) — Remove the background from a photo.
+- `.suggest` (reply to a message, or add a question) — Make a quick Yes/No poll.
+- `.cpy` (reply to a message) then `.pst` — Copy a message with its formatting, then paste it anywhere. Works for 24 hours.
+- `.getmsg <message link>` — Get a message from a chat that blocks forwarding or saving.
+- `.thumb` (reply to a file) — Get the file's cover image.
+- `.ipinfo <IP address>` — See where an IP address is from.
+- `.json` (reply to a message) — See the message's raw data (for developers).
 
 **tools**
 
-- `.circle` — Reply to a audio song or gif to get video note.
-- `.ls` — Get all the Files inside a Directory.
-- `.bots` — Shows the number of bots in the current chat with their perma-link.
-- `.hl <a link> <text-optional>` — Embeds the link with a whitespace as message.
-- `.id` — Reply a Sticker to Get Its Id Reply a User to Get His Id Without Replying You Will Get the Chat's Id
-- `.sg <reply to a user><username/id>` — Get His Name History of the replied user.
-- `.tr <dest lang code> <(reply to) a message>` — Get translated message.
-- `.webshot <url>` — Get a screenshot of the webpage.
-- `.shorturl <url> <id-optional>` — shorten any url...
+- `.id` — Get an ID. Reply to a person or sticker for theirs, or send it alone for the chat's ID.
+- `.sg` (reply, or add username/ID) — See someone's old names and usernames.
+- `.tr <language code>` (reply to a message) — Translate it. Example: `.tr hi` (Hindi) or `.tr en` (English)
+- `.webshot <link>` — Take a screenshot of a website.
+- `.shorturl <link>` — Make a short link.
+- `.circle` (reply to an audio or GIF) — Turn it into a round video message.
+- `.hl <link> <text (optional)>` — Hide a link behind text.
+- `.bots` — List the bots in this chat.
+- `.ls` — See the files in a folder on your server.
 
 **calculator**
 
-- `.calc` - Inline Calculator
+- `.calc` — Open a calculator with buttons.
 
 **specialtools**
 
-- `.wspr <@username/id> <message>`
-- `.wspr <message>` (reply to someone) — Secret message in any chat — only that person (and you) can open it. Max 200 characters. `.wspr @username` alone shows their profile card.
-- `.q <color-optional>`
-- `.q @username`
-- `.q r <color-optional>`
-- `.q count` : `multiple quotes` — Create quotes..
-- `.sticker <query>` — Search Stickers as Per ur Wish..
-- `.getaudio <reply to an audio>` — Download Audio To put in ur Desired Video/Gif.
-- `.addaudio <reply to Video/gif>` — It will put the above audio to the replied video/gif.
-- `.dob <date of birth>` — Put in dd/mm/yy Format only(eg .dob 01/01/1999).
-- `.wall <query>` — Search Hd Wallpaper as Per ur Wish..
+- `.wspr @username <message>` (or reply to someone with `.wspr <message>`) — Send a secret message in any chat. Only that person (and you) can open it. Up to 200 characters. `.wspr @username` alone shows their profile card.
+- `.q` (reply to a message) — Turn messages into a quote sticker. `.q <colour>` - choose the background colour `.q 3` - quote 3 messages together (up to 20) `.q r` - include the message it replied to
+- `.sticker <search>` — Find stickers.
+- `.getaudio` (reply to an audio) — Pick an audio to add to a video.
+- `.addaudio` (reply to a video or GIF) — Put that audio on this video.
+- `.dob <dd/mm/yyyy>` — See age and birthday details. Example: `.dob 01/01/2008`
+- `.wall <search>` — Find HD wallpapers.
 
 **twitter**
 
-- `.tw <tweet text>` — Tweet the text.
-- `.twdetail <tweet id/link>` — Get tweet details with reply/quote/comment count.
-- `.twuser <username>` — Get user details of the Twitter account.
-- `.twl <tweet link>` — Upload the tweet media to telegram.
+- `.tw <text>` — Post a tweet.
+- `.twdetail <tweet link or ID>` — See a tweet's details (likes, replies, quotes).
+- `.twuser <username>` — See a Twitter/X profile.
+- `.twl <tweet link>` — Download a tweet's photos and videos.
 
 **stories**
 
-- `.setstory <reply media>` — Set replied media as your story.
-- `.storydl <username/reply user/story link>` — Download and upload user stories or specific story from link!
+- `.setstory` (reply to a photo or video) — Post it as your Telegram story.
+- `.storydl <username or story link>` (or reply to someone) — Download someone's stories, or one story from its link.
 
 ### ⚙️ Bot, settings & developer
 
 **bot**
 
-- `.botpic` (reply to a photo, optional) — Change the assistant bot's profile photo.
-- `.alive` | `.alive inline` — Check if your bot is working.
-- `.ping` — Check the bot's response time.
-- `.update` — See changelogs if any update is available.
-- `.cmds` — View all plugin names.
-- `.restart` — To restart your bot.
-- `.logs (sys)` — Get the full terminal logs.
-- `.logs carbon` — Get the carbonized sys logs.
-- `.logs heroku` — Get the latest 100 lines of heroku logs.
-- `.shutdown` — Turn off your bot.
+- `.alive` | `.alive inline` — Check that your bot is running.
+- `.ping` — See how fast the bot replies.
+- `.botpic` (reply to a photo, optional) — Change your assistant bot's profile photo.
+- `.update` — Check for new updates.
+- `.cmds` — List all plugin names.
+- `.restart` — Restart the bot.
+- `.logs` — Get the bot's log file (useful when something breaks).
+- `.logs carbon` — Get the logs as an image.
+- `.logs heroku` — Get the last 100 lines of Heroku logs.
+- `.shutdown` — Turn the bot off.
 
 **core**
 
-- `.install <reply to plugin>` — To install the plugin, `.install f` To force Install.
-- `.uninstall <plugin name>` — To unload and remove the plugin.
-- `.load <plugin name>` — To load unloaded unofficial plugin.
-- `.unload <plugin name>` — To unload unofficial plugin.
-- `.help <plugin name>` — Shows you a help menu (like this) for every plugin.
-- `.getaddons <raw link to code>` — Load Plugins from the given raw link.
+- `.install` (reply to a plugin file) — Add a new plugin.
+- `.install f` — Force install it.
+- `.uninstall <name>` — Remove a plugin you added.
+- `.load <name>` — Turn on a plugin you turned off.
+- `.unload <name>` — Turn off a plugin you added (until restart).
+- `.help <name>` — Show the help for any plugin. Example: `.help afk`
+- `.getaddons <raw link>` — Install a plugin from a link.
 
 **database**
 
-- **DataBase Commands, do not use if you don't know what it is.**
-- `.setdb key | value` — Set Value in Database. e.g : `.setdb hi there` `.setdb hi there | OWNER Assistant here` `.setdb --extend variable value` or `.setdb -e variable value` to add the value to the exiting values in db.
-- `.deldb key` — Delete Key from DB.
-- `.rendb old keyname | new keyname` — Update Key Name
+- ⚠️ **Advanced - only use these if you know what you're changing.**
+- `.setdb <name> <value>` — Save a setting. Example: `.setdb PMWARNS 3` Use ` | ` if the value has spaces: `.setdb ALIVE_TEXT | I'm online!` Add `-e` to add to the existing value: `.setdb -e <name> <value>`
+- `.deldb <name>` — Delete a setting.
+- `.rendb <old name> | <new name>` — Rename a setting.
 
 **variables**
 
-- `.get var <variable name>` — Get value of the given variable name.
-- `.get type <variable name>` — Get variable type.
-- `.get db <key>` — Get db value of the given key.
-- `.get keys` — Get all redis keys.
+- ⚠️ **Advanced.**
+- `.get var <name>` — See the value of a setting.
+- `.get type <name>` — See what type of value it is.
+- `.get db <name>` — See a value saved in the database.
+- `.get keys` — List all saved setting names.
 
 **sudo**
 
-- `.addsudo` — Add Sudo Users by replying to user or using <space> separated userid(s)
-- `.delsudo` — Remove Sudo Users by replying to user or using <space> separated userid(s)
-- `.listsudo` — List all sudo users.
+- Sudo users can use your bot's commands. Only add people you fully trust.
+- `.addsudo` (reply, or add user IDs with spaces) — Add sudo users.
+- `.delsudo` (reply, or add user IDs with spaces) — Remove sudo users.
+- `.listsudo` — See all sudo users.
 
 **usage**
 
-- `.usage` — Get overall usage.
-- `.usage heroku` — Get heroku stats.
-- `.usage db` — Get database storage usage.
+- `.usage` — See your server's CPU, RAM, disk and data use.
+- `.usage heroku` — See Heroku usage.
+- `.usage db` — See how much database space is used.
 
 **asstcmd**
 
-- `.addcmd <new cmd> <reply>` — It will set new cmd for your assistant bot with that reply message.
-- `.remcmd <cmd name>` — It will remove your cmd.
-- `.listcmd` — To Get list of all your custom cmd.
+- `.addcmd <word>` (reply to a message) — Make a new /command for your assistant bot. It answers with the message you replied to. Example: `.addcmd rules`  →  people can send /rules
+- `.remcmd <word>` — Delete that command.
+- `.listcmd` — See all your commands.
 
 **button**
 
-- `.button <text with button format>` — Create a message with buttons. You can reply to a picture too. Format:- `.button Hey There! 😎 [Google | https://google.com][YouTube | https://youtube.com | same] [Instagram | https://instagram.com]`
+- `.button <text with buttons>` — Send a message with link buttons. You can also reply to a photo. Write each button as `[Name | link]`. Put `| same` at the end to keep it on the same row. Example: `.button Hey there! 😎 [Google | https://google.com][YouTube | https://youtube.com | same] [Instagram | https://instagram.com]`
 
 **devtools**
 
-- `.bash <cmds>`
-- `.bash -c <cmds>` Carbon image as command output. — Run linux commands on telegram.
-- `.eval <code>` — Evaluate python commands on telegram. Shortcuts: client = bot = event.client e = event p = print reply = await event.get_reply_message() chat = event.chat_id
-- `.cpp <code>` — Run c++ code from Telegram.
-- `.sysinfo` — Shows System Info.
+- ⚠️ **Advanced - these run code on your server.**
+- `.bash <command>` — Run a Linux command.
+- `.bash -c <command>` — Same, but show the result as an image.
+- `.eval <code>` — Run Python code. Shortcuts you can use: client = bot = event.client e = event p = print reply = await event.get_reply_message() chat = event.chat_id
+- `.cpp <code>` — Run C++ code.
+- `.sysinfo` — See your server's details.
 
 **vctools**
 
-- `.startvc` — Start Group Call in a group.
-- `.stopvc` — Stop Group Call in a group.
-- `.vctitle <title>` — Change the title Group call.
-- `.vcinvite` — Invite all members of group in Group Call. (You must be joined)
+- `.startvc` — Start a voice chat in this group.
+- `.stopvc` — End the voice chat.
+- `.vctitle <title>` — Change the voice chat's title.
+- `.vcinvite` — Invite all group members to the voice chat. (Join it yourself first.)
 
 ## 9. Every command (extra addons)
 
@@ -819,23 +824,23 @@ Telegram mein **Saved Messages** mein bhejo, phir message **delete** karo. Resta
 
 **love**
 
-- `.propose <name>` (or reply to someone) — A long, flirty proposal story 💍 — walk-up, ring, a dot-by-dot rose, a beating heart, pick-up lines and the big question.
+- `.propose <name>` (or reply to someone) — A long, flirty proposal story 💍 - walk-up, ring, a rose drawn dot by dot, a beating heart, pick-up lines and the big question.
 - `.love <name>` — A heart drawn dot by dot that comes alive and beats for them ❤️
 - `.rose <name>` — A rose that blooms dot by dot 🌹
 - `.hearts` — It's raining hearts 💕
-- `.lovecalc <name1> <name2>` — The (totally scientific) love meter 💘
+- `.lovecalc <name 1> <name 2>` — The (totally scientific) love meter 💘
 
 ### 🎉 Fun & pranks
 
 **fun**
 
-- `.joke` — To get joke.
-- `.url <long url>` — To get a shorten link of long link.
-- `.phlogo <first_name> <last_name>` — Make a phub based logo.
-- `.decide` — Decide something.
-- `.xo` — Opens tic tac game only where using inline mode is allowed.
-- `.wordi` — Opens word game only where using inline mode is allowed.
-- `.gps <name of place>` — Shows the desired place in the map.
+- `.joke` — Get a joke.
+- `.decide` — Can't decide? Get a yes / no / maybe.
+- `.url <long link>` — Make a short link.
+- `.phlogo <word 1> <word 2>` — Make a two-colour logo with your words.
+- `.gps <place>` — Show a place on the map.
+- `.xo` — Play tic-tac-toe (only in chats where inline bots are allowed).
+- `.wordi` — Play a word game (only in chats where inline bots are allowed).
 
 **hack**
 
@@ -843,237 +848,224 @@ Telegram mein **Saved Messages** mein bhejo, phir message **delete** karo. Resta
 
 **animations**
 
-- Animation Plugin
-- `.kill`
-- `.fp`
+- `.kill` — A short, silly 'fire!' animation.
+- `.fp` — Send a facepalm 🤦‍♂
 
 **typing**
 
-- `.type <msg>` — Edits the Message and shows like someone is typing.
+- `.type <message>` — Show your message appearing letter by letter, like live typing.
 
 **truthdare**
 
-- `.truth` — `Get Truth Task.`
-- `.dare` — `Get Dare Task.`
+- `.truth` — Get a truth question.
+- `.dare` — Get a dare.
 
 **random**
 
-- `Get some Random Content.`
-- `.random dog`
-- `.random duck`
-- `.random cat`
-- `.random fox`
-- `.random quote`
-- `.random word`
-- `.random quotable`
-- `.random celebrity`
+- Get something random:
+- `.random dog` / `cat` / `fox` / `duck` - a cute photo
+- `.random quote` / `quotable` - a quote
+- `.random word` - a random word
+- `.random celebrity` - a random celebrity
 
 **inlinefun**
 
-- `.uta <search query>` — Inline song search and downloader.
-- `.gglax <query>` — Create google search sticker with text.
-- `.stic <emoji>` — Get random stickers from emoji.
-- `.frog <text>` — make text stickers.
-- `.tweet <text>` — make twitter posts.
-- `.quot <text>` — write quote on animated sticker.
+- `.uta <song>` — Search and download a song.
+- `.gglax <text>` — Make a funny 'Google search' sticker.
+- `.stic <emoji>` — Get random stickers for an emoji.
+- `.frog <text>` — Make a frog sticker holding your text.
+- `.tweet <text>` — Make a fake tweet image.
+- `.quot <text>` — Write a quote on an animated sticker.
 
 **waifu**
 
-- `.waifu <text>` — paste text on random stickers.
+- `.waifu <text>` — Put your text on a random anime sticker.
 
 **memify**
 
-- `.mmf <upper text> ; <lower text> <reply to media>` — To create memes as sticker, for trying different fonts use (.mmf <text>_1)(u can use 1 to 10).
-- `.mms <upper text> ; <lower text> <reply to media>` — To create memes as pic, for trying different fonts use (.mms <text>_1)(u can use 1 to 10).
+- `.mmf <top text> ; <bottom text>` (reply to a photo or sticker) — Make a meme sticker.
+- `.mms <top text> ; <bottom text>` (reply to a photo or sticker) — Make a meme picture. Try other fonts by adding `_1` to `_10` at the end. Example: `.mms when the exam ; is tomorrow_3`
 
 **sticklet**
 
-- `.sticklet <text>` — `create random sticker with text.`
+- `.sticklet <text>` — Make a colourful text sticker.
 
 **figlet**
 
-- `.figlet <text>` — Make a text a figlet.
+- `.figlet <text>` — Write text in big ASCII letters.
 
 **fontsnew**
 
-- `.weeb <text>` — turns text to 山乇乇乃 font
-- `.tantext <text>` — turns text to ᎿᎯᏁᎿᏋﾒᎿ font
-- `.linetext <text>` — turns text to 𝕃𝕀ℕ𝔼𝕋𝔼𝕏𝕋
-- `.boxtext <text>` — turns text to 🄱🄾🅇🅃🄴🅇🅃
-- `.bubbletext <text>` — turns text to ⒷⓊⒷⒷⓁⒺⓉⒺⓍⓉ
-- `.cursive <text>` — turns text to 𝓬𝓾𝓻𝓼𝓲𝓿𝓮 font
-- `.greekify <text>` — turns text to ϑгεεκιғψ font
-- `.sorcify <text>` — turns text to ֆօʀƈɛʀɛʀ font
-- `.fraktify <text>` — turns text to 𝖋𝖗𝖆𝖐𝖙𝖚𝖗𝖊 font
-- `.rusify <text>` — turns text to яц$їfч font
+- Write your text in a fun style:
+- `.weeb <text>` - 山乇乇乃
+- `.tantext <text>` - ᎿᎯᏁᎿᏋﾒᎿ
+- `.linetext <text>` - 𝕃𝕀ℕ𝔼𝕋𝔼𝕏𝕋
+- `.boxtext <text>` - 🄱🄾🅇🅃🄴🅇🅃
+- `.bubbletext <text>` - ⒷⓊⒷⒷⓁⒺⓉⒺⓍⓉ
+- `.cursive <text>` - 𝓬𝓾𝓻𝓼𝓲𝓿𝓮
+- `.greekify <text>` - ϑгεεκιғψ
+- `.sorcify <text>` - ֆօʀƈɛʀɛʀ
+- `.fraktify <text>` - 𝖋𝖗𝖆𝖐𝖙𝖚𝖗𝖊
+- `.rusify <text>` - яц$їfч
 
 **quote**
 
-- `.qbot <reply>` — Make sticker quote without QuotlyBot
+- `.qbot` (reply to a message) — Make a quote sticker from a message.
 
 **quotefancy**
 
-- `.qfancy` — Gets random quotes from QuoteFancy.com.
+- `.qfancy` — Get a random quote picture.
 
 **howto**
 
-- `.htg <text>` — How To Google. Some peoples don't know how to google so help them 🙃🙂.
-- `.htd <text>` — How to duck duck go...
+- `.htg <question>` — Send a 'let me Google that for you' link.
+- `.htd <question>` — Same, with DuckDuckGo.
 
 **activitygen**
 
-- `.bored` — Get some activity to do when you get bored
+- `.bored` — Get an idea for something to do when you're bored.
 
 **brainfuck**
 
-- `.bf` — Text to Brainfuck String Generator with text or reply.
-- `.rbf` — Brainfuck Interpreter with string or reply.
+- `.bf <text>` (or reply) — Turn text into Brainfuck code.
+- `.rbf <code>` (or reply) — Run Brainfuck code and show the result.
 
 **morsecode**
 
-- `.mencode <text>` — Encode the given text to Morse Code.
-- `.mdecode <text>` — Decode the given text from Morse Code.
+- `.mencode <text>` — Turn text into Morse code.
+- `.mdecode <Morse code>` — Turn Morse code back into text.
 
 **encodedecode**
 
-- .encode <text/reply to message> — encode the text
-- .decode <text/reply to message> — decode the text
+- `.encode <text>` (or reply) — Turn text into base64 code.
+- `.decode <code>` (or reply) — Turn base64 code back into text.
 
 **clone**
 
-- `.clone <reply/username>` — clone the identity of user.
-- `.revert` — Revert to your original identity
+- `.clone` (reply, or add @username) — Copy someone's name, bio and photo onto your account (for fun).
+- `.revert` — Go back to your own name, bio and photo.
 
 ### ⚠️ Spam (use carefully — can get your account limited)
 
 **spam**
 
-- `.spam <no of msgs> <your msg>` — `.spam <no of msgs> <reply message>` spams chat, the current limit for this is from 1 to 99.
-- `.bigspam <no of msgs> <your msg>` — `.bigspam <no of msgs> <reply message>` Spams chat, the current limit is above 100.
-- `.delayspam <delay time> <count> <msg>` — Spam chat with delays..
-- `.tspam <text>` — Spam Chat with One-One Character..
+- ⚠️ Spamming can get your account limited or banned by Telegram. Use with care.
+- `.spam <count> <message>` (or reply to a message) — Send a message many times (1 to 99).
+- `.bigspam <count> <message>` (or reply) — Send it 100 or more times.
+- `.delayspam <seconds> <count> <message>` — Send it many times with a pause between each.
+- `.tspam <text>` — Send the text one letter at a time.
 
 **stickerspam**
 
-- `.sspam <reply to sticker> <optional- time gap>` — it spam the whole stickers in that pack.
+- `.sspam <seconds between (optional)>` (reply to a sticker) — Send every sticker from that pack, one by one. ⚠️ Too many messages can get your account limited.
 
 ### 🎵 Music & voice
 
 **song**
 
-- `.lyrics <search query>` — get lyrics of song.
-- `.song <search query>` — Search the song on YouTube and send its audio.
+- `.song <song name>` — Find the song on YouTube and send the audio.
+- `.lyrics <song name>` — Get the song's lyrics.
 
 **findsong**
 
-- `.findsong <reply to song>` — Identify the song name
+- `.findsong` (reply to a song) — Find the song's name.
 
 **whichsong**
 
-- `.whichsong` — Reply to a song file, to recognise the song.
+- `.whichsong` (reply to a song file) — Find out which song it is.
 
 **speechtool**
 
-- `.tts` `LanguageCode <reply to a message>`
-- `.tts` `LangaugeCode | text to speak`
-- `.stt` `<reply to audio file>` — `Convert Speech to Text...` `Note - Sometimes Not 100% Accurate`
+- `.tts <language code> | <text>` — Turn text into a voice message. Example: `.tts en | hello everyone` Or reply to a message: `.tts hi`
+- `.stt` (reply to a voice or audio) — Turn speech into text. It isn't always 100% right.
 
 ### 🔎 Info & search
 
 **wikipedia**
 
-- `.wiki <search query>`` — Wikipedia search from telegram.
+- `.wiki <search>` — Search Wikipedia.
 
 **imdb**
 
-- Search movie details from IMDB
-- `.imdb <keyword>`
+- `.imdb <movie name>` — Get a movie's details from IMDb.
 
 **anime**
 
-- `.character <character name>` — Fetch anime character details.
+- `.character <name>` — Get details about an anime character.
 
 **animedb**
 
-- Search animes and manga from anilist.co using @animedb_bot
-- `.manga <keyword>` — To get manga info
+- `.manga <name>` — Get details about a manga (from anilist.co).
 
 **animechan**
 
-- Fetch Random anime quotes — Command : `.aniquote`
+- `.aniquote` — Get a random anime quote.
 
 **pokedex**
 
-- `.pokemon <query>` — Send details of Pokemon.
-- `.pokecard <query>` — Send Card of Pokemon.
+- `.pokemon <name>` — Get details about a Pokémon.
+- `.pokecard <name>` — Get a Pokémon card picture.
 
 **astronomy**
 
-- `.apod`` — Get Astronomy Picture of Day by NASA
+- `.apod` — Get NASA's astronomy picture of the day.
 
 **covid**
 
-- `.covid country name` — Gets the Covid-19 Status of a given Country.
+- `.covid <country>` — See COVID-19 numbers for a country.
 
 **flaticon**
 
-- `.icon <query>` — Icon search from flaticon.com and uploading as sticker.
+- `.icon <search>` — Find an icon on flaticon.com and send it as a sticker.
 
 **searchmsgs**
 
-- To Search Messages in chat easily :) — >> .search (some_text) >> .search -r (some_text) : 10 »» To search in Reverse order.
-- `.search hello`
-- `.search -r Heroku : 10`
+- `.search <text>` — Find messages in this chat that have this text.
+- `.search -r <text> : <how many>` — Same, but start from the oldest messages. Examples: `.search hello`   ·   `.search -r exam : 10`
 
 **totalmsgs**
 
-- `.totalmsgs` — Returns your total msg count in current chat
-- `.totalmsgs [username]/<reply>` — Returns total msg count of user in current chat
+- `.totalmsgs` — See how many messages you've sent in this chat.
+- `.totalmsgs <username>` (or reply to someone) — See how many messages they've sent here.
 
 ### 🧰 Tools
 
 **ocr**
 
-- `.ocr <language code><reply to a photo>` — text recognition service.
+- `.ocr <language code>` (reply to a photo) — Read the text in a photo. Example: `.ocr eng` Needs a free key from ocr.space: `.setdb OCR_API <key>`
 
 **fastly**
 
-- Fasly Bot Cheat.
-- `.fastly` - On/Off command.
-- Also Required : `OCR_API`. Add it using the command `.setdb OCR_API api_key`
-- To get the API visit 'https://ocr.space/ocrapi' — The bot will try to auto reply first to the messages by @FastlyWriteBot
-- Add User id of fastly clone to `FASTLY_CLONES` to allow this plugin work with them.
+- `.fastly` — Turn the @FastlyWriteBot auto-answer on or off. It tries to reply first to that bot's typing games. Needs an OCR key: get one at ocr.space/ocrapi, then `.setdb OCR_API <key>`. For copies of that bot, add their user IDs to `FASTLY_CLONES`.
 
 **spellcheck**
 
-- .spcheck <text/reply to message> — check spelling of the text/sentence
+- `.spcheck <text>` (or reply) — Check the spelling and get the corrected text.
 
 **autocorrect**
 
-- `.autocorrect` — To on/off Autocorrect Feature (English messages only). Messages ending with `..` are not corrected.
+- `.autocorrect` — Turn autocorrect on or off. It fixes spelling in your English messages. Messages that end with `..` are left as they are.
 
 **ncode**
 
-- `.ncode <file>` — Use - Paste the contents of file and send as pic.
+- `.ncode` (reply to a code file) — Send the code as a nice-looking image.
 
 **autoprofile**
 
-- `.autoname` — `Starts AUTONAME`.
-- `.stopname` — `Stops AUTONAME.`
-- `.autobio` — `Starts AUTOBIO.`
-- `.stopbio` — `Stops AUTOBIO.`
+- `.autoname` / `.stopname` — Start or stop showing the live time and date in your name.
+- `.autobio` / `.stopbio` — Start or stop a live bio with the date, time and a random line.
 
 **wreplace**
 
-- `.wreplace <count> <old word>;<new word>` — Note : Don't use brackets Ex. : `.wreplace 10 Hi;Hello` Use: It replaces a perticular word by new word (only in your msgs.) In many msgs at a time
+- `.wreplace <how many messages> <old word>;<new word>` — Replace a word in your own recent messages. Example: `.wreplace 10 Hi;Hello` changes 'Hi' to 'Hello' in your last 10 messages.
 
 **limited**
 
-- `.limited` — Check you are limited or not !
+- `.limited` — Check if Telegram has limited your account (asks @SpamBot).
 
 **servertest**
 
-- `.test` — Test Your Server Speed.
+- `.test` — Test your server's internet speed.
 
 ### 🔍 Inline (assistant bot)
 
@@ -1253,6 +1245,15 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   account. Say this plainly if asked again. Also #35: manager persists panel ids in
   the store so a restart deletes the old 'Manager online' panel instead of
   stacking a new one.
+- **Text style (#42, owner asked "smooth English, easy to understand")**: all
+  user-facing text is plain friendly English - short sentences, say what to do
+  next, give an example in help. No small-caps fonts, no whole message in
+  `code` backticks, no "u/ur/plz/msg", no "him/his" (use "them"), no Title Case
+  On Every Word. Help format: `• \`{i}cmd <arg>\` (reply to ...)` + one plain
+  line + `Example:`. Official help lives in `strings/strings/en.yml`
+  (`help_<plugin>`, wins over the docstring); addons and the rest use the
+  module docstring starting with `📖 **Commands**`. Other 24 language files
+  were NOT rewritten (they still hold old translations).
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 

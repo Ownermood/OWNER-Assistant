@@ -4,13 +4,13 @@
 # Animation Plugin
 
 """
-  Animation Plugin
-
-✘ Commands Available
+📖 **Commands**
 
 • `{i}kill`
-• `{i}fp`
+    A short, silly 'fire!' animation.
 
+• `{i}fp`
+    Send a facepalm 🤦‍♂
 """
 
 import asyncio
@@ -20,7 +20,7 @@ import asyncio
 async def _(event):
     animation_interval = 0.7
     animation_ttl = range(0, 12)
-    a = await event.eor("`ready to die dude.....`")
+    a = await event.eor("ready to die dude.")
     animation_chars = [
         "Ｆｉｉｉｉｉｒｅ",
         "(　･ิω･ิ)︻デ═一-->",

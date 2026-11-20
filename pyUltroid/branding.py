@@ -11,7 +11,7 @@ from .configs import Var
 
 BOT_NAME = "OWNER Assistant"
 BOT_NAME_CAPS = "OWNER ASSISTANT"
-BOT_NAME_FANCY = "Oᴡɴᴇʀ Assɪsᴛᴀɴᴛ"
+BOT_NAME_FANCY = "OWNER Assistant"
 
 REPO_URL = Var.UPSTREAM_REPO.replace(".git", "")
 _RAW = REPO_URL.replace("https://github.com/", "https://raw.githubusercontent.com/")

@@ -28,12 +28,12 @@ from . import get_string, ultroid_cmd
 )
 async def uri_poll(e):
     if not e.client._bot and e.is_private:
-        return await e.eor("`Use this in Group/Channel.`", time=15)
+        return await e.eor("Use this in group/channel.", time=15)
     match = e.pattern_match.group(1).strip()
     if not match:
-        return await e.eor("`Give Proper Input...`", time=5)
+        return await e.eor("Give proper input.", time=5)
     if ";" not in match:
-        return await e.eor("`Unable to Determine Options.`.", time=5)
+        return await e.eor("I couldn't read the options. Separate them with ` ; `", time=5)
     ques = match.split(";")[0]
     option = match.split(";")[1::]
     publ = None
@@ -47,7 +47,7 @@ async def uri_poll(e):
             karzo = [str(int(ptype.split("_")[1]) - 1).encode()]
             ptype = ptype.split("_")[0]
         if ptype not in ["public", "quiz", "multiple"]:
-            return await e.eor("`Invalid Poll Type...`", time=5)
+            return await e.eor("Invalid poll type.", time=5)
         if ptype == "multiple":
             mpp = True
         elif ptype == "public":
@@ -55,7 +55,7 @@ async def uri_poll(e):
         elif ptype == "quiz":
             quizo = True
     if len(option) <= 1:
-        return await e.eor("`Options Should be More than 1..`", time=5)
+        return await e.eor("Add at least 2 options.", time=5)
     m = await e.eor(get_string("com_1"))
     OUT = [PollAnswer(TextWithEntities(option[on], entities=[]), str(on).encode()) for on in range(len(option))]
     await e.respond(

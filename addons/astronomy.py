@@ -5,10 +5,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}apod``
-    Get Astronomy Picture of Day by NASA
+• `{i}apod`
+    Get NASA's astronomy picture of the day.
 """
 
 

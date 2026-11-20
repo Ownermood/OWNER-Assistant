@@ -50,7 +50,7 @@ async def _(ult):
         else:
             k = udB.del_key(key)
         if k == 0:
-            return await ult.eor("`No Such Key.`")
+            return await ult.eor("There's no setting with that name.")
         await ult.eor(f"`Successfully deleted key {key}`")
     except BaseException:
         await ult.eor(get_string("com_7"))
@@ -60,7 +60,7 @@ async def _(ult):
 async def _(ult):
     match = ult.pattern_match.group(1).strip()
     if not match:
-        return await ult.eor("`Provide Keys name to rename..`")
+        return await ult.eor("Which setting should I rename? Example: `.rendb OLD | NEW`")
     delim = " " if re.search("[|]", match) is None else " | "
     data = match.split(delim)
     if Redis(data[0]):

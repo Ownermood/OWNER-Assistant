@@ -1,8 +1,8 @@
 """
-✘ Commands Available
+📖 **Commands**
 
 • `{i}figlet <text>`
-    Make a text a figlet.
+    Write text in big ASCII letters.
 """
 
 import pyfiglet
@@ -464,7 +464,7 @@ offset = 0
 async def figlet(event):
     input_str = event.pattern_match.group(1).strip()
     if not input_str:
-        return await event.eor("`Provide some text to make figlet...`")
+        return await event.eor("Provide some text to make figlet.")
     if input_str == "list":
         global offset
         if offset == len(Split):
@@ -501,5 +501,5 @@ async def figlet(event):
     else:
         result = pyfiglet.figlet_format(text)
     if len(result) > 4000:
-        return await event.eor("`Text too long for this font, try a shorter text.`")
+        return await event.eor("Text too long for this font, try a shorter text.")
     await event.eor(f"‌‌‎`{result}`")

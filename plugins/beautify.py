@@ -41,11 +41,11 @@ async def cr_bn(event):
             code = read_text_file(b)
             os.remove(b)
             if code is None:
-                return await event.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
+                return await event.eor("Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.", time=8)
         else:
             code = temp.message
         if not code:
-            return await event.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
+            return await event.eor("Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.", time=8)
     else:
         try:
             code = event.text.split(" ", maxsplit=1)[1]
@@ -77,11 +77,11 @@ async def crbn(event):
             code = read_text_file(b)
             os.remove(b)
             if code is None:
-                return await event.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
+                return await event.eor("Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.", time=8)
         else:
             code = temp.message
         if not code:
-            return await event.eor("`Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.`", time=8)
+            return await event.eor("Reply to a text or code file (or a text message). Photos, PDFs and other files can't be read as text.", time=8)
     else:
         try:
             match = match.split(" ", maxsplit=1)

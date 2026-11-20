@@ -9,25 +9,25 @@
 # .uta ported from Dark-Cobra
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}uta <search query>`
-    Inline song search and downloader.
+• `{i}uta <song>`
+    Search and download a song.
 
-• `{i}gglax <query>`
-    Create google search sticker with text.
+• `{i}gglax <text>`
+    Make a funny 'Google search' sticker.
 
 • `{i}stic <emoji>`
-    Get random stickers from emoji.
+    Get random stickers for an emoji.
 
 • `{i}frog <text>`
-    make text stickers.
+    Make a frog sticker holding your text.
 
 • `{i}tweet <text>`
-    make twitter posts.
+    Make a fake tweet image.
 
 • `{i}quot <text>`
-    write quote on animated sticker.
+    Write a quote on an animated sticker.
 """
 
 from random import choice
@@ -42,7 +42,7 @@ async def tweet(e):
     wai = await e.eor()
     text = e.pattern_match.group(1)
     if not text:
-        return await wai.edit("`Give me Some Text !`")
+        return await wai.edit("Give me some text!")
     try:
         results = await e.client.inline_query("twitterstatusbot", text)
         await e.reply("New Tweet", file=results[0].document)
@@ -56,12 +56,12 @@ async def tweet(e):
     wai = await e.eor(get_string("com_1"))
     text = e.pattern_match.group(1).strip()
     if not text:
-        return await wai.edit("`Give me Some Emoji !`")
+        return await wai.edit("Give me some emoji!")
     try:
         results = await e.client.inline_query("sticker", text)
         num = choice(results)
     except Exception:
-        return await wai.edit("`No sticker found.`")
+        return await wai.edit("No sticker found.")
     await e.reply("@sticker", file=num.document)
     await wai.delete()
 
@@ -71,7 +71,7 @@ async def gglax_sticker(e):
     wai = await e.eor(get_string("com_1"))
     text = e.pattern_match.group(1)
     if not text:
-        return await wai.edit("`Give me Some Text !`")
+        return await wai.edit("Give me some text!")
     try:
         results = await e.client.inline_query("googlaxbot", text)
         await e.reply("Googlax", file=results[0].document)
@@ -85,7 +85,7 @@ async def honkasays(e):
     wai = await e.eor(get_string("com_1"))
     text = e.pattern_match.group(1)
     if not text:
-        return await wai.edit("`Give Me Some Text !`")
+        return await wai.edit("Give me some text!")
     text = deEmojify(text)
     if not text.endswith("."):
         text += "."
@@ -114,7 +114,7 @@ async def nope(doit):
         ok = replied.message
     else:
         return await doit.eor(
-            "`Sir please give some query to search and download it for you..!`",
+            "Sir please give some query to search and download it for you..!",
         )
     try:
         sticcers = await doit.client.inline_query("Lybot", f"{(deEmojify(ok))}")
@@ -130,7 +130,7 @@ async def quote_(event):
     if "quotly" in event.text:
         return
     if not IFUZI:
-        return await event.eor("`Give some text to make Quote..`")
+        return await event.eor("Give some text to make quote.")
     EI_IR = await event.eor(get_string("com_1"))
     try:
         RE_ZK = await event.client.inline_query("@QuotAfBot", IFUZI)

@@ -114,14 +114,14 @@ async def mi(e):
 async def rotate_(ult):
     match = ult.pattern_match.group(1).strip()
     if not ult.is_reply:
-        return await ult.eor("`Reply to a media...`")
+        return await ult.eor("Reply to a media.")
     if match:
         try:
             match = int(match)
         except ValueError:
             match = None
     if not match:
-        return await ult.eor("`Please provide a valid angle to rotate media..`")
+        return await ult.eor("Please provide a valid angle to rotate media.")
     reply = await ult.get_reply_message()
     msg = await ult.eor(get_string("com_1"))
     photo = reply.game.photo if reply.game else None

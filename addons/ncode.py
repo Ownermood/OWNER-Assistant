@@ -6,10 +6,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}ncode <file>`
-   Use - Paste the contents of file and send as pic.
+• `{i}ncode` (reply to a code file)
+    Send the code as a nice-looking image.
 """
 
 import os, pygments
@@ -21,7 +21,7 @@ from . import check_filename, read_text_file, ultroid_cmd
 @ultroid_cmd(pattern="ncode$")
 async def coder_print(event):
     if not event.reply_to_msg_id:
-        return await event.eor("`Reply to a file or message!`", time=5)
+        return await event.eor("Reply to a file or message!", time=5)
     msg = await event.get_reply_message()
     if msg.document:
         a = await event.client.download_media(
@@ -30,7 +30,7 @@ async def coder_print(event):
         c = read_text_file(a)
         if c is None:
             os.remove(a)
-            return await event.eor("`Reply to a text or code file, not a photo/PDF.`", time=8)
+            return await event.eor("Reply to a text or code file, not a photo/PDF.", time=8)
     else:
         a = None
         c = msg.text

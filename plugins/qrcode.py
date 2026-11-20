@@ -39,7 +39,7 @@ async def cd(e):
     if reply and reply.text:
         msg = reply.text
     elif not msg:
-        return await e.eor("`Give Some Text or Reply", time=5)
+        return await e.eor("`Give some text or reply", time=5)
     default, cimg = ULTConfig.thumb, None
     if reply and (reply.sticker or reply.photo):
         cimg = await reply.download_media()
@@ -73,7 +73,7 @@ async def qrwater(e):
         r, thumb=-1 if isinstance(r.media, doc) else None
     )
     if not dl:
-        return await e.eor("`Reply Any Media and Give Text`", time=5)
+        return await e.eor("Reply to a photo and add some text.", time=5)
     kk = await e.eor(get_string("com_1"))
     img_bg = Image.open(dl)
     qr = qrcode.QRCode(box_size=5)
@@ -92,7 +92,7 @@ async def qrwater(e):
 async def decod(e):
     r = await e.get_reply_message()
     if not (r and r.media):
-        return await e.eor("`Reply to Qrcode Media`", time=5)
+        return await e.eor("Reply to Qrcode media", time=5)
     kk = await e.eor(get_string("com_1"))
     dl = await e.client.download_media(
         r, thumb=-1 if isinstance(r.media, doc) else None
@@ -105,5 +105,5 @@ async def decod(e):
         tx, y, z = det.detectAndDecode(im)
         await kk.edit("**Decoded Text:\n\n**" + tx)
     except BaseException:
-        await kk.edit("`Reply To Media in Which Qr image present.`")
+        await kk.edit("Reply to a photo of a QR code.")
     os.remove(dl)

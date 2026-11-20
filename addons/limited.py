@@ -2,10 +2,10 @@
 # written by @senku_ishigamiii/@Uzumaki_Naruto_XD
 
 """
-✘ Commands Available -
+📖 **Commands**
 
 • `{i}limited`
-   Check you are limited or not !
+    Check if Telegram has limited your account (asks @SpamBot).
 """
 
 from telethon import events
@@ -17,7 +17,7 @@ from . import ultroid_cmd
 @ultroid_cmd(pattern="limited$")
 async def demn(ult):
     chat = "@SpamBot"
-    msg = await ult.eor("Checking If You Are Limited...")
+    msg = await ult.eor("Checking if you are Limited.")
     async with ult.client.conversation(chat) as conv:
         try:
             response = conv.wait_event(

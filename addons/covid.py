@@ -6,10 +6,10 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available
+📖 **Commands**
 
-• `{i}covid country name`
-    Gets the Covid-19 Status of a given Country.
+• `{i}covid <country>`
+    See COVID-19 numbers for a country.
 """
 
 from . import async_searcher, ultroid_cmd
@@ -19,7 +19,7 @@ from . import async_searcher, ultroid_cmd
 async def coronish(event):
     country = event.pattern_match.group(1).strip()
     if not country:
-        return await event.eor("Give a country name to Search for it's Covid Cases!")
+        return await event.eor("Give a country name to search for it's Covid Cases!")
     try:
         cases = await async_searcher(
             f"https://disease.sh/v3/covid-19/countries/{country}", re_json=True

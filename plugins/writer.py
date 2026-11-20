@@ -6,13 +6,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}write <text or reply to text>`
-   It will write on a paper.
+• `{i}write <text>` (or reply to a message)
+    Write the text on a page, like handwriting.
 
-• `{i}image <text or reply to html or any doc file>`
-   Write a image from html or any text.
+• `{i}image <text>` (or reply to text or an HTML file)
+    Turn text or HTML into an image.
 """
 
 import os
@@ -28,7 +28,7 @@ async def ghtml(e):
     if txt := e.pattern_match.group(1).strip():
         link = e.text.split(maxsplit=1)[1]
     else:
-        return await eod(e, "`Either reply to any file or give any text`")
+        return await eod(e, "Either reply to any file or give any text")
     k = await async_searcher(link)
     with open("file.html", "w+") as f:
         f.write(k)
@@ -48,7 +48,7 @@ async def f2i(e):
         elif r.text:
             html = r.text
     if not html:
-        return await eod(e, "`Either reply to any file or give any text`")
+        return await eod(e, "Either reply to any file or give any text")
     html = html.replace("\n", "<br>")
     shot = WebShot(quality=85)
     css = "body {background: white;} p {color: red;}"

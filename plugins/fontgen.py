@@ -41,7 +41,7 @@ async def _(e):
         except IndexError:
             return await eod(e, help)
     elif not input:
-        return await eod(e, "`Give font dude :/`")
+        return await eod(e, "Give font dude :/")
     else:
         font = input
         text = reply.message

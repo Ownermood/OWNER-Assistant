@@ -53,7 +53,7 @@ async def _(e):
     elif r.document and r.document.thumbs:
         dl = await r.download_media(thumb=-1)
     else:
-        return await e.eor("`Reply to Photo or media with thumb...`")
+        return await e.eor("Reply to photo or media with thumb.")
     nn = uf(dl)
     os.remove(dl)
     udB.set_key("CUSTOM_THUMBNAIL", str(nn))
@@ -127,7 +127,7 @@ async def uconverter(event):
     xx = await event.eor(get_string("com_1"))
     a = await event.get_reply_message()
     if a is None:
-        return await event.eor("`Reply to Photo or media with thumb...`")
+        return await event.eor("Reply to photo or media with thumb.")
     input_ = event.pattern_match.group(1).strip()
     b = await a.download_media("resources/downloads/")
     if not b and (a.document and a.document.thumbs):
@@ -147,7 +147,7 @@ async def uconverter(event):
         )
         os.remove(file)
     else:
-        await xx.edit("`Failed to convert`")
+        await xx.edit("Failed to convert")
         return
     await xx.delete()
 

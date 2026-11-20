@@ -5,28 +5,22 @@
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 """
-✘ Commands Available -
+📖 **Commands**
 
-At Night it will turn off everyone permission to send message in  an all groups which you added via `{i}addnight`
-And Turn On auto at morning
+Night mode closes your groups at night (nobody can send messages) and opens them again in the morning.
 
 • `{i}addnm`
-   Add NightMode
-   To Add Group To Auto Night Mode.
+    Add this group to night mode.
 
 • `{i}remnm`
-   Remove NightMode
-   To remove Group From Auto Night Mode
+    Remove this group from night mode.
 
 • `{i}listnm`
-   List NightMode
-   To Get All List of Groups where NightMode Active.
+    See all groups with night mode.
 
-• `{i}nmtime <close hour> <close min> <open hour> <open min>`
-   NightMode Time
-   By Default Its close 00:00 , open 07:00
-   Use 24hr format
-   Ex- `nmtime 01 00 06 30`
+• `{i}nmtime <close hour> <close minute> <open hour> <open minute>`
+    Choose the times (24-hour clock). Default: close 00:00, open 07:00.
+    Example: `{i}nmtime 23 00 06 30` closes at 11 PM and opens at 6:30 AM.
 """
 
 from . import LOGS

@@ -6,18 +6,14 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `Get some Random Content.`
+Get something random:
 
-• `{i}random dog`
-• `{i}random duck`
-• `{i}random cat`
-• `{i}random fox`
-• `{i}random quote`
-• `{i}random word`
-• `{i}random quotable`
-• `{i}random celebrity`
+• `{i}random dog` / `cat` / `fox` / `duck` - a cute photo
+• `{i}random quote` / `quotable` - a quote
+• `{i}random word` - a random word
+• `{i}random celebrity` - a random celebrity
 """
 
 from bs4 import BeautifulSoup as bs

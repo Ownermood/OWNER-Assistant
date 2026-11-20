@@ -34,7 +34,7 @@ async def logo_gen(event):
     xx = await event.eor(get_string("com_1"))
     name = event.pattern_match.group(1).strip()
     if not name:
-        return await xx.eor("`Give a name too!`", time=5)
+        return await xx.eor("Give a name too!", time=5)
     bg_, font_ = None, None
     if event.reply_to_msg_id:
         temp = await event.get_reply_message()
@@ -88,7 +88,7 @@ async def logo_gen(event):
         stroke_width=strke,
         stroke_fill="black",
     )
-    await xx.edit("`Done!`")
+    await xx.edit("Done!")
     await event.client.send_file(
         event.chat_id,
         file=name,

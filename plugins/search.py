@@ -147,7 +147,7 @@ async def reverse(event):
     # Lens and can't be scraped), so upload the image and link the engines.
     reply = await event.get_reply_message()
     if not (reply and (reply.photo or reply.sticker or reply.document)):
-        return await event.eor("`Reply to an Image`")
+        return await event.eor("Reply to an image")
     ult = await event.eor(get_string("com_1"))
     dl = await reply.download_media()
     file = await con.convert(dl, convert_to="png")
@@ -183,7 +183,7 @@ async def reverse(event):
 async def siesace(e):
     song = e.pattern_match.group(1).strip()
     if not song:
-        return await e.eor("`Give me Something to Search", time=5)
+        return await e.eor("`Give me something to search", time=5)
     eve = await e.eor(f"`Searching for {song} on Saavn...`")
     try:
         data = (await saavn_search(song))[0]
@@ -196,7 +196,7 @@ async def siesace(e):
         duration = data["duration"]
         performer = data["artists"]
     except KeyError:
-        return await eve.eor("`Something went wrong.`")
+        return await eve.eor("Something went wrong.")
     song, _ = await fast_download(url, filename=f"{title}.m4a")
     thumb, _ = await fast_download(img, filename=f"{title}.jpg")
     song, _ = await e.client.fast_uploader(song, to_delete=True)

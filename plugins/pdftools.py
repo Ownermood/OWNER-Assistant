@@ -5,25 +5,24 @@
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 """
-✘ Commands Available -
+📖 **Commands**
 
-• `{i}pdf <page num> <reply to pdf file>`
-    Extract & send page as an Image.(note-: For extracting all pages, just use .pdf)
-    to upload selected range `{i}pdf 1-7`
+• `{i}pdf` (reply to a PDF)
+    Send every page as an image.
+    `{i}pdf 3` - only page 3   ·   `{i}pdf 1-7` - pages 1 to 7
 
-• `{i}pdtext <page num> <reply to pdf file>`
-    Extract Text From the Pdf.(note-: For Extraction all text just use .pdtext)
-    to extract selected pages `{i}pdf 1-7`
+• `{i}pdtext` (reply to a PDF)
+    Get the text from the PDF.
+    `{i}pdtext 3` - only page 3   ·   `{i}pdtext 1-7` - pages 1 to 7
 
-• `{i}pdscan <reply to image>`
-    It scan, crop & send image(s) as pdf.
+• `{i}pdscan` (reply to a photo)
+    Scan a photo of a page (crop and clean it) and send it as a PDF.
 
-• `{i}pdsave <reply to image/pdf>`
-    It scan, crop & save file to merge.
-    you can merge many pages in a single pdf.
+• `{i}pdsave` (reply to a photo or PDF)
+    Scan it and keep it aside, so you can join many pages into one PDF.
 
-• `{i}pdsend `
-    Merge & send the pdf, collected from .pdsave.
+• `{i}pdsend`
+    Join all the pages you saved with `{i}pdsave` and send one PDF.
 """
 import glob
 import os
@@ -64,7 +63,7 @@ async def pdfseimg(event):
     ok = await event.get_reply_message()
     msg = event.pattern_match.group(1).strip()
     if not (ok and (ok.document and (ok.document.mime_type == "application/pdf"))):
-        await event.eor("`Reply The pdf u Want to Download..`")
+        await event.eor("Reply to a PDF file.")
         return
     xx = await event.eor(get_string("com_1"))
     file = ok.media.document
@@ -126,7 +125,7 @@ async def pdfsetxt(event):
     ok = await event.get_reply_message()
     msg = event.pattern_match.group(1).strip()
     if not ok and ok.document and ok.document.mime_type == "application/pdf":
-        await event.eor("`Reply The pdf u Want to Download..`")
+        await event.eor("Reply to a PDF file.")
         return
     xx = await event.eor(get_string("com_1"))
     file = ok.media.document
@@ -181,13 +180,13 @@ async def pdfsetxt(event):
 async def imgscan(event):
     ok = await event.get_reply_message()
     if not (ok and (ok.media)):
-        await event.eor("`Reply The pdf u Want to Download..`")
+        await event.eor("Reply to a PDF file.")
         return
     if not (
         ok.photo
         or (ok.file.name and ok.file.name.endswith(("png", "jpg", "jpeg", "webp")))
     ):
-        await event.eor("`Reply to a Image only...`")
+        await event.eor("Reply to an image.")
         return
     ultt = await ok.download_media()
     xx = await event.eor(get_string("com_1"))
@@ -253,7 +252,7 @@ async def savepdf(event):
     if not (ok and (ok.media)):
         await eor(
             event,
-            "`Reply to Images/pdf which u want to merge as a single pdf..`",
+            "Reply to images/pdf which you want to merge as a single pdf.",
         )
         return
     ultt = await ok.download_media()
@@ -321,7 +320,7 @@ async def savepdf(event):
             f"Done, Now Reply Another Image/pdf if completed then use {HNDLR}pdsend to merge nd send all as pdf",
         )
     else:
-        await event.eor("`Reply to a Image/pdf only...`")
+        await event.eor("Reply to an image or PDF.")
     os.remove(ultt)
 
 
@@ -332,7 +331,7 @@ async def sendpdf(event):
     if not os.path.exists("pdf/scan.pdf"):
         await eor(
             event,
-            "first select pages by replying .pdsave of which u want to make multi page pdf file",
+            "first select pages by replying .pdsave of which you want to make multi page pdf file",
         )
         return
     msg = event.pattern_match.group(1).strip()

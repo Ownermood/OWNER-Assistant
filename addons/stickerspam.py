@@ -6,11 +6,11 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-•`{i}sspam <reply to sticker> <optional- time gap>`
-   it spam the whole stickers in that pack.
-
+• `{i}sspam <seconds between (optional)>` (reply to a sticker)
+    Send every sticker from that pack, one by one.
+    ⚠️ Too many messages can get your account limited.
 """
 
 import asyncio
@@ -27,13 +27,13 @@ async def _(e):
     match = e.pattern_match.group(1)
     x = await e.get_reply_message()
     if not (x and x.sticker):
-        return await eod(e, "`Reply To Sticker Only`")
+        return await eod(e, "Reply to sticker only")
     attr = next(
         (a for a in x.document.attributes if isinstance(a, DocumentAttributeSticker)),
         None,
     )
     if not attr or isinstance(attr.stickerset, InputStickerSetEmpty):
-        return await eod(e, "`This sticker is not part of a pack.`")
+        return await eod(e, "This sticker is not part of a pack.")
     sset = await e.client(GetStickerSetRequest(attr.stickerset, hash=0))
     docs = [get_input_document(d) for d in sset.documents]
     try:

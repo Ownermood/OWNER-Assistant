@@ -6,13 +6,13 @@
 # <https://www.github.com/TeamUltroid/Ultroid/blob/main/LICENSE/>.
 
 """
-✘ Commands Available -
+📖 **Commands**
 
-• {i}encode <text/reply to message>
-    encode the text
+• `{i}encode <text>` (or reply)
+    Turn text into base64 code.
 
- • {i}decode <text/reply to message>
-    decode the text
+• `{i}decode <code>` (or reply)
+    Turn base64 code back into text.
 """
 
 import base64
@@ -28,7 +28,7 @@ async def encod(e):
         if gt.text:
             match = gt.text
     if not match:
-        return await e.eor("`Give me Something to Encode..`")
+        return await e.eor("Give me something to Encode.")
     byt = match.encode("utf-8")
     et = base64.b64encode(byt)
     atc = et.decode("utf-8")
@@ -43,7 +43,7 @@ async def encod(e):
         if gt.text:
             match = gt.text
     if not match:
-        return await e.eor("`Give me Something to Decode..`")
+        return await e.eor("Give me something to Decode.")
     byt = match.encode("utf-8")
     try:
         et = base64.b64decode(byt)

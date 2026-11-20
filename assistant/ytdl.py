@@ -43,9 +43,9 @@ async def _(event):
         fuk = event.builder.article(
             title="Search Something",
             thumb=wb(ytt, 0, "image/jpeg", []),
-            text="**YᴏᴜTᴜʙᴇ Sᴇᴀʀᴄʜ**\n\nYou didn't search anything",
+            text="**YouTube Search**\n\nYou didn't search anything",
             buttons=Button.switch_inline(
-                "Sᴇᴀʀᴄʜ Aɢᴀɪɴ",
+                "Search Again",
                 query="yt ",
                 same_peer=True,
             ),
@@ -59,7 +59,7 @@ async def _(event):
             [
                 await event.builder.article(
                     title="No results found",
-                    text=f"**YᴏᴜTᴜʙᴇ Sᴇᴀʀᴄʜ**\n\nNo results for `{string}`",
+                    text=f"**YouTube Search**\n\nNo results for `{string}`",
                 )
             ]
         )
@@ -86,12 +86,12 @@ async def _(event):
             ],
             [
                 Button.switch_inline(
-                    "Sᴇᴀʀᴄʜ Aɢᴀɪɴ",
+                    "Search Again",
                     query="yt ",
                     same_peer=True,
                 ),
                 Button.switch_inline(
-                    "Sʜᴀʀᴇ",
+                    "Share",
                     query=f"yt {string}",
                     same_peer=False,
                 ),
