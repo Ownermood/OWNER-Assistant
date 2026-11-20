@@ -115,7 +115,7 @@ Key ek baar set karo (Saved Messages mein bhejo, phir message delete karo):
 | Kaam | Command |
 |---|---|
 | Premium emoji save karo | Apne account se premium emoji bhejo → us message par reply `.pemoji` |
-| Poora emoji pack save karo | `.pemoji pack https://t.me/addemoji/PackKaNaam` |
+| Pack save karo (ek ya **25 tak ek saath**) | `.pemoji pack` ke baad saare links — space se ya nayi line mein. Ya links wale message pe reply: `.pemoji pack` |
 | Status + saved list | `.pemoji` |
 | Dekho kaisa dikhta hai | `.pemoji test` |
 | Band / chalu | `.pemoji off` / `.pemoji on` |
@@ -123,7 +123,7 @@ Key ek baar set karo (Saved Messages mein bhejo, phir message delete karo):
 | Assistant bot mein bhi (try karo) | `.pemoji bot on` (na chale to `.pemoji bot off`) |
 
 Save karne ke baad `.alive`, `.ping`, `.help` jaise messages mein wahi emoji
-**apne aap** premium ban jaate hain. Premium nahi hai → normal emoji dikhte hain, kuch nahi tootta.
+**apne aap** premium ban jaate hain. Do packs mein same emoji ho to **last wala pack** jeetega. Premium nahi hai → normal emoji dikhte hain, kuch nahi tootta.
 
 ### 🖼️ Pictures
 
