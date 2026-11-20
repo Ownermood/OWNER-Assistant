@@ -132,6 +132,9 @@ termux-wake-lock && bash startup
 
 ## Tarika 3: Heroku / Render / Koyeb / Railway (cloud)
 
+> **Dost ke liye aasaan guide:** [FRIEND_DEPLOY.md](./FRIEND_DEPLOY.md) — session safe banane se le kar deploy tak, Hinglish mein.
+
+
 1. Is repo ko deploy karo (Dockerfile se build hota hai, aapka hi code chalega).
 2. Env vars mein `SESSION` daalo.
 3. Cloud par local file restart par mit jaati hai, isliye ek **free database** do:

@@ -14,6 +14,8 @@
 Sirf **`SESSION`** chahiye, baaki sab bot khud bana leta hai.
 Pura step-by-step guide: **[SETUP.md](./SETUP.md)** (Docker / VPS / Termux / Heroku).
 
+**Apna bot 5 min mein (doston ke liye, free host):** **[FRIEND_DEPLOY.md](./FRIEND_DEPLOY.md)** — har koi apna bot, apne account pe, apna session sirf apne paas.
+
 **Sabse aasaan (VPS + Docker):**
 
 ```bash
