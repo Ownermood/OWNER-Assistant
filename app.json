@@ -14,7 +14,7 @@
     "stack": "container",
     "env": {
         "SESSION": {
-            "description": "Telethon string session of your account. Make it with `python3 sessiongen` or @SessionGeneratorBot. (REQUIRED)",
+            "description": "Telethon string session of YOUR account. Make it safely with the repo's own method (see FRIEND_DEPLOY.md) - never use a random 'session generator' bot, it can steal your account. (REQUIRED)",
             "value": "",
             "required": true
         },
