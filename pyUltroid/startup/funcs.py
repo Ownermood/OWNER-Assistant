@@ -373,9 +373,10 @@ async def autopilot():
             except BaseException as er:
                 LOGS.info("Error while promoting assistant in Log Channel..")
                 LOGS.exception(er)
-    # Set the OWNER Assistant photo on an empty log channel, and once on old
-    # channels that still have the previous (Ultroid) picture.
-    if isinstance(chat.photo, ChatPhotoEmpty) or not udB.get_key("OA_LOGPIC"):
+    # Set the OWNER Assistant photo on an empty log channel, and once more
+    # whenever the brand picture changes (bump LOGPIC_VERSION).
+    LOGPIC_VERSION = 2  # 2 = black/red hooded guardian logo
+    if isinstance(chat.photo, ChatPhotoEmpty) or udB.get_key("OA_LOGPIC") != LOGPIC_VERSION:
         photo = brand_file("avatar")
         downloaded = photo.startswith("http")
         try:
@@ -385,7 +386,7 @@ async def autopilot():
             await ultroid_bot(
                 EditPhotoRequest(int(channel), InputChatUploadedPhoto(ll))
             )
-            udB.set_key("OA_LOGPIC", True)
+            udB.set_key("OA_LOGPIC", LOGPIC_VERSION)
         except BaseException as er:
             LOGS.exception(er)
         if downloaded and os.path.exists(photo):
