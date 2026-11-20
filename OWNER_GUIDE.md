@@ -72,6 +72,12 @@ Key ek baar set karo (Saved Messages mein bhejo, phir message delete karo):
 ---
 
 
+**Public / Private switch (saari animations, ek button):**
+
+- OWNER Manager bot ke menu mein **🔒 Fun: PRIVATE → make public** button hai. Dabao → **public** (koi bhi animations chala le). Dubara dabao → **private** (sirf tum).
+- Ya command se: `.funmode public` / `.funmode private` (phone se bhi chalega).
+- Private karte hi sabka band, sirf tum. Switch hamesha tumhare haath mein.
+
 **2nd id / partner ko sirf animations dena (baaki kuch nahi):**
 
 ```

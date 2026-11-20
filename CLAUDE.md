@@ -147,7 +147,13 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   (`fun_users()` + `fun=` kwarg); fun users bypass the owner/sudo check for
   those commands only, never fullsudo or anything else. `.funuser clear` =
   back to owner-only. This is the SAFE answer to "make the bot public" —
-  never build multi-user login/session-hosting.
+  never build multi-user login/session-hosting. #35: Public/Private switch
+  for the fun commands — DB-less flag in `data/fun_mode.json` (shared by the
+  userbot and the manager, same container/cwd); `.funmode [public|private]`
+  on the userbot, and a toggle button on the manager menu. Gate: owner/sudo OR
+  fun_public() OR sender in FUN_USERS. Also #35: manager persists panel ids in
+  the store so a restart deletes the old 'Manager online' panel instead of
+  stacking a new one.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
