@@ -49,3 +49,5 @@ bin-release/
 
 # fly.io configs
 fly.toml
+# OWNER Manager session store
+data/

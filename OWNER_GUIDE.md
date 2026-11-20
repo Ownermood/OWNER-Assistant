@@ -139,6 +139,22 @@ cd ~/Ultroid && git pull && docker compose up -d --build
 
 ---
 
+## 📱 OWNER Manager (control bot)
+
+| Kaam | Kaise |
+|---|---|
+| Account connect karo | `/login` → phone → code **spaces ke saath** `1 2 3 4 5` → 2FA |
+| Account hatao (logout) | `/logout` → "Yes" |
+| Chal raha hai? | `/status` |
+| Chalao / roko / restart | `/run` · `/stop` · `/restart` |
+| Error dekhna | `/logs` |
+| API key jaisi setting | `/setvar GEMINI_API_KEY value` (message khud delete hota hai), phir `/restart` |
+
+Bot crash ho to manager khud restart karta hai aur tumhe message bhejta hai. Telegram se
+logout ho gaye to bhi message aayega — bas **Login** dabao.
+
+---
+
 ## 🛡️ Safety rules
 
 - `SESSION`, `BOT_TOKEN`, API keys, VPS password **kabhi kisi ko mat do** — Claude ko bhi nahi.

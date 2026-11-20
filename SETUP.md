@@ -3,7 +3,29 @@
 Sab kuch isi ek repo mein hai: bot + saare extra plugins (`addons/` folder).
 Alag addons repo ya `ADDONS_URL` ki zaroorat **nahi** hai.
 
-## Sirf 1 cheez zaroori hai: `SESSION`
+## 📱 Sabse aasaan: OWNER Manager (terminal ki zarurat nahi)
+
+Ek **alag control bot** jisse phone se hi login / logout / restart / logs kar sakte ho.
+Logout karne ke baad bhi ye bot chalta rehta hai — jab chaho dobara login karo.
+
+1. @BotFather mein **naya bot** banao (`/newbot`) — assistant bot se alag. Token copy karo.
+2. VPS pe `.env` mein ye 2 lines daalo (apna token aur apni Telegram user id):
+   ```
+   MANAGER_BOT_TOKEN=yahan_token
+   OWNER_ID=yahan_apni_id
+   ```
+   (ID nahi pata? `OWNER_ID` khaali chhod ke bot ko `/start` bhejo — wo bata dega.)
+3. Update + restart:
+   ```bash
+   cd ~/Ultroid && git pull && docker compose up -d --build
+   ```
+4. Naye bot ko `/start` bhejo → **🔐 Login** → phone number → code **spaces ke saath**
+   (`1 2 3 4 5`) → 2FA password (agar hai).
+
+Buttons: Login, Logout, Status, Logs, Run, Stop, Restart, Vars. Session `data/` volume mein
+save hota hai (rebuild pe bhi rehta hai). `.env` ka `SESSION` ab zaroori nahi.
+
+## Bina manager ke: sirf 1 cheez zaroori hai: `SESSION`
 
 Baaki sab (assistant bot, log group, database) bot khud bana leta hai.
 

@@ -22,7 +22,7 @@
 **OWNER Assistant** aapke **apne Telegram account** se chalta hai (userbot).
 Aap kisi bhi chat mein `.` se command likhte ho — jaise `.alive` — aur bot
 aapke account se kaam kar deta hai. Saath mein ek **assistant bot**
-(`@OWN_CLAT_bot`) bhi hai jo menus, buttons aur inline features chalata hai.
+bhi hai jo menus, buttons aur inline features chalata hai.
 
 - 77 official plugins + 53 extra addons ≈ **360+ commands**
 - AI, group management, DM safety, downloads, media, stickers, love animations, pranks
@@ -1139,7 +1139,19 @@ file before changing anything.
   the old container would keep running with the same session → AuthKeyDuplicated)
   and its own Redis. The owner runs other, unrelated containers on the same
   VPS — never stop or touch them.
-- Assistant bot: `@OWN_CLAT_bot` (token in the VPS `.env`, not in the repo).
+- Assistant bot: token in the VPS `.env` (`BOT_TOKEN`), not in the repo. Don't
+  write its username in docs (owner didn't want "CLAT" in the bot's name; the
+  username can only be changed by the owner at @BotFather).
+- **OWNER Manager** (`manager/`, PR #30): a separate control bot
+  (`MANAGER_BOT_TOKEN` + `OWNER_ID` in `.env`). `startup` runs `python3 -m manager`
+  when the token is set; it runs the userbot as a child process
+  (`python3 -m pyUltroid`, `SESSION` passed in env), so login/logout/run/stop/
+  restart/logs/vars work from Telegram. Session + vars live in
+  `data/manager.json` (docker volume `owner-data`, chmod 600). Login = phone →
+  code (owner must type it with spaces, else Telegram kills the code) → 2FA
+  (message deleted, never stored). After `/logout` the `.env` SESSION is NOT
+  used again (`use_env_session`). Crash → auto-restart (max 5 / 10 min);
+  exit 0 = `.shutdown` (no restart); session dead → "logged out" message.
 
 ### Layout
 

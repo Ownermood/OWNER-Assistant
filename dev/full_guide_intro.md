@@ -22,7 +22,7 @@
 **OWNER Assistant** aapke **apne Telegram account** se chalta hai (userbot).
 Aap kisi bhi chat mein `.` se command likhte ho — jaise `.alive` — aur bot
 aapke account se kaam kar deta hai. Saath mein ek **assistant bot**
-(`@OWN_CLAT_bot`) bhi hai jo menus, buttons aur inline features chalata hai.
+bhi hai jo menus, buttons aur inline features chalata hai.
 
 - 77 official plugins + 53 extra addons ≈ **360+ commands**
 - AI, group management, DM safety, downloads, media, stickers, love animations, pranks
