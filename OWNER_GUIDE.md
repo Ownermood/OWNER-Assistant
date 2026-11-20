@@ -132,21 +132,6 @@ Wo log sirf `.propose .love .rose .hearts .lovecalc` chala payenge — aur koi c
 | Logs | `.logs` |
 | Welcome tour (log group mein) | `.intro` |
 
-### 💎 Premium emoji (Telegram Premium chahiye)
-
-| Kaam | Command |
-|---|---|
-| Premium emoji save karo | Apne account se premium emoji bhejo → us message par reply `.pemoji` |
-| Pack save karo (ek ya **25 tak ek saath**) | `.pemoji pack` ke baad saare links — space se ya nayi line mein. Ya links wale message pe reply: `.pemoji pack` |
-| Status + saved list | `.pemoji` |
-| Dekho kaisa dikhta hai | `.pemoji test` |
-| Band / chalu | `.pemoji off` / `.pemoji on` |
-| Ek hatao / sab hatao | `.pemoji del 👑` / `.pemoji clear` |
-| Assistant bot mein bhi (try karo) | `.pemoji bot on` (na chale to `.pemoji bot off`) |
-
-Save karne ke baad `.alive`, `.ping`, `.help` jaise messages mein wahi emoji
-**apne aap** premium ban jaate hain. Do packs mein same emoji ho to **last wala pack** jeetega. Premium nahi hai → normal emoji dikhte hain, kuch nahi tootta.
-
 ### 🖼️ Pictures
 
 Alive, help, /start, PM security, deploy aur log channel ki photos ab bot ke andar hi hain

@@ -49,14 +49,11 @@ file before changing anything.
   exit 0 = `.shutdown` (no restart); session dead → "logged out" message.
   UI (PR #31): one live panel per chat (button press = edit; typed command =
   delete owner's message + old panel, send new), no coloured buttons (owner
-  asked), premium emoji via `manager/emoji.py` (text entities + button `icon=`;
-  saved in `manager.json`; any RPCError while emojis are on → auto-off and
-  retry plain). #32: coloured buttons removed from the userbot. #33: premium
-  emoji in the manager from a BUILT-IN map (`manager/ui_emoji.json`, owner's
-  UI_Icons pack ids). **#36: button icons ONLY** (`icon=`) — the text hook was
-  removed because premium emoji in every message line looked bad to the owner.
-  `emoji_ok` flips to False and persists if Telegram rejects it. Confirmed
-  working on the owner's bot (custom icons render on the buttons). Force join: `FORCE_JOIN` (default @VillanCommunity, `off` to
+  asked). #32: coloured buttons removed from the userbot. #33–#36: premium
+  emoji experiments in the manager. **#41: ALL premium emoji REMOVED** (owner
+  asked "premium emojis hata do completely"): no `manager/emoji.py`, no
+  `ui_emoji.json`, no `icon=` on buttons, no `.pemoji`, no `pyUltroid/fns/pemoji.py`.
+  Buttons are plain text with normal emojis. Don't bring it back unless asked. Force join: `FORCE_JOIN` (default @VillanCommunity, `off` to
   disable) checked with `GetParticipantRequest` — fails OPEN with a warning if
   the bot isn't admin, so the owner is never locked out. Still owner-only.
 
@@ -66,7 +63,6 @@ file before changing anything.
 |---|---|
 | `pyUltroid/` | Core (package name kept on purpose, see "Don't") |
 | `pyUltroid/branding.py` | Bot name, banners (`brand_file()` local / `brand_url()` web), `assistant_buttons()` — change branding here |
-| `pyUltroid/fns/pemoji.py` + `plugins/pemoji.py` | Premium (custom) emoji: saved map + auto-upgrade of every sent/edited message |
 | `pyUltroid/configs.py` | Env config; empty values are tolerated |
 | `pyUltroid/fns/ai.py` | Shared AI client (Gemini/OpenAI/Claude/DeepSeek): streaming, retries, retired-model fallback |
 | `pyUltroid/fns/helper.py` | Helpers incl. `KEEP_SAFE`, `call_back`, `mask_secret`, `read_text_file` |
@@ -137,12 +133,8 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   the AGPL credits.
 - Send pictures with `brand_file(name)` (local file, survives a private repo);
   use `brand_url(name)` only where Telegram needs a URL (inline thumbs/InputWebDocument).
-- Premium emoji: `pe.install(client)` wraps `client._parse_message_text`, so every
-  send/edit gets `MessageEntityCustomEmoji` for emojis saved in DB `PREMIUM_EMOJI`
-  ({emoji: document_id}). Userbot: only if `me.premium` and not `PREMIUM_EMOJI_OFF`.
-  Assistant bot: only if `PREMIUM_EMOJI_BOT` (Telegram may refuse custom emoji for
-  bots without a Fragment username / Premium owner — unverified). Never hard-code
-  emoji IDs we haven't seen; the owner saves them with `.pemoji` / `.pemoji pack`.
+- **No premium (custom) emoji anywhere** (removed in #41, owner's choice). Old DB
+  keys `PREMIUM_EMOJI*` may still exist on the VPS; nothing reads them.
 - `.funuser` (#34): an allowlist (DB `FUN_USERS`) of user ids who may run
   ONLY `fun=True` commands (the love animations). Gate is in `ultroid_cmd`
   (`fun_users()` + `fun=` kwarg); fun users bypass the owner/sudo check for
@@ -185,7 +177,7 @@ Full A–Z rebrand pass (#27): repo/support links removed everywhere (25 languag
 incl. translated "Ultroid" words), new banners (alive/help/start/deploy/pm) +
 upload thumbnail, log-channel photo replaced once (`OA_LOGPIC`), old Ultroid
 images deleted, `.ultroid` → `.intro`, file names (logs/zip/updates) renamed,
-premium emoji system (`.pemoji`), coloured buttons. #28: `.pemoji pack` takes up to 25 packs.
+premium emoji system (`.pemoji`, later removed in #41), coloured buttons.
 #29: owner's AI images (uploaded via GitHub) used as avatar/banners/thumb; log-channel
 photo re-applied once via `OA_LOGPIC` = 2 (bump it when the avatar changes). Assistant bot DP
 only changes when the owner runs `.botpic`. Never use Pinterest/other artists' images.
@@ -198,8 +190,7 @@ Order suggested to them: **A → B → C → D**.
   Privacy, Tools), one-line explanation + example per command, `.find <word>`,
   `.guide` first-time tour, `.setlang` (Hinglish/English).
 - **B. Modern look**: coloured buttons (green on / red off / blue next),
-  expandable blockquotes for long help, premium emoji with automatic fallback
-  (needs the owner's account to have Telegram Premium), consistent message style, new `.alive` card.
+  expandable blockquotes for long help, consistent message style, new `.alive` card.
 - **C. Merge the owner's 2–3 other bots** — waiting for their repo links /
   what they do. Either port features as plugins or run them side by side in
   the same docker-compose.
@@ -212,7 +203,7 @@ Order suggested to them: **A → B → C → D**.
   non-blocking `requests` calls in youtube/imagetools/imdb/tools.
 
 Open questions to the owner: links to their other bots; do they have
-Telegram Premium (needed for `.pemoji`); help language (Hinglish or English); group commands with
+help language (Hinglish or English); group commands with
 `/` (assistant bot, admins can use) or `.` (owner only).
 
 ## Never do
