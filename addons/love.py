@@ -507,3 +507,59 @@ async def funuser(event):
         "👥 **Fun users** (love animations only):\n{}\n\n"
         "`{h}funuser del <id>`  ·  `{h}funuser clear`".format(lines, h=HNDLR)
     )
+
+
+# ----------------------------------------------------------------------------
+# Public / Private switch for the fun animations.
+#   .funmode            -> show + flip
+#   .funmode public     -> anyone can use the love animations
+#   .funmode private    -> only you (and your .funuser list)
+# The Public/Private button in the OWNER Manager bot flips the same switch.
+# ----------------------------------------------------------------------------
+
+import json as _json
+import os as _os
+
+
+def _fun_mode_file():
+    return _os.path.join(_os.environ.get("OA_DATA_DIR", "data"), "fun_mode.json")
+
+
+def _get_public():
+    try:
+        with open(_fun_mode_file(), encoding="utf-8") as f:
+            return bool(_json.load(f).get("public"))
+    except Exception:
+        return False
+
+
+def _set_public(value):
+    path = _fun_mode_file()
+    _os.makedirs(_os.path.dirname(path) or ".", exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        _json.dump({"public": bool(value)}, f)
+
+
+@ultroid_cmd(pattern="funmode( (.*)|$)")
+async def funmode(event):
+    arg = (event.pattern_match.group(1) or "").strip().lower()
+    if arg in ("public", "on", "open"):
+        new = True
+    elif arg in ("private", "off", "close"):
+        new = False
+    else:
+        new = not _get_public()  # no arg = flip
+    _set_public(new)
+    if new:
+        await event.eor(
+            "🔓 **Fun mode: PUBLIC**\n"
+            "`Anyone can now use the love animations "
+            f"({HNDLR}propose {HNDLR}love {HNDLR}rose {HNDLR}hearts {HNDLR}lovecalc).`\n"
+            f"`Make it private again: {HNDLR}funmode private`"
+        )
+    else:
+        await event.eor(
+            "🔒 **Fun mode: PRIVATE**\n"
+            "`Only you can use the love animations now.`\n"
+            f"`(Specific friends only: {HNDLR}funuser add)`"
+        )

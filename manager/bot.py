@@ -233,7 +233,7 @@ class Manager:
         self.runner = runner or Runner(self.userbot_exited)
         self.login = None  # {"step", "client", "phone", "hash", "tries", "since"}
         self.logged_out = False
-        self.panels = {}  # chat id -> id of the one live menu message
+        self.panels = {int(k): v for k, v in (self.store.data.get("panels") or {}).items()}
         self.kb_msg = None  # "share phone" keyboard message during login
         self.join_cache = {}
         self.join_problem = None
@@ -258,6 +258,7 @@ class Manager:
                 try:
                     await event.edit(text, buttons=buttons, link_preview=False)
                     self.panels[chat] = event.message_id
+                    self._save_panels()
                     return
                 except errors.MessageNotModifiedError:
                     return
@@ -266,6 +267,7 @@ class Manager:
             old = self.panels.get(chat)
             msg = await self.bot.send_message(chat, text, buttons=buttons, link_preview=False)
             self.panels[chat] = msg.id
+            self._save_panels()
             if old and old != msg.id:
                 await self.drop(chat, old)
         except errors.RPCError:
@@ -322,9 +324,33 @@ class Manager:
         lines = [f"**Status:** {line}", f"👤 {self.account_text()}"]
         if st == "running" and self.runner.started:
             lines.append(f"⏳ {fmt_uptime(time.time() - self.runner.started)}")
+        lines.append("🔓 Fun animations: **PUBLIC**" if self.fun_public()
+                     else "🔒 Fun animations: **private**")
         if self.join_problem:
             lines.append(f"⚠️ {self.join_problem}")
         return "\n".join(lines)
+
+    def _save_panels(self):
+        self.store.data["panels"] = {str(k): v for k, v in self.panels.items()}
+        self.store.save()
+
+    # ---- Public / Private switch for the fun animations (shared with userbot)
+    def _fun_file(self):
+        return os.path.join(DATA_DIR, "fun_mode.json")
+
+    def fun_public(self):
+        try:
+            with open(self._fun_file(), encoding="utf-8") as f:
+                return bool(json.load(f).get("public"))
+        except Exception:
+            return False
+
+    def set_fun_public(self, value):
+        try:
+            with open(self._fun_file(), "w", encoding="utf-8") as f:
+                json.dump({"public": bool(value)}, f)
+        except Exception as er:
+            log("fun mode:", er)
 
     def menu_buttons(self):
         st = self.state()
@@ -336,6 +362,10 @@ class Manager:
         else:
             rows.append([self.btn("▶️", "Run", "m:run")])
         rows.append([self.btn("📜", "Logs", "m:logs"), self.btn("⚙️", "Settings", "m:settings")])
+        if self.fun_public():
+            rows.append([self.btn("🔓", "Fun: PUBLIC → make private", "m:fun_off")])
+        else:
+            rows.append([self.btn("🔒", "Fun: PRIVATE → make public", "m:fun_on")])
         if st != "logged_out":
             rows.append([self.btn("🔐", "Login again", "m:login"), self.btn("🚪", "Logout", "m:logout")])
         rows.append([self.btn("🔃", "Refresh", "m:menu")])
@@ -685,6 +715,13 @@ class Manager:
                 await self.view_logs(chat, event)
             elif action == "logfile":
                 await self.send_logfile(chat)
+            elif action in ("fun_on", "fun_off"):
+                on = action == "fun_on"
+                self.set_fun_public(on)
+                note = ("🔓 **Fun mode: PUBLIC** — anyone can use the love animations now."
+                        if on else
+                        "🔒 **Fun mode: PRIVATE** — only you (and your `.funuser` list).")
+                await self.view_menu(chat, event, note=note)
             elif action == "close":
                 await self.drop(chat, event.message_id)
             elif action == "settings":

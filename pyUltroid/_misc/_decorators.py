@@ -66,6 +66,22 @@ def compile_pattern(data, hndlr):
     return re.compile("\\" + hndlr + data)
 
 
+def _fun_mode_file():
+    import os
+    return os.path.join(os.environ.get("OA_DATA_DIR", "data"), "fun_mode.json")
+
+
+def fun_public():
+    """True = anyone may run fun=True commands (the Public/Private switch)."""
+    import json
+
+    try:
+        with open(_fun_mode_file(), encoding="utf-8") as f:
+            return bool(json.load(f).get("public"))
+    except Exception:
+        return False
+
+
 def fun_users():
     """User ids allowed to run fun=True commands (set by .funuser)."""
     data = udB.get_key("FUN_USERS")
@@ -106,7 +122,7 @@ def ultroid_cmd(
                 if ult.sender_id not in owner_and_sudos():
                     # Allow a whitelisted "fun user" to run ONLY fun=True
                     # commands (e.g. love animations). Nothing else.
-                    if not (fun and ult.sender_id in fun_users()):
+                    if not (fun and (fun_public() or ult.sender_id in fun_users())):
                         return
                 elif ult.sender_id in _ignore_eval:
                     return await eod(
