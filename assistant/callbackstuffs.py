@@ -25,7 +25,7 @@ from catbox import CatboxUploader
 from telethon.tl.types import MessageMediaWebPage
 from telethon.utils import get_peer_id
 
-from pyUltroid.fns.helper import fast_download, progress
+from pyUltroid.fns.helper import fast_download, progress, upstream_branch
 from pyUltroid.fns.tools import Carbon, async_searcher, get_paste, telegraph_client
 from pyUltroid.startup.loader import Loader
 
@@ -281,7 +281,7 @@ heroku_api, app_name = Var.HEROKU_API, Var.HEROKU_APP_NAME
 @callback("updatenow", owner=True)
 async def update(eve):
     repo = Repo()
-    ac_br = repo.active_branch
+    ac_br = upstream_branch()
     ups_rem = repo.remote("upstream")
     if heroku_api:
         import heroku3
@@ -333,7 +333,7 @@ async def changes(okk):
     repo = Repo.init()
     button = [[Button.inline("Update Now", data="updatenow")]]
     changelog, tl_chnglog = await gen_chlog(
-        repo, f"HEAD..upstream/{repo.active_branch}"
+        repo, f"HEAD..upstream/{upstream_branch()}"
     )
     cli = "\n\nClick the below button to update!"
     if not match:
