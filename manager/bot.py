@@ -407,6 +407,11 @@ class Manager:
             rows.append([self.btn("✅", "Turn fun mode ON (friends)", "m:fun_on")])
         if st != "logged_out":
             rows.append([self.btn("🔐", "Login again", "m:login"), self.btn("🚪", "Logout", "m:logout")])
+        if self.primary is None:
+            if self.public_login():
+                rows.append([self.btn("🌍", "Public login: ON (tap to turn off)", "m:pub_off")])
+            else:
+                rows.append([self.btn("🔒", "Public login: OFF (tap to turn on)", "m:pub_on")])
         rows.append([self.btn("🔃", "Refresh", "m:menu")])
         return rows
 
@@ -447,8 +452,32 @@ class Manager:
 
     # ------------------------------------------------------------ extra accounts
     def route(self, uid):
-        """The manager of this sender: main, a second account, or main (guests)."""
+        """The manager of this sender: main, a second account, or main (guests).
+        People who came in through public login are guests while it is OFF."""
+        if uid in self.public_users() and not self.public_login():
+            return self
         return self.slots.get(uid, self)
+
+    # ---- Public login: anyone can get their own userbot (default OFF)
+    def public_login(self):
+        return bool(self.store.data.get("public_login", False))
+
+    def public_users(self):
+        return {int(u) for u in self.store.data.get("public_users") or []}
+
+    async def set_public_login(self, on):
+        self.store.data["public_login"] = bool(on)
+        self.store.save()
+        for uid in self.public_users():
+            slot = self.slots.get(uid)
+            if not slot:
+                continue
+            if on:
+                if slot.store.session and not slot.runner.running:
+                    await slot.start_userbot()
+            else:
+                await slot.cancel_login()
+                await slot.runner.stop()
 
     def add_slot(self, uid, index):
         """Manager for a second account: own session file, own DB, own bots."""
@@ -512,8 +541,27 @@ class Manager:
     async def request_access(self, event):
         """A non-owner tapped 'Get my own userbot': ask the main owner (one tap)."""
         uid = event.sender_id
+        if uid in self.public_users() and not self.public_login():
+            return await event.answer("🔴 The bot is off right now.", alert=True)
         if self.primary is not None or uid in self.slots:
             return await event.answer("Send /start.", alert=True)
+        if self.public_login():
+            ok, note = self.add_owner(uid)
+            if not ok:
+                return await event.answer("❌ No free place right now. Try later.", alert=True)
+            self.store.data.setdefault("public_users", []).append(uid)
+            self.store.save()
+            await event.answer("✅ Done!")
+            await self.welcome(uid)
+            sender = getattr(event, "sender", None)
+            name = (sender and getattr(sender, "first_name", None)) or str(uid)
+            try:
+                await self.bot.send_message(
+                    self.owner, f"🌍 **{name}** (`{uid}`) joined through public login.",
+                    buttons=[[self.btn("🗑", "Remove them", f"m:kick_{uid}")]])
+            except Exception as er:
+                log("public join:", er)
+            return
         last = self.requests.get(uid, 0)
         if time.time() - last < 600:
             return await event.answer("⏳ Already asked. Wait for the owner.", alert=True)
@@ -570,6 +618,9 @@ class Manager:
             await slot.cancel_login()
             await slot.runner.stop()
         owners.pop(str(uid))
+        pub = self.store.data.get("public_users") or []
+        if uid in pub:
+            pub.remove(uid)
         self.store.save()
         return await self.view_owners(chat, note=f"🗑 Removed `{uid}`. Its userbot is stopped.")
 
@@ -687,7 +738,8 @@ class Manager:
             if cb:
                 await event.answer("🔒 This bot is private right now.", alert=True)
             elif event.is_private:
-                await event.reply("🔒 This bot is private right now.\n\n"
+                await event.reply(("🌍 Tap below to get your own userbot.\n\n" if self.public_login()
+                                   else "🔴 The bot is off right now.\n\n") +
                                   f"Your Telegram id: `{event.sender_id}`",
                                   buttons=[[self.btn("🔑", "Get my own userbot", "m:req")]])
             return False
@@ -993,6 +1045,20 @@ class Manager:
                 await m.show(chat, HELP, [[m.back("m:settings")]], event)
             elif action == "vars":
                 await m.view_vars(chat, event)
+            elif action in ("pub_on", "pub_off") and m is self:
+                on = action == "pub_on"
+                await self.set_public_login(on)
+                note = ("🌍 **PUBLIC LOGIN IS ON** — anyone can open this bot and run their own "
+                        f"userbot on your VPS (max {MAX_EXTRA}). If they spam, your VPS can get banned."
+                        if on else
+                        "🔒 **PUBLIC LOGIN IS OFF** — public users see the bot as off.")
+                await self.view_menu(chat, event, note=note)
+            elif action.startswith("kick_") and action[5:].isdigit() and m is self:
+                await self.owner_cmd(chat, "/delowner", f"/delowner {action[5:]}")
+                try:
+                    await event.edit(f"🗑 Removed `{action[5:]}`.")
+                except Exception:
+                    pass
             elif action[:3] in ("ok_", "no_") and action[3:].isdigit() and m is self:
                 return await self.answer_request(event, action)
             elif action == "owners" and m is self:
@@ -1019,7 +1085,9 @@ class Manager:
             return
         if self.primary is None:
             self.load_slots()
-            for slot in self.slots.values():
+            for uid, slot in self.slots.items():
+                if uid in self.public_users() and not self.public_login():
+                    continue
                 if slot.store.session:
                     await slot.boot()
         if self.store.session:
