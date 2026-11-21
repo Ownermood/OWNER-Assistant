@@ -70,7 +70,23 @@ def compile_pattern(data, hndlr):
 
 def _fun_mode_file():
     import os
-    return os.path.join(os.environ.get("OA_DATA_DIR", "data"), "fun_mode.json")
+    # each account run by the manager has its own switch (OA_INSTANCE = "_<id>")
+    name = f"fun_mode{os.environ.get('OA_INSTANCE', '')}.json"
+    return os.path.join(os.environ.get("OA_DATA_DIR", "data"), name)
+
+
+def other_userbots():
+    """Account ids of the other userbots on this manager. Public fun mode must not
+    answer them - they run the same command themselves (else it plays twice)."""
+    import json
+    import os
+
+    try:
+        path = os.path.join(os.environ.get("OA_DATA_DIR", "data"), "userbots.json")
+        with open(path, encoding="utf-8") as f:
+            return {int(i) for i in json.load(f)}
+    except Exception:
+        return set()
 
 
 def fun_public():
@@ -136,7 +152,7 @@ def ultroid_cmd(
                 if ult.sender_id not in owner_and_sudos():
                     # Allow a whitelisted "fun user" to run ONLY fun=True
                     # commands (e.g. love animations). Nothing else.
-                    _open = fun_public()
+                    _open = fun_public() and ult.sender_id not in other_userbots()
                     if not (
                         (fun and (_open or ult.sender_id in fun_users()))
                         or (_open and is_fun_command(_name))

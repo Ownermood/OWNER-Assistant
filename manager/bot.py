@@ -624,6 +624,20 @@ class Manager:
         self.store.save()
         return await self.view_owners(chat, note=f"🗑 Removed `{uid}`. Its userbot is stopped.")
 
+    def save_userbots(self):
+        """data/userbots.json: account ids of every userbot here (read by the
+        userbots so public fun mode doesn't answer another one of them)."""
+        ids = []
+        for m in [self, *self.slots.values()]:
+            acc = m.store.data.get("account")
+            if m.store.session and acc:
+                ids.append(acc["id"])
+        try:
+            with open(os.path.join(DATA_DIR, "userbots.json"), "w", encoding="utf-8") as f:
+                json.dump(ids, f)
+        except Exception as er:
+            log("userbots.json:", er)
+
     def other_accounts(self):
         main = self.primary or self
         ids = set()
@@ -658,6 +672,7 @@ class Manager:
                 self.store.data["account"] = acc
                 self.store.save()
         self.logged_out = False
+        (self.primary or self).save_userbots()
         await self.runner.start(session, self.store.env)
         return True, "Started."
 
