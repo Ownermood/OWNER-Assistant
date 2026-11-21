@@ -521,7 +521,8 @@ import os as _os
 
 
 def _fun_mode_file():
-    return _os.path.join(_os.environ.get("OA_DATA_DIR", "data"), "fun_mode.json")
+    name = f"fun_mode{_os.environ.get('OA_INSTANCE', '')}.json"  # own switch per account
+    return _os.path.join(_os.environ.get("OA_DATA_DIR", "data"), name)
 
 
 def _get_public():

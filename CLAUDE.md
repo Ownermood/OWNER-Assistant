@@ -184,6 +184,10 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   notified with a Remove button); OFF = those `public_users` are routed as guests,
   their userbots stop, and they see "bot is off". Approved (Allow) ids are not affected.
   Owner was warned: strangers' spam can get the VPS banned.
+  #47: fun switch is per account (`fun_mode{OA_INSTANCE}.json`; extra accounts default
+  private) and public fun mode ignores senders in `data/userbots.json` (all userbot
+  account ids, written by the manager on start) - before, one `.love` played on BOTH
+  accounts. Warned owner: any added account can `.bash` and read everyone's sessions.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
