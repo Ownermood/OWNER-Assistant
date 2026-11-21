@@ -1128,6 +1128,13 @@ class Manager:
         if not self.owner:
             log("OWNER_ID is not set - open the bot and send /start to see your id.")
             return
+        # Main account first: extra accounts need its id (OA_CONTROLLER) to
+        # accept its "!" commands.
+        ok = False
+        if self.store.session:
+            ok, _ = await self.start_userbot()
+        if not ok:
+            self.logged_out = True
         if self.primary is None:
             self.load_slots()
             for uid, slot in self.slots.items():
@@ -1135,11 +1142,8 @@ class Manager:
                     continue
                 if slot.store.session:
                     await slot.boot()
-        if self.store.session:
-            ok, _ = await self.start_userbot()
-            if ok:
-                return await self.tell("🟢 **Manager online.**")
-        self.logged_out = True
+        if ok:
+            return await self.tell("🟢 **Manager online.**")
         await self.tell("🔴 **Manager online.** Tap **Login** to connect your account.")
 
 
