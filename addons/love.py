@@ -18,6 +18,13 @@
 
 • `{i}lovecalc <name 1> <name 2>`
     The (totally scientific) love meter 💘
+
+• `{i}fortune` 🔮 · `{i}dice` 🎲 · `{i}8ball <question>` 🎱 · `{i}inspire` ✨ · `{i}matrix` 🟩
+    Quick games, same as the bot's Fun Zone.
+    Example: `{i}8ball will I crack CLAT?`
+
+• `{i}compliment <name>` 💝 · `{i}rate <name>` ⭐️ (or reply to someone)
+    A sweet compliment, or a funny rating.
 """
 
 import asyncio
@@ -563,3 +570,54 @@ async def funmode(event):
             "`Only you can use the love animations now.`\n"
             f"`(Specific friends only: {HNDLR}funuser add)`"
         )
+
+
+# ---------------------------------------------------------------- Fun Zone games
+# The same games as the manager bot's Fun Zone (manager/fun.py), as userbot commands.
+try:
+    from manager import fun as _zone
+except Exception:  # manager folder missing - games just aren't loaded
+    _zone = None
+
+
+async def _zone_play(event, kind, first):
+    name = "you"
+    if kind in ("compliment", "rate"):
+        name = await _target_name(event)
+    msg = await _start(event, first)
+    if not msg:
+        return
+    frames = _zone.build(kind, name=name, seed=int(time.time() * 1000) % 10**9)
+    if frames:
+        await play(msg, frames, event=event)
+
+
+if _zone:
+
+    @ultroid_cmd(pattern="fortune$", fun=True)
+    async def fortune(event):
+        await _zone_play(event, "fortune", "🔮")
+
+    @ultroid_cmd(pattern="dice$", fun=True)
+    async def dice(event):
+        await _zone_play(event, "dice", "🎲")
+
+    @ultroid_cmd(pattern="8ball( (.*)|$)", fun=True)
+    async def eightball(event):
+        await _zone_play(event, "8ball", "🎱")
+
+    @ultroid_cmd(pattern="inspire$", fun=True)
+    async def quote(event):
+        await _zone_play(event, "quote", "✨")
+
+    @ultroid_cmd(pattern="compliment( (.*)|$)", fun=True)
+    async def compliment(event):
+        await _zone_play(event, "compliment", "💝")
+
+    @ultroid_cmd(pattern="rate( (.*)|$)", fun=True)
+    async def rate(event):
+        await _zone_play(event, "rate", "⭐️")
+
+    @ultroid_cmd(pattern="matrix$", fun=True)
+    async def matrix(event):
+        await _zone_play(event, "matrix", "🟩")
