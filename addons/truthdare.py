@@ -16,33 +16,20 @@
 """
 
 
+import time
+
+from manager import fun as _zone
+
 from . import *
 
-# Free keyless API (the old fungenerators.com scraping broke).
-API = "https://api.truthordarebot.xyz/v1/{}"
-
-
-async def _get(kind):
-    try:
-        res = await async_searcher(API.format(kind), params={"rating": "pg13"}, re_json=True)
-        return res["question"]
-    except Exception:
-        return None
+# Offline, same questions as the manager bot's Fun Zone (the old web API died).
 
 
 @ultroid_cmd(pattern="truth$")
 async def gtruth(ult):
-    m = await ult.eor("Generating a Truth Statement.. ")
-    cm = await _get("truth")
-    if not cm:
-        return await m.edit("Service is down, try again later.")
-    await m.edit(f"**#TruthTask**\n\n`{cm}`")
+    await ult.eor(_zone.build("truth", seed=int(time.time() * 1000))[-1])
 
 
 @ultroid_cmd(pattern="dare$")
 async def gdare(ult):
-    m = await ult.eor("Generating a Dare Task.. ")
-    cm = await _get("dare")
-    if not cm:
-        return await m.edit("Service is down, try again later.")
-    await m.edit(f"**#DareTask**\n\n`{cm}`")
+    await ult.eor(_zone.build("dare", seed=int(time.time() * 1000))[-1])
