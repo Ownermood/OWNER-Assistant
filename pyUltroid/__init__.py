@@ -97,6 +97,22 @@ if run_as_module:
 
     _version_changes(udB)
 
+    # Extra account run by the manager: the owner's main account controls it.
+    # Main id becomes full sudo, and sudo commands use "!" (not ".") so a
+    # command typed by the main account runs only on THIS account.
+    _ctrl = (os.environ.get("OA_CONTROLLER") or "").strip()
+    if _ctrl.isdigit():
+        _cid = int(_ctrl)
+        _sudos = udB.get_key("SUDOS") or []
+        if _cid not in _sudos:
+            udB.set_key("SUDOS", [*_sudos, _cid])
+        udB.set_key("SUDO", "True")
+        _full = str(udB.get_key("FULLSUDO") or "").split()
+        if _ctrl not in _full:
+            udB.set_key("FULLSUDO", " ".join([*_full, _ctrl]))
+        if not udB.get_key("SUDO_HNDLR"):
+            udB.set_key("SUDO_HNDLR", "!")
+
     HNDLR = udB.get_key("HNDLR") or "."
     DUAL_HNDLR = udB.get_key("DUAL_HNDLR") or "/"
     SUDO_HNDLR = udB.get_key("SUDO_HNDLR") or HNDLR

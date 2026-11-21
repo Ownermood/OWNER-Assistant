@@ -509,10 +509,22 @@ class Manager:
                 "**How:** open this bot from your second id and tap "
                 "**🔑 Get my own userbot**. You get an **Allow** button here.\n\n"
                 "Remove: `/delowner 123456789`\n\n"
+                "**Control them from your main id:** in a chat with that account "
+                "(like its DM), send commands with `!` instead of `.` - for example "
+                "`!alive`. Only that account runs it.\n\n"
                 f"**Added:**\n{self.owners_text()}")
         if note:
             text = note + "\n\n" + text
-        await self.show(chat, text, [[self.back("m:settings")]], event)
+        rows = []
+        for uid, slot in self.slots.items():
+            label = (slot.store.data.get("account") or {}).get("name") or str(uid)
+            if slot.runner.running:
+                rows.append([self.btn("🔄", f"Restart {label}"[:30], f"m:sr_{uid}"),
+                             self.btn("⏹", "Stop", f"m:ss_{uid}")])
+            elif slot.store.session:
+                rows.append([self.btn("▶️", f"Run {label}"[:30], f"m:sr_{uid}")])
+        rows.append([self.btn("🔃", "Refresh", "m:owners"), self.back("m:settings")])
+        await self.show(chat, text, rows, event)
 
     def add_owner(self, uid):
         owners = self.store.data.setdefault("owners", {})
@@ -672,7 +684,13 @@ class Manager:
                 self.store.data["account"] = acc
                 self.store.save()
         self.logged_out = False
-        (self.primary or self).save_userbots()
+        main = self.primary or self
+        main.save_userbots()
+        if self.primary is not None:
+            # the main account controls this one (full sudo, "!" commands)
+            acc = main.store.data.get("account") or {}
+            if acc.get("id"):
+                self.runner.base_env["OA_CONTROLLER"] = str(acc["id"])
         await self.runner.start(session, self.store.env)
         return True, "Started."
 
@@ -1076,6 +1094,18 @@ class Manager:
                     pass
             elif action[:3] in ("ok_", "no_") and action[3:].isdigit() and m is self:
                 return await self.answer_request(event, action)
+            elif action[:3] in ("sr_", "ss_") and action[3:].isdigit() and m is self:
+                slot = self.slots.get(int(action[3:]))
+                if not slot:
+                    return await event.answer("Not found.", alert=True)
+                await event.answer("⏳ Working…")
+                await slot.runner.stop()
+                if action.startswith("ss_"):
+                    note = "⏹ Stopped."
+                else:
+                    ok, msg = await slot.start_userbot()
+                    note = "▶️ Started." if ok else f"❌ {msg}"
+                return await self.view_owners(chat, event, note=note)
             elif action == "owners" and m is self:
                 await self.view_owners(chat, event)
             try:

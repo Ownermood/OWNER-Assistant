@@ -188,6 +188,10 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   private) and public fun mode ignores senders in `data/userbots.json` (all userbot
   account ids, written by the manager on start) - before, one `.love` played on BOTH
   accounts. Warned owner: any added account can `.bash` and read everyone's sessions.
+  #51: main account CONTROLS extra accounts: manager passes `OA_CONTROLLER=<main
+  account id>`; `pyUltroid/__init__.py` makes it SUDO + FULLSUDO and sets `SUDO_HNDLR`
+  to `!` (if unset) so `!cmd` typed by main runs only on that extra account (`.` stays
+  main's). Settings → Second account has Run/Restart/Stop per account (`m:sr_/m:ss_`).
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
