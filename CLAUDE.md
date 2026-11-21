@@ -179,6 +179,11 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   #44: no typing needed - the other id taps **🔑 Get my own userbot** (private reply /
   Fun Zone), the main owner gets **Allow / Deny** buttons (`m:ok_<id>`/`m:no_<id>`,
   main owner only; 10-min cooldown per requester). Owner asked: no `/addowner` hassle.
+  #45: **Public login** switch on the main menu (DB `public_login` in manager.json,
+  default OFF). ON = anyone tapping the button gets a slot directly (max 3, owner is
+  notified with a Remove button); OFF = those `public_users` are routed as guests,
+  their userbots stop, and they see "bot is off". Approved (Allow) ids are not affected.
+  Owner was warned: strangers' spam can get the VPS banned.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
