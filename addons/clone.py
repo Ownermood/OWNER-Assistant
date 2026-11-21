@@ -8,8 +8,9 @@
 """
 📖 **Commands**
 
-• `{i}clone` (reply, or add @username)
+• `{i}clone` (reply, or add @username or user id)
     Copy someone's name, bio and photo onto your account (for fun).
+    Example: `{i}clone @username` or `{i}clone 123456789`
 
 • `{i}revert`
     Go back to your own name, bio and photo.
@@ -50,6 +51,24 @@ def _normalise_avatar(path):
 BACKUP_KEY = "CLONE_BACKUP"
 
 
+async def _user_by_id(client, uid):
+    """Find a user from a bare id. Telegram only knows ids this account has
+    seen, so on a miss load the chat list (fills the cache) and try again."""
+    try:
+        return await client.get_entity(uid)
+    except ValueError:
+        pass
+    await client.get_dialogs(limit=500)
+    try:
+        return await client.get_entity(uid)
+    except ValueError:
+        raise ValueError(
+            "Can't find this id. This account must have seen them once - "
+            "be in a chat or group with them, or forward one of their messages "
+            "and reply to it with clone."
+        )
+
+
 async def _target_user(event):
     """Return the user to clone (reply / mention / username / id / private chat)."""
     if event.reply_to_msg_id:
@@ -62,7 +81,9 @@ async def _target_user(event):
         if isinstance(ent, MessageEntityMentionName):
             return await event.client.get_entity(ent.user_id)
     if arg:
-        return await event.client.get_entity(int(arg) if arg.lstrip("-").isdigit() else arg)
+        if arg.lstrip("-").isdigit():
+            return await _user_by_id(event.client, int(arg))
+        return await event.client.get_entity(arg)
     if event.is_private:
         return await event.client.get_entity(event.chat_id)
     return None
@@ -74,10 +95,10 @@ async def _(event):
     try:
         user = await _target_user(event)
         if not user or getattr(user, "broadcast", False) or not hasattr(user, "first_name"):
-            return await eve.edit("Reply to a user or give a username to clone.")
+            return await eve.edit("Reply to a user, or give a username or user id to clone.")
         full = await event.client(GetFullUserRequest(user.id))
     except Exception as er:
-        return await eve.edit(f"`{er}`")
+        return await eve.edit(f"❌ {er}")
 
     me = await event.client(GetFullUserRequest("me"))
     # Save the real identity only once, so cloning twice never loses it.
