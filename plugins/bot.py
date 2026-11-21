@@ -242,7 +242,8 @@ async def shutdownbot(ult):
 )
 async def _(event):
     opt = event.pattern_match.group(1).strip()
-    file = f"ultroid{sys.argv[-1]}.log" if len(sys.argv) > 1 else "ultroid.log"
+    file = (f"ultroid{sys.argv[-1]}.log" if len(sys.argv) > 1
+            else f"ultroid{os.environ.get('OA_INSTANCE', '')}.log")
     if opt == "heroku":
         await heroku_logs(event)
     elif opt == "carbon" and Carbon:
@@ -259,14 +260,14 @@ async def _(event):
             return
         await event.reply(f"📄 **{BOT_NAME} logs**", file=file)
     elif opt == "open":
-        with open("ultroid.log", "r") as f:
+        with open(file, "r") as f:
             file = f.read()[-4000:]
         return await event.eor(f"`{file}`")
     elif (
         opt.isdigit() and 5 <= int(opt) <= 100
     ):  # Check if input is a number between 10 and 100
         num_lines = int(opt)
-        with open("ultroid.log", "r") as f:
+        with open(file, "r") as f:
             lines = f.readlines()[-num_lines:]
             file = "".join(lines)
         return await event.eor(f"`{file}`")

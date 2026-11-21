@@ -169,6 +169,13 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   (`help_<plugin>`, wins over the docstring); addons and the rest use the
   module docstring starting with `📖 **Commands**`. Other 24 language files
   were NOT rewritten (they still hold old translations).
+- **Second account (#43)**: the main owner adds another of THEIR OWN ids with
+  `/addowner <id>` in the manager (Settings → Second account; max 3). Each gets its
+  own slot: `data/manager_<id>.json`, own child userbot with Redis DB number N
+  (`REDIS_URI/.../N`), no `BOT_TOKEN`/`LOG_CHANNEL` from .env (autobot makes its own
+  assistant bot + log group), `OA_INSTANCE=_<id>` → own `asst_<id>.session` and
+  `ultroid_<id>.log`. Same account can't run twice. Strangers see their id in the
+  private / fun reply so the owner can copy it. Needs a `redis://` URI (docker default).
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
