@@ -46,7 +46,9 @@ if run_as_module:
     from ..version import __version__ as __pyUltroid__
     from ..version import ultroid_version
 
-    file = f"ultroid{sys.argv[6]}.log" if len(sys.argv) > 6 else "ultroid.log"
+    # OA_INSTANCE: set by the manager for a second account, so logs don't mix
+    _inst = os.environ.get("OA_INSTANCE", "")
+    file = f"ultroid{sys.argv[6]}.log" if len(sys.argv) > 6 else f"ultroid{_inst}.log"
 
     if os.path.exists(file):
         os.remove(file)

@@ -9,6 +9,7 @@ import re
 import signal
 import sys
 import time
+from urllib.parse import urlsplit, urlunsplit
 
 from telethon import Button, TelegramClient, errors, events
 from telethon.sessions import StringSession
@@ -41,7 +42,8 @@ USERBOT_CMD = [sys.executable, "-m", "pyUltroid"]
 LOGIN_TIMEOUT = 600  # a login must finish within 10 minutes
 CRASH_WINDOW, MAX_CRASHES = 600, 5  # stop auto-restart after 5 crashes in 10 min
 VAR_RE = re.compile(r"^[A-Z][A-Z0-9_]{1,40}$")
-BLOCKED_VARS = {"MANAGER_BOT_TOKEN", "OWNER_ID", "SESSION", "OA_DATA_DIR"}
+BLOCKED_VARS = {"MANAGER_BOT_TOKEN", "OWNER_ID", "SESSION", "OA_DATA_DIR", "OA_INSTANCE"}
+MAX_EXTRA = 3  # extra (second) accounts the owner can add
 ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 
 
@@ -62,10 +64,11 @@ def log(*a):
 class Store:
     """Small JSON file in the data volume: saved session, account, extra vars."""
 
-    def __init__(self, path=STORE_FILE):
+    def __init__(self, path=STORE_FILE, env_session=True):
         self.path = path
         # use_env_session: the SESSION from .env counts until the owner logs out here
-        self.data = {"session": None, "account": None, "env": {}, "use_env_session": True}
+        # (main account only - a second account always logs in here)
+        self.data = {"session": None, "account": None, "env": {}, "use_env_session": env_session}
         try:
             with open(path) as f:
                 self.data.update(json.load(f))
@@ -129,8 +132,20 @@ async def check_session(session):
 # ----------------------------------------------------------------- userbot process
 
 
+def redis_db_url(index):
+    """REDIS_URI pointing at database number `index` (own DB per account)."""
+    uri = (os.environ.get("REDIS_URI") or os.environ.get("REDIS_URL") or "").strip()
+    if not uri.startswith(("redis://", "rediss://")):
+        return None
+    u = urlsplit(uri)
+    return urlunsplit((u.scheme, u.netloc, f"/{index}", u.query, u.fragment))
+
+
 class Runner:
-    def __init__(self, on_exit):
+    def __init__(self, on_exit, base_env=None):
+        # base_env: per-account overrides (own DB, own log file); a key set to
+        # None is removed so a second account never reuses the main bot token.
+        self.base_env = base_env or {}
         self.proc = None
         self.lines = collections.deque(maxlen=500)
         self.started = None
@@ -146,6 +161,11 @@ class Runner:
         if self.running:
             return
         env = os.environ.copy()
+        for k, v in self.base_env.items():
+            if v is None:
+                env.pop(k, None)
+            else:
+                env[k] = str(v)
         env.update({k: str(v) for k, v in extra_env.items()})
         env["SESSION"] = session
         env.pop("MANAGER_BOT_TOKEN", None)
@@ -214,6 +234,7 @@ HELP = """❓ **Help**
 
 Commands also work: /login /logout /status /restart /logs /cancel
 `/setvar KEY value` · `/delvar KEY`
+👥 Second account (main owner): `/addowner <id>` · `/delowner <id>` · `/owners`
 
 Your messages here are deleted automatically to keep the chat clean."""
 
@@ -227,8 +248,11 @@ def fmt_uptime(sec):
 
 
 class Manager:
-    def __init__(self, bot, store=None, runner=None):
+    def __init__(self, bot, store=None, runner=None, owner=None, primary=None):
         self.bot = bot
+        self.owner = owner or OWNER_ID
+        self.primary = primary  # None = this is the main account's manager
+        self.slots = {}  # main manager only: extra owner id -> Manager
         self.store = store or Store()
         self.runner = runner or Runner(self.userbot_exited)
         self.login = None  # {"step", "client", "phone", "hash", "tries", "since"}
@@ -285,10 +309,10 @@ class Manager:
 
     async def tell(self, text, extra=None):
         """Alert the owner: replaces the panel so it is the newest message."""
-        if not OWNER_ID:
+        if not self.owner:
             return
         try:
-            await self.show(OWNER_ID, text + "\n\n" + self.status_text(), self.menu_buttons())
+            await self.show(self.owner, text + "\n\n" + self.status_text(), self.menu_buttons())
         except Exception as er:  # owner never pressed /start, or blocked the bot
             log("could not message owner:", er)
 
@@ -323,7 +347,7 @@ class Manager:
 
     async def send_panel(self, chat, text, buttons=None, event=None):
         """show() for guests / the join gate - guest chats are not persisted."""
-        if chat == OWNER_ID:
+        if chat == self.owner:
             return await self.show(chat, text, buttons, event)
         try:
             if isinstance(event, events.CallbackQuery.Event):
@@ -404,7 +428,7 @@ class Manager:
         lines = list(self.runner.lines)
         if not lines:
             return
-        path = os.path.join(DATA_DIR, "userbot-logs.txt")
+        path = os.path.join(DATA_DIR, f"userbot-logs-{self.owner}.txt")
         with open(path, "w") as f:
             f.write("\n".join(lines))
         try:
@@ -414,9 +438,96 @@ class Manager:
             os.remove(path)
 
     async def view_settings(self, chat, event=None):
-        await self.show(chat, "⚙️ **Settings**",
-                        [[self.btn("🧩", "Extra vars", "m:vars"), self.btn("❓", "Help", "m:help")],
-                         [self.back()]], event)
+        rows = [[self.btn("🧩", "Extra vars", "m:vars"), self.btn("❓", "Help", "m:help")]]
+        if self.primary is None:
+            rows.append([self.btn("👥", "Second account", "m:owners")])
+        rows.append([self.back()])
+        await self.show(chat, "⚙️ **Settings**", rows, event)
+
+    # ------------------------------------------------------------ extra accounts
+    def route(self, uid):
+        """The manager of this sender: main, a second account, or main (guests)."""
+        return self.slots.get(uid, self)
+
+    def add_slot(self, uid, index):
+        """Manager for a second account: own session file, own DB, own bots."""
+        base = {"REDIS_URI": redis_db_url(index), "REDIS_URL": None, "OA_INSTANCE": f"_{uid}",
+                "BOT_TOKEN": None, "LOG_CHANNEL": None, "SESSION": None}
+        store = Store(os.path.join(DATA_DIR, f"manager_{uid}.json"), env_session=False)
+        slot = Manager(self.bot, store=store, owner=uid, primary=self)
+        slot.runner = Runner(slot.userbot_exited, base)
+        slot.join_cache = self.join_cache
+        self.slots[uid] = slot
+        return slot
+
+    def load_slots(self):
+        for uid, index in (self.store.data.get("owners") or {}).items():
+            if redis_db_url(index):
+                self.add_slot(int(uid), int(index))
+
+    def owners_text(self):
+        lines = []
+        for uid, slot in self.slots.items():
+            lines.append(f"• `{uid}` — {slot.account_text()} ({slot.state().replace('_', ' ')})")
+        return "\n".join(lines) or "None yet."
+
+    async def view_owners(self, chat, event=None, note=""):
+        text = ("👥 **Second account**\n\n"
+                "Give another Telegram id of yours its own userbot. It gets its own "
+                "login, logs, settings, database and assistant bot. It can't see or "
+                "touch your main account.\n\n"
+                "**How:**\n"
+                "1. Open this bot from your second id. It shows its id.\n"
+                "2. Send here: `/addowner 123456789`\n"
+                "3. On the second id, send /start and tap **Login**.\n\n"
+                "Remove: `/delowner 123456789`\n\n"
+                f"**Added:**\n{self.owners_text()}")
+        if note:
+            text = note + "\n\n" + text
+        await self.show(chat, text, [[self.back("m:settings")]], event)
+
+    async def owner_cmd(self, chat, cmd, text):
+        parts = text.split()
+        uid = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 0
+        if cmd == "/owners":
+            return await self.view_owners(chat)
+        if not uid:
+            return await self.view_owners(chat, note=f"Usage: `{cmd} 123456789`")
+        owners = self.store.data.setdefault("owners", {})
+        if cmd == "/addowner":
+            if uid == self.owner:
+                return await self.view_owners(chat, note="That is your main id.")
+            if str(uid) in owners:
+                return await self.view_owners(chat, note="Already added.")
+            if len(owners) >= MAX_EXTRA:
+                return await self.view_owners(chat, note=f"You can add up to {MAX_EXTRA} accounts.")
+            used = {int(v) for v in owners.values()}
+            index = next(i for i in range(1, 16) if i not in used)
+            if not redis_db_url(index):
+                return await self.view_owners(
+                    chat, note="❌ A second account needs a Redis database (`REDIS_URI=redis://...`). "
+                               "The docker setup has one by default.")
+            owners[str(uid)] = index
+            self.store.save()
+            self.add_slot(uid, index)
+            return await self.view_owners(chat, note=f"✅ Added `{uid}`. Now open this bot from that id and tap **Login**.")
+        if str(uid) not in owners:
+            return await self.view_owners(chat, note="Not found.")
+        slot = self.slots.pop(uid, None)
+        if slot:
+            await slot.cancel_login()
+            await slot.runner.stop()
+        owners.pop(str(uid))
+        self.store.save()
+        return await self.view_owners(chat, note=f"🗑 Removed `{uid}`. Its userbot is stopped.")
+
+    def other_accounts(self):
+        main = self.primary or self
+        ids = set()
+        for m in [main, *main.slots.values()]:
+            if m is not self and m.store.session and m.store.data.get("account"):
+                ids.add(m.store.data["account"]["id"])
+        return ids
 
     async def view_vars(self, chat, event=None, note=""):
         env = self.store.env
@@ -509,7 +620,7 @@ class Manager:
         if not OWNER_ID:
             text = f"⚙️ Setup: put this in your `.env` and restart:\n\n`OWNER_ID={event.sender_id}`"
             return await (event.answer("OWNER_ID not set", alert=True) if cb else event.reply(text)) and False
-        if event.sender_id != OWNER_ID:
+        if event.sender_id != self.owner:
             # Guests: the fun animations only, and only while fun mode is ON.
             # They never reach login / logout / settings / logs.
             if self.fun_public() and (cb or event.is_private):
@@ -521,7 +632,8 @@ class Manager:
             if cb:
                 await event.answer("🔒 This bot is private right now.", alert=True)
             elif event.is_private:
-                await event.reply("🔒 This bot is private right now.")
+                await event.reply("🔒 This bot is private right now.\n\n"
+                                  f"Your Telegram id: `{event.sender_id}`")
             return False
         if not await self.is_member(event.sender_id):
             await self.join_gate(event, cb)
@@ -561,7 +673,8 @@ class Manager:
             rows.append(row)
         name = (getattr(event, "sender", None) and getattr(event.sender, "first_name", None)) or "you"
         await self.send_panel(chat,
-                              f"🎉 **Fun Zone**\n\nHey {name}! {len(fun.MENU)} things to play with 👇",
+                              f"🎉 **Fun Zone**\n\nHey {name}! {len(fun.MENU)} things to play with 👇"
+                              f"\n\nYour Telegram id: `{event.sender_id}`",
                               rows, event if cb else None)
 
     async def play(self, chat, kind, event):
@@ -595,7 +708,7 @@ class Manager:
     # ------------------------------------------------------------ login
     async def cancel_login(self):
         if self.kb_msg:
-            await self.remove_keyboard(OWNER_ID)
+            await self.remove_keyboard(self.owner)
         if self.login:
             client = self.login.get("client")
             self.login = None
@@ -705,6 +818,15 @@ class Manager:
     async def finish_login(self, chat):
         client = self.login["client"]
         me = await client.get_me()
+        if me.id in self.other_accounts():
+            # Same account twice = every command runs twice. Drop the new session.
+            self.login = None
+            try:
+                await client.log_out()
+            except Exception:
+                await client.disconnect()
+            return await self.view_menu(chat, note="❌ This account already runs here. "
+                                        "Log in with a different account.")
         session = client.session.save()
         await client.disconnect()
         self.login = None
@@ -721,95 +843,101 @@ class Manager:
 
         @bot.on(events.NewMessage(func=lambda e: e.is_private))
         async def on_message(event):
-            if not await self.allowed(event):
+            m = self.route(event.sender_id)
+            if not await m.allowed(event):
                 return
             chat = event.chat_id
             text = (event.raw_text or "").strip()
             cmd = text.split()[0].lower().split("@")[0] if text.startswith("/") else ""
 
             if cmd == "/cancel":
-                await self.clean(event)
-                had = bool(self.login)
-                await self.cancel_login()
-                return await self.view_menu(chat, note="✖️ Cancelled." if had else "")
-            if self.login and not cmd:
-                return await self.login_step(event)
-            await self.clean(event)
+                await m.clean(event)
+                had = bool(m.login)
+                await m.cancel_login()
+                return await m.view_menu(chat, note="✖️ Cancelled." if had else "")
+            if m.login and not cmd:
+                return await m.login_step(event)
+            await m.clean(event)
             if cmd == "/login":
-                return await self.begin_login(chat)
+                return await m.begin_login(chat)
             if cmd == "/logout":
-                return await self.show(chat, "🚪 **Log out** your account from the userbot?",
-                                       [[self.btn("✅", "Yes, log out", "m:logout_yes"), self.back()]])
+                return await m.show(chat, "🚪 **Log out** your account from the userbot?",
+                                       [[m.btn("✅", "Yes, log out", "m:logout_yes"), m.back()]])
             if cmd in ("/run", "/stop", "/restart"):
-                return await self.control(cmd[1:], chat)
+                return await m.control(cmd[1:], chat)
             if cmd == "/logs":
-                return await self.view_logs(chat)
+                return await m.view_logs(chat)
             if cmd == "/vars":
-                return await self.view_vars(chat)
+                return await m.view_vars(chat)
+            if cmd in ("/addowner", "/delowner", "/owners") and m is self:
+                return await self.owner_cmd(chat, cmd, text)
             if cmd == "/help":
-                return await self.show(chat, HELP, [[self.back()]])
+                return await m.show(chat, HELP, [[m.back()]])
             if cmd == "/setvar":
                 parts = text.split(maxsplit=2)
                 if len(parts) < 3 or not VAR_RE.match(parts[1].upper()):
-                    return await self.view_vars(chat, note="Usage: `/setvar KEY value`")
+                    return await m.view_vars(chat, note="Usage: `/setvar KEY value`")
                 key = parts[1].upper()
                 if key in BLOCKED_VARS:
-                    return await self.view_vars(chat, note=f"`{key}` can't be set here.")
-                self.store.data.setdefault("env", {})[key] = parts[2].strip()
-                self.store.save()
-                return await self.view_vars(chat, note=f"✅ `{key}` saved. Tap **Restart** to use it.")
+                    return await m.view_vars(chat, note=f"`{key}` can't be set here.")
+                m.store.data.setdefault("env", {})[key] = parts[2].strip()
+                m.store.save()
+                return await m.view_vars(chat, note=f"✅ `{key}` saved. Tap **Restart** to use it.")
             if cmd == "/delvar":
                 parts = text.split()
                 key = parts[1].upper() if len(parts) > 1 else ""
-                gone = self.store.data.get("env", {}).pop(key, None) is not None
-                self.store.save()
-                return await self.view_vars(chat, note=f"🗑 `{key}` removed." if gone else "Not found.")
-            return await self.view_menu(chat)  # /start, /menu, /status, anything else
+                gone = m.store.data.get("env", {}).pop(key, None) is not None
+                m.store.save()
+                return await m.view_vars(chat, note=f"🗑 `{key}` removed." if gone else "Not found.")
+            return await m.view_menu(chat)  # /start, /menu, /status, anything else
 
         @bot.on(events.CallbackQuery(pattern=rb"^m:"))
         async def on_button(event):
-            if not await self.allowed(event):
+            m = self.route(event.sender_id)
+            if not await m.allowed(event):
                 return
             chat = event.chat_id
             action = event.data.decode()[2:]
             answer = ""
             if action in ("menu", "joined"):
-                await self.view_menu(chat, event)
+                await m.view_menu(chat, event)
             elif action in ("run", "stop", "restart"):
                 await event.answer("⏳ Working…")
-                return await self.control(action, chat, event)
+                return await m.control(action, chat, event)
             elif action == "login":
-                await self.begin_login(chat, event)
+                await m.begin_login(chat, event)
             elif action == "cancel":
-                await self.cancel_login()
-                await self.view_menu(chat, event, note="✖️ Cancelled.")
+                await m.cancel_login()
+                await m.view_menu(chat, event, note="✖️ Cancelled.")
             elif action == "logout":
-                await self.show(chat, "🚪 **Log out** your account from the userbot?",
-                                [[self.btn("✅", "Yes, log out", "m:logout_yes"), self.back()]], event)
+                await m.show(chat, "🚪 **Log out** your account from the userbot?",
+                                [[m.btn("✅", "Yes, log out", "m:logout_yes"), m.back()]], event)
             elif action == "logout_yes":
                 await event.answer("⏳ Logging out…")
-                note = await self.do_logout()
-                return await self.view_menu(chat, event, note=note)
+                note = await m.do_logout()
+                return await m.view_menu(chat, event, note=note)
             elif action == "logs":
-                await self.view_logs(chat, event)
+                await m.view_logs(chat, event)
             elif action == "logfile":
-                await self.send_logfile(chat)
+                await m.send_logfile(chat)
             elif action in ("fun_on", "fun_off"):
                 on = action == "fun_on"
-                self.set_fun_public(on)
+                m.set_fun_public(on)
                 note = ("✅ **FUN MODE IS ON** — anyone who opens this bot can play the "
                         "animations. Your login / settings stay yours only."
                         if on else
                         "⛔ **FUN MODE IS OFF** — nobody else can use this bot now.")
-                await self.view_menu(chat, event, note=note)
+                await m.view_menu(chat, event, note=note)
             elif action == "close":
-                await self.drop(chat, event.message_id)
+                await m.drop(chat, event.message_id)
             elif action == "settings":
-                await self.view_settings(chat, event)
+                await m.view_settings(chat, event)
             elif action == "help":
-                await self.show(chat, HELP, [[self.back("m:settings")]], event)
+                await m.show(chat, HELP, [[m.back("m:settings")]], event)
             elif action == "vars":
-                await self.view_vars(chat, event)
+                await m.view_vars(chat, event)
+            elif action == "owners" and m is self:
+                await self.view_owners(chat, event)
             try:
                 await event.answer(answer)
             except Exception:
@@ -827,9 +955,14 @@ class Manager:
         await self.view_menu(chat, event, note=note)
 
     async def boot(self):
-        if not OWNER_ID:
+        if not self.owner:
             log("OWNER_ID is not set - open the bot and send /start to see your id.")
             return
+        if self.primary is None:
+            self.load_slots()
+            for slot in self.slots.values():
+                if slot.store.session:
+                    await slot.boot()
         if self.store.session:
             ok, _ = await self.start_userbot()
             if ok:
@@ -861,6 +994,8 @@ async def amain():
     await manager.boot()
     await stop.wait()
     log("shutting down")
+    for slot in manager.slots.values():
+        await slot.runner.stop()
     await manager.runner.stop()
     await bot.disconnect()
 
