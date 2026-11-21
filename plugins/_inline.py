@@ -17,7 +17,7 @@ from telethon.utils import resolve_bot_file_id
 
 from pyUltroid._misc._assistant import callback, in_pattern
 from pyUltroid.dB._core import HELP, LIST
-from pyUltroid.fns.helper import gen_chlog, time_formatter, updater
+from pyUltroid.fns.helper import gen_chlog, time_formatter, updater, upstream_branch
 from pyUltroid.fns.misc import split_list
 
 from . import (
@@ -232,7 +232,7 @@ async def _(event):
         return await event.answer(f"Do '{HNDLR}update' to update..")
     repo = Repo.init()
     changelog, tl_chnglog = await gen_chlog(
-        repo, f"HEAD..upstream/{repo.active_branch}"
+        repo, f"HEAD..upstream/{upstream_branch()}"
     )
     changelog_str = changelog + "\n\n" + get_string("inline_8")
     if len(changelog_str) > 1024:

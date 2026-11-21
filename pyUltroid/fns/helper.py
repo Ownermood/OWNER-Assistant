@@ -270,7 +270,27 @@ async def bash(cmd, run_code=0):
 # Will add in class
 
 
+def upstream_branch():
+    """Branch to compare with. The VPS clone may be on an old local branch
+    (e.g. 'master') that the repo doesn't have any more - always use
+    UPSTREAM_BRANCH (default 'main')."""
+    from ..configs import Var
+
+    return (Var.UPSTREAM_BRANCH or "main").strip() or "main"
+
+
 async def updater():
+    """True if an update is available. Never crashes the bot."""
+    from .. import LOGS
+
+    try:
+        return await _updater()
+    except Exception as er:
+        LOGS.info(f"Update check skipped: {er}")
+        return False
+
+
+async def _updater():
     from .. import LOGS
 
     from ..configs import Var
@@ -295,7 +315,7 @@ async def updater():
         repo.create_head(branch, ref)
         repo.heads[branch].set_tracking_branch(ref)
         repo.heads[branch].checkout(True)
-    ac_br = repo.active_branch.name
+    ac_br = upstream_branch()
     if "upstream" not in repo.remotes:
         repo.create_remote("upstream", off_repo)
     ups_rem = repo.remote("upstream")
