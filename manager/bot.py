@@ -43,7 +43,7 @@ LOGIN_TIMEOUT = 600  # a login must finish within 10 minutes
 CRASH_WINDOW, MAX_CRASHES = 600, 5  # stop auto-restart after 5 crashes in 10 min
 VAR_RE = re.compile(r"^[A-Z][A-Z0-9_]{1,40}$")
 BLOCKED_VARS = {"MANAGER_BOT_TOKEN", "OWNER_ID", "SESSION", "OA_DATA_DIR", "OA_INSTANCE"}
-MAX_EXTRA = 3  # extra (second) accounts the owner can add
+MAX_EXTRA = 10  # extra accounts (Redis has DBs 1-15 free for them)
 ANSI = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
 
 
