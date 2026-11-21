@@ -42,7 +42,15 @@ from . import ultroid_cmd, get_string, HNDLR, async_searcher
 
 @ultroid_cmd(pattern="joke$")
 async def _(ult):
-    await ult.eor(get_joke())
+    # same jokes as the manager bot's Fun Zone; old programmer jokes as a fallback
+    try:
+        import time
+
+        from manager import fun as _zone
+
+        return await ult.eor(_zone.build("joke", seed=int(time.time() * 1000))[-1])
+    except Exception:
+        await ult.eor(get_joke())
 
 
 @ultroid_cmd(pattern="url( (.*)|$)")
