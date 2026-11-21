@@ -176,6 +176,9 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   assistant bot + log group), `OA_INSTANCE=_<id>` → own `asst_<id>.session` and
   `ultroid_<id>.log`. Same account can't run twice. Strangers see their id in the
   private / fun reply so the owner can copy it. Needs a `redis://` URI (docker default).
+  #44: no typing needed - the other id taps **🔑 Get my own userbot** (private reply /
+  Fun Zone), the main owner gets **Allow / Deny** buttons (`m:ok_<id>`/`m:no_<id>`,
+  main owner only; 10-min cooldown per requester). Owner asked: no `/addowner` hassle.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 

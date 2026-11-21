@@ -253,6 +253,7 @@ class Manager:
         self.owner = owner or OWNER_ID
         self.primary = primary  # None = this is the main account's manager
         self.slots = {}  # main manager only: extra owner id -> Manager
+        self.requests = {}  # uid -> time of their last access request
         self.store = store or Store()
         self.runner = runner or Runner(self.userbot_exited)
         self.login = None  # {"step", "client", "phone", "hash", "tries", "since"}
@@ -476,15 +477,78 @@ class Manager:
                 "Give another Telegram id of yours its own userbot. It gets its own "
                 "login, logs, settings, database and assistant bot. It can't see or "
                 "touch your main account.\n\n"
-                "**How:**\n"
-                "1. Open this bot from your second id. It shows its id.\n"
-                "2. Send here: `/addowner 123456789`\n"
-                "3. On the second id, send /start and tap **Login**.\n\n"
+                "**How:** open this bot from your second id and tap "
+                "**🔑 Get my own userbot**. You get an **Allow** button here.\n\n"
                 "Remove: `/delowner 123456789`\n\n"
                 f"**Added:**\n{self.owners_text()}")
         if note:
             text = note + "\n\n" + text
         await self.show(chat, text, [[self.back("m:settings")]], event)
+
+    def add_owner(self, uid):
+        owners = self.store.data.setdefault("owners", {})
+        if uid == self.owner:
+            return False, "That is your main id."
+        if str(uid) in owners:
+            return False, "Already added."
+        if len(owners) >= MAX_EXTRA:
+            return False, f"You can add up to {MAX_EXTRA} accounts."
+        used = {int(v) for v in owners.values()}
+        index = next(i for i in range(1, 16) if i not in used)
+        if not redis_db_url(index):
+            return False, ("❌ A second account needs a Redis database (`REDIS_URI=redis://...`). "
+                           "The docker setup has one by default.")
+        owners[str(uid)] = index
+        self.store.save()
+        self.add_slot(uid, index)
+        return True, f"✅ Added `{uid}`. It can log in now."
+
+    async def welcome(self, uid):
+        try:
+            await self.slots[uid].view_menu(uid, note="✅ **Access approved!** Tap **Login** to connect your account.")
+        except Exception as er:
+            log("welcome:", er)
+
+    async def request_access(self, event):
+        """A non-owner tapped 'Get my own userbot': ask the main owner (one tap)."""
+        uid = event.sender_id
+        if self.primary is not None or uid in self.slots:
+            return await event.answer("Send /start.", alert=True)
+        last = self.requests.get(uid, 0)
+        if time.time() - last < 600:
+            return await event.answer("⏳ Already asked. Wait for the owner.", alert=True)
+        self.requests[uid] = time.time()
+        sender = getattr(event, "sender", None)
+        name = (sender and " ".join(filter(None, [sender.first_name, getattr(sender, "last_name", None)]))) or str(uid)
+        user = f" (@{sender.username})" if sender and getattr(sender, "username", None) else ""
+        try:
+            await self.bot.send_message(
+                self.owner,
+                f"🔑 **{name}**{user} wants their own userbot here.\nId: `{uid}`\n\n"
+                "Allow only your own accounts or people you fully trust.",
+                buttons=[[self.btn("✅", "Allow", f"m:ok_{uid}"), self.btn("❌", "Deny", f"m:no_{uid}")]])
+        except Exception as er:
+            log("request:", er)
+            return await event.answer("Could not reach the owner. Try later.", alert=True)
+        await event.answer("✅ Request sent. You'll get a message when it's approved.", alert=True)
+
+    async def answer_request(self, event, action):
+        uid = int(action[3:])
+        self.requests.pop(uid, None)
+        if action.startswith("ok_"):
+            ok, note = self.add_owner(uid)
+            if ok:
+                await self.welcome(uid)
+        else:
+            note = f"❌ Denied `{uid}`."
+            try:
+                await self.bot.send_message(uid, "❌ The owner did not approve your request.")
+            except Exception:
+                pass
+        try:
+            await event.edit(note)
+        except Exception:
+            pass
 
     async def owner_cmd(self, chat, cmd, text):
         parts = text.split()
@@ -495,22 +559,10 @@ class Manager:
             return await self.view_owners(chat, note=f"Usage: `{cmd} 123456789`")
         owners = self.store.data.setdefault("owners", {})
         if cmd == "/addowner":
-            if uid == self.owner:
-                return await self.view_owners(chat, note="That is your main id.")
-            if str(uid) in owners:
-                return await self.view_owners(chat, note="Already added.")
-            if len(owners) >= MAX_EXTRA:
-                return await self.view_owners(chat, note=f"You can add up to {MAX_EXTRA} accounts.")
-            used = {int(v) for v in owners.values()}
-            index = next(i for i in range(1, 16) if i not in used)
-            if not redis_db_url(index):
-                return await self.view_owners(
-                    chat, note="❌ A second account needs a Redis database (`REDIS_URI=redis://...`). "
-                               "The docker setup has one by default.")
-            owners[str(uid)] = index
-            self.store.save()
-            self.add_slot(uid, index)
-            return await self.view_owners(chat, note=f"✅ Added `{uid}`. Now open this bot from that id and tap **Login**.")
+            ok, note = self.add_owner(uid)
+            if ok:
+                await self.welcome(uid)
+            return await self.view_owners(chat, note=note)
         if str(uid) not in owners:
             return await self.view_owners(chat, note="Not found.")
         slot = self.slots.pop(uid, None)
@@ -621,6 +673,9 @@ class Manager:
             text = f"⚙️ Setup: put this in your `.env` and restart:\n\n`OWNER_ID={event.sender_id}`"
             return await (event.answer("OWNER_ID not set", alert=True) if cb else event.reply(text)) and False
         if event.sender_id != self.owner:
+            if cb and event.data == b"m:req":
+                await self.request_access(event)
+                return False
             # Guests: the fun animations only, and only while fun mode is ON.
             # They never reach login / logout / settings / logs.
             if self.fun_public() and (cb or event.is_private):
@@ -633,7 +688,8 @@ class Manager:
                 await event.answer("🔒 This bot is private right now.", alert=True)
             elif event.is_private:
                 await event.reply("🔒 This bot is private right now.\n\n"
-                                  f"Your Telegram id: `{event.sender_id}`")
+                                  f"Your Telegram id: `{event.sender_id}`",
+                                  buttons=[[self.btn("🔑", "Get my own userbot", "m:req")]])
             return False
         if not await self.is_member(event.sender_id):
             await self.join_gate(event, cb)
@@ -671,6 +727,7 @@ class Manager:
                 row = []
         if row:
             rows.append(row)
+        rows.append([self.btn("🔑", "Get my own userbot", "m:req")])
         name = (getattr(event, "sender", None) and getattr(event.sender, "first_name", None)) or "you"
         await self.send_panel(chat,
                               f"🎉 **Fun Zone**\n\nHey {name}! {len(fun.MENU)} things to play with 👇"
@@ -936,6 +993,8 @@ class Manager:
                 await m.show(chat, HELP, [[m.back("m:settings")]], event)
             elif action == "vars":
                 await m.view_vars(chat, event)
+            elif action[:3] in ("ok_", "no_") and action[3:].isdigit() and m is self:
+                return await self.answer_request(event, action)
             elif action == "owners" and m is self:
                 await self.view_owners(chat, event)
             try:
