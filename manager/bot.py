@@ -6,6 +6,7 @@ import collections
 import json
 import os
 import re
+import glob
 import signal
 import sys
 import time
@@ -514,14 +515,44 @@ class Manager:
         base = {"REDIS_URI": redis_db_url(index), "REDIS_URL": None, "OA_INSTANCE": f"_{uid}",
                 "BOT_TOKEN": None, "LOG_CHANNEL": None, "SESSION": None}
         store = Store(os.path.join(DATA_DIR, f"manager_{uid}.json"), env_session=False)
+        if store.data.get("db_index") != index:
+            store.data["db_index"] = index
+            store.save()
         slot = Manager(self.bot, store=store, owner=uid, primary=self)
         slot.runner = Runner(slot.userbot_exited, base)
         slot.join_cache = self.join_cache
         self.slots[uid] = slot
         return slot
 
+    def _slot_files(self):
+        """{uid: path} for every saved second-account file on disk."""
+        found = {}
+        for path in glob.glob(os.path.join(DATA_DIR, "manager_*.json")):
+            m = re.fullmatch(r"manager_(\d+)\.json", os.path.basename(path))
+            if m:
+                found[int(m.group(1))] = path
+        return found
+
     def load_slots(self):
-        for uid, index in (self.store.data.get("owners") or {}).items():
+        owners = self.store.data.setdefault("owners", {})
+        # Self-heal: a second account whose file is on disk but dropped out of
+        # the index (e.g. the index was lost) is added back, so it never vanishes.
+        for uid, path in self._slot_files().items():
+            if str(uid) in owners:
+                continue
+            try:
+                with open(path) as f:
+                    saved = json.load(f).get("db_index")
+            except Exception:
+                saved = None
+            used = {int(v) for v in owners.values()}
+            index = saved if isinstance(saved, int) and saved not in used else \
+                next((i for i in range(1, 16) if i not in used), None)
+            if index:
+                owners[str(uid)] = index
+                log(f"recovered second account {uid} from its saved file (db {index})")
+        self.store.save()
+        for uid, index in dict(owners).items():
             try:
                 if redis_db_url(index):
                     self.add_slot(int(uid), int(index))
@@ -685,6 +716,11 @@ class Manager:
         if uid in pub:
             pub.remove(uid)
         self.store.save()
+        for extra in (f"manager_{uid}.json", f"fun_mode_{uid}.json", f"userbot-logs-{uid}.txt"):
+            try:
+                os.remove(os.path.join(DATA_DIR, extra))
+            except OSError:
+                pass
         return await self.view_owners(chat, note=f"🗑 Removed `{uid}`. Its userbot is stopped.")
 
     def save_userbots(self):
