@@ -9,8 +9,8 @@ file before changing anything.
 ## The owner (how to talk to them)
 
 - Writes **Hinglish** (Hindi in Latin script). Reply in simple Hinglish, short
-  sentences, no jargon. They are a Class 12 student preparing for **CLAT
-  (exam on 6 December)** — a one-line study nudge at the end is welcome, don't lecture.
+  sentences, no jargon. They cleared CLAT long ago and graduated from **MNLU
+  Mumbai** (2026). Do NOT add CLAT / study nudges (old note was wrong; they found it annoying).
 - They are not a programmer. Give copy-paste commands, one per code block.
 - They often paste errors / screenshots from Telegram. The crash report's
   "Last 5 commits" tells you which version the VPS is running.
@@ -23,7 +23,12 @@ file before changing anything.
 
 - Repo: `Ownermood/OWNER-Assistant` (renamed from `Ownermood/Ultroid`; GitHub
   redirects the old name). Default branch `main`.
-- Owner's VPS (Ubuntu, Docker). Bot folder on the VPS is still `~/Ultroid`
+- **Nov 2026: the owner REMOVED this bot from their VPS** (`docker compose down -v
+  --rmi local`, `rm -rf ~/Ultroid`, `docker system prune -f`) because the many
+  per-account userbots slowed their other containers. Their other containers
+  (`dv-app`, `dv-warp`, `dv-mongo`, `dv-bgutil-provider`) must never be touched.
+  If they want it back, it's a fresh clone + new `.env` + new logins.
+- Owner's VPS (Ubuntu, Docker). Bot folder on the VPS was `~/Ultroid`
   (older clone). Update command the owner runs:
   ```bash
   cd ~/Ultroid && git pull && docker compose up -d --build
