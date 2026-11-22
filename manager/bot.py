@@ -235,6 +235,7 @@ HELP = """❓ **Help**
 Commands also work: /login /logout /status /restart /logs /cancel
 `/setvar KEY value` · `/delvar KEY`
 👥 Second account (main owner): `/addowner <id>` · `/delowner <id>` · `/owners`
+⛔ Friends' bots: `/stopall` · `/startall`
 
 Your messages here are deleted automatically to keep the chat clean."""
 
@@ -412,6 +413,11 @@ class Manager:
                 rows.append([self.btn("🌍", "Public login: ON (tap to turn off)", "m:pub_off")])
             else:
                 rows.append([self.btn("🔒", "Public login: OFF (tap to turn on)", "m:pub_on")])
+            if self.slots:
+                if self.all_off():
+                    rows.append([self.btn("✅", "Start ALL friends' bots", "m:all_on")])
+                else:
+                    rows.append([self.btn("⛔", "Stop ALL friends' bots", "m:all_off")])
         rows.append([self.btn("🔃", "Refresh", "m:menu")])
         return rows
 
@@ -454,9 +460,34 @@ class Manager:
     def route(self, uid):
         """The manager of this sender: main, a second account, or main (guests).
         People who came in through public login are guests while it is OFF."""
-        if uid in self.public_users() and not self.public_login():
+        if self.is_off(uid):
             return self
         return self.slots.get(uid, self)
+
+    # ---- "Stop all": every extra account's userbot off, friends see the bot as off
+    def all_off(self):
+        return bool(self.store.data.get("all_off", False))
+
+    def is_off(self, uid):
+        """True if this extra account is switched off right now."""
+        if uid in self.slots and self.all_off():
+            return True
+        return uid in self.public_users() and not self.public_login()
+
+    async def set_all_off(self, off):
+        self.store.data["all_off"] = bool(off)
+        self.store.save()
+        n = 0
+        for uid, slot in self.slots.items():
+            if off:
+                await slot.cancel_login()
+                if slot.runner.running:
+                    n += 1
+                await slot.runner.stop()
+            elif slot.store.session and not slot.runner.running and not self.is_off(uid):
+                ok, _ = await slot.start_userbot()
+                n += bool(ok)
+        return n
 
     # ---- Public login: anyone can get their own userbot (default OFF)
     def public_login(self):
@@ -473,7 +504,7 @@ class Manager:
             if not slot:
                 continue
             if on:
-                if slot.store.session and not slot.runner.running:
+                if slot.store.session and not slot.runner.running and not self.all_off():
                     await slot.start_userbot()
             else:
                 await slot.cancel_login()
@@ -526,6 +557,15 @@ class Manager:
         rows.append([self.btn("🔃", "Refresh", "m:owners"), self.back("m:settings")])
         await self.show(chat, text, rows, event)
 
+    async def all_switch(self, chat, off, event=None):
+        n = await self.set_all_off(off)
+        note = (f"⛔ **ALL friends' bots are OFF** ({n} stopped). They see the bot as off "
+                "and can't start it. Your own bot keeps running.\n"
+                "Turn them back on: /startall"
+                if off else
+                f"✅ **Friends' bots are ON again** ({n} started).")
+        await self.view_menu(chat, event, note=note)
+
     def add_owner(self, uid):
         owners = self.store.data.setdefault("owners", {})
         if uid == self.owner:
@@ -553,7 +593,7 @@ class Manager:
     async def request_access(self, event):
         """A non-owner tapped 'Get my own userbot': ask the main owner (one tap)."""
         uid = event.sender_id
-        if uid in self.public_users() and not self.public_login():
+        if self.is_off(uid) or self.all_off():
             return await event.answer("🔴 The bot is off right now.", alert=True)
         if self.primary is not None or uid in self.slots:
             return await event.answer("Send /start.", alert=True)
@@ -760,6 +800,14 @@ class Manager:
             if cb and event.data == b"m:req":
                 await self.request_access(event)
                 return False
+            if self.primary is None and self.is_off(event.sender_id):
+                # their bot is switched off: no Fun Zone, nothing - just "off"
+                if cb:
+                    await event.answer("🔴 The bot is off right now.", alert=True)
+                elif event.is_private:
+                    await self.clean(event)
+                    await self.send_panel(event.chat_id, "🔴 **The bot is off right now.**\n\nTry again later.")
+                return False
             # Guests: the fun animations only, and only while fun mode is ON.
             # They never reach login / logout / settings / logs.
             if self.fun_public() and (cb or event.is_private):
@@ -771,7 +819,7 @@ class Manager:
             if cb:
                 await event.answer("🔒 This bot is private right now.", alert=True)
             elif event.is_private:
-                await event.reply(("🌍 Tap below to get your own userbot.\n\n" if self.public_login()
+                await event.reply(("🌍 Tap below to get your own userbot.\n\n" if self.public_login() and not self.all_off()
                                    else "🔴 The bot is off right now.\n\n") +
                                   f"Your Telegram id: `{event.sender_id}`",
                                   buttons=[[self.btn("🔑", "Get my own userbot", "m:req")]])
@@ -1011,6 +1059,8 @@ class Manager:
                 return await m.view_logs(chat)
             if cmd == "/vars":
                 return await m.view_vars(chat)
+            if cmd in ("/stopall", "/startall") and m is self:
+                return await self.all_switch(chat, cmd == "/stopall")
             if cmd in ("/addowner", "/delowner", "/owners") and m is self:
                 return await self.owner_cmd(chat, cmd, text)
             if cmd == "/help":
@@ -1106,6 +1156,9 @@ class Manager:
                     ok, msg = await slot.start_userbot()
                     note = "▶️ Started." if ok else f"❌ {msg}"
                 return await self.view_owners(chat, event, note=note)
+            elif action in ("all_on", "all_off") and m is self:
+                await event.answer("⏳ Working…")
+                return await self.all_switch(chat, action == "all_off", event)
             elif action == "owners" and m is self:
                 await self.view_owners(chat, event)
             try:
@@ -1138,7 +1191,7 @@ class Manager:
         if self.primary is None:
             self.load_slots()
             for uid, slot in self.slots.items():
-                if uid in self.public_users() and not self.public_login():
+                if self.is_off(uid):
                     continue
                 if slot.store.session:
                     await slot.boot()
