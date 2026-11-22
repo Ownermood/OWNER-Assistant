@@ -200,6 +200,10 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   #56: the OA_CONTROLLER block also adds the main id to the extra account's PM-permit
   approved list (`PMPERMIT`) and tries `UnblockRequest` once at boot - PM-permit used to
   warn/block the main account, so its `!` commands never arrived.
+  #57: Second-account panel reads the SAVED `owners` dict (not just loaded `self.slots`),
+  so an account that failed to load (e.g. REDIS_URI not `redis://` after a rebuild) shows
+  as "⚠️ not loaded" instead of the whole list reading "None yet". `load_slots` logs each
+  load/skip. If the panel says not loaded, the friend only gets Fun Zone (guest), not their userbot.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 

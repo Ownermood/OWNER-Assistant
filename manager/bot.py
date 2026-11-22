@@ -522,13 +522,25 @@ class Manager:
 
     def load_slots(self):
         for uid, index in (self.store.data.get("owners") or {}).items():
-            if redis_db_url(index):
-                self.add_slot(int(uid), int(index))
+            try:
+                if redis_db_url(index):
+                    self.add_slot(int(uid), int(index))
+                    log(f"second account {uid} loaded (db {index})")
+                else:
+                    log(f"second account {uid} NOT loaded: REDIS_URI is not a redis:// url, "
+                        "so it has no database. Fix REDIS_URI in .env.")
+            except Exception as er:
+                log(f"second account {uid} failed to load:", er)
 
     def owners_text(self):
+        owners = self.store.data.get("owners") or {}
         lines = []
-        for uid, slot in self.slots.items():
-            lines.append(f"• `{uid}` — {slot.account_text()} ({slot.state().replace('_', ' ')})")
+        for uid in owners:
+            slot = self.slots.get(int(uid))
+            if slot:
+                lines.append(f"• `{uid}` — {slot.account_text()} ({slot.state().replace('_', ' ')})")
+            else:
+                lines.append(f"• `{uid}` — ⚠️ not loaded (REDIS_URI issue, see Logs)")
         return "\n".join(lines) or "None yet."
 
     async def view_owners(self, chat, event=None, note=""):
