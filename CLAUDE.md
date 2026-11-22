@@ -204,6 +204,10 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   so an account that failed to load (e.g. REDIS_URI not `redis://` after a rebuild) shows
   as "⚠️ not loaded" instead of the whole list reading "None yet". `load_slots` logs each
   load/skip. If the panel says not loaded, the friend only gets Fun Zone (guest), not their userbot.
+  #58: self-heal - `load_slots` scans leftover `manager_<id>.json` files and re-adds any
+  account missing from the `owners` index (db number stored in the slot file as `db_index`),
+  so accounts never vanish after a restart that lost the index. `/delowner` now deletes the
+  slot file (+ fun_mode/log) so a removed account can't come back via self-heal.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
