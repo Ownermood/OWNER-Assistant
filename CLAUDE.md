@@ -195,6 +195,8 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   #53: main boots first. #54: **Stop ALL friends' bots** (main menu button `m:all_off`/
   `m:all_on`, `/stopall` `/startall`; DB `all_off` in manager.json): every extra userbot
   stops, those ids are routed as guests and only see "bot is off" (no Fun Zone, can't Run).
+  #55: while `all_off`, the manager bot is off for EVERY non-owner (strangers too, no Fun
+  Zone); button always shown ("Turn bot OFF/ON for everyone").
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
