@@ -197,6 +197,9 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   stops, those ids are routed as guests and only see "bot is off" (no Fun Zone, can't Run).
   #55: while `all_off`, the manager bot is off for EVERY non-owner (strangers too, no Fun
   Zone); button always shown ("Turn bot OFF/ON for everyone").
+  #56: the OA_CONTROLLER block also adds the main id to the extra account's PM-permit
+  approved list (`PMPERMIT`) and tries `UnblockRequest` once at boot - PM-permit used to
+  warn/block the main account, so its `!` commands never arrived.
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
