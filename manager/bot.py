@@ -921,11 +921,17 @@ class Manager:
                 await self.guest(event, cb)
                 return False
             if cb:
-                await event.answer("🔒 This bot is private right now.", alert=True)
+                await event.answer("🔒 Private bot. Tap 🔑 Get my own userbot to ask the owner.", alert=True)
             elif event.is_private:
-                await event.reply(("🌍 Tap below to get your own userbot.\n\n" if self.public_login() and not self.all_off()
-                                   else "🔴 The bot is off right now.\n\n") +
-                                  f"Your Telegram id: `{event.sender_id}`",
+                if self.public_login():
+                    msg = ("🌍 **Want your own userbot?**\n\n"
+                           "Tap the button below and you get it right away.")
+                else:
+                    msg = ("🔒 **This is a private bot.**\n\n"
+                           "Want your own userbot on it? Tap the button below. "
+                           "The owner gets a request and taps **Allow**. "
+                           "Then come back here and tap **Login**.")
+                await event.reply(f"{msg}\n\nYour Telegram id: `{event.sender_id}`",
                                   buttons=[[self.btn("🔑", "Get my own userbot", "m:req")]])
             return False
         if not await self.is_member(event.sender_id):

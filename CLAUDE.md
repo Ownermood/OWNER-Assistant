@@ -212,6 +212,9 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   status) opening a per-account panel (`m:sa_<id>`) with Run/Stop, **Lock/Unlock**
   (`m:lk_`, DB `locked` list - frozen account routed as guest, in `is_off`), **Logout**
   (`m:lo_`, keeps it in the list to re-login), **Remove** (`m:rm_` = delowner).
+  #60: clearer private reply - a non-owner DM (fun OFF) now says "This is a private bot
+  ... tap Get my own userbot, owner taps Allow, then Login" instead of the misleading
+  "bot is off". public_login ON says "get it right away".
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
