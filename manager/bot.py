@@ -413,11 +413,10 @@ class Manager:
                 rows.append([self.btn("🌍", "Public login: ON (tap to turn off)", "m:pub_off")])
             else:
                 rows.append([self.btn("🔒", "Public login: OFF (tap to turn on)", "m:pub_on")])
-            if self.slots:
-                if self.all_off():
-                    rows.append([self.btn("✅", "Start ALL friends' bots", "m:all_on")])
-                else:
-                    rows.append([self.btn("⛔", "Stop ALL friends' bots", "m:all_off")])
+            if self.all_off():
+                rows.append([self.btn("✅", "Turn bot ON for everyone", "m:all_on")])
+            else:
+                rows.append([self.btn("⛔", "Turn bot OFF for everyone", "m:all_off")])
         rows.append([self.btn("🔃", "Refresh", "m:menu")])
         return rows
 
@@ -559,8 +558,8 @@ class Manager:
 
     async def all_switch(self, chat, off, event=None):
         n = await self.set_all_off(off)
-        note = (f"⛔ **ALL friends' bots are OFF** ({n} stopped). They see the bot as off "
-                "and can't start it. Your own bot keeps running.\n"
+        note = (f"⛔ **ALL friends' bots are OFF** ({n} stopped). This bot is off for "
+                "everyone else too (no Fun Zone, nothing works for them). Your own bot keeps running.\n"
                 "Turn them back on: /startall"
                 if off else
                 f"✅ **Friends' bots are ON again** ({n} started).")
@@ -800,8 +799,9 @@ class Manager:
             if cb and event.data == b"m:req":
                 await self.request_access(event)
                 return False
-            if self.primary is None and self.is_off(event.sender_id):
-                # their bot is switched off: no Fun Zone, nothing - just "off"
+            if self.primary is None and (self.all_off() or self.is_off(event.sender_id)):
+                # switched off (Stop ALL = the whole bot for everyone but the
+                # owner): no Fun Zone, nothing - just "off"
                 if cb:
                     await event.answer("🔴 The bot is off right now.", alert=True)
                 elif event.is_private:
