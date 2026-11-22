@@ -192,6 +192,9 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   account id>`; `pyUltroid/__init__.py` makes it SUDO + FULLSUDO and sets `SUDO_HNDLR`
   to `!` (if unset) so `!cmd` typed by main runs only on that extra account (`.` stays
   main's). Settings → Second account has Run/Restart/Stop per account (`m:sr_/m:ss_`).
+  #53: main boots first. #54: **Stop ALL friends' bots** (main menu button `m:all_off`/
+  `m:all_on`, `/stopall` `/startall`; DB `all_off` in manager.json): every extra userbot
+  stops, those ids are routed as guests and only see "bot is off" (no Fun Zone, can't Run).
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
