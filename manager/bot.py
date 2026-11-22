@@ -468,11 +468,33 @@ class Manager:
     def all_off(self):
         return bool(self.store.data.get("all_off", False))
 
+    def locked_users(self):
+        return {int(u) for u in self.store.data.get("locked") or []}
+
     def is_off(self, uid):
         """True if this extra account is switched off right now."""
+        if uid in self.locked_users():
+            return True
         if uid in self.slots and self.all_off():
             return True
         return uid in self.public_users() and not self.public_login()
+
+    async def set_locked(self, uid, lock):
+        """Lock = that one account's userbot off; it is routed as a guest."""
+        locked = self.store.data.setdefault("locked", [])
+        slot = self.slots.get(uid)
+        if lock:
+            if uid not in locked:
+                locked.append(uid)
+            if slot:
+                await slot.cancel_login()
+                await slot.runner.stop()
+        else:
+            if uid in locked:
+                locked.remove(uid)
+            if slot and slot.store.session and not self.all_off():
+                await slot.start_userbot()
+        self.store.save()
 
     async def set_all_off(self, off):
         self.store.data["all_off"] = bool(off)
@@ -504,7 +526,7 @@ class Manager:
             if not slot:
                 continue
             if on:
-                if slot.store.session and not slot.runner.running and not self.all_off():
+                if slot.store.session and not slot.runner.running and not self.is_off(uid):
                     await slot.start_userbot()
             else:
                 await slot.cancel_login()
@@ -574,29 +596,62 @@ class Manager:
                 lines.append(f"• `{uid}` — ⚠️ not loaded (REDIS_URI issue, see Logs)")
         return "\n".join(lines) or "None yet."
 
+    def slot_status(self, uid):
+        slot = self.slots.get(uid)
+        if not slot:
+            return "⚠️ not loaded"
+        if uid in self.locked_users():
+            return "🔒 locked"
+        if slot.runner.running:
+            return "🟢 running"
+        if slot.store.session:
+            return "⚪ stopped"
+        return "🔴 not logged in"
+
     async def view_owners(self, chat, event=None, note=""):
-        text = ("👥 **Second account**\n\n"
-                "Give another Telegram id of yours its own userbot. It gets its own "
-                "login, logs, settings, database and assistant bot. It can't see or "
-                "touch your main account.\n\n"
-                "**How:** open this bot from your second id and tap "
-                "**🔑 Get my own userbot**. You get an **Allow** button here.\n\n"
-                "Remove: `/delowner 123456789`\n\n"
-                "**Control them from your main id:** in a chat with that account "
-                "(like its DM), send commands with `!` instead of `.` - for example "
-                "`!alive`. Only that account runs it.\n\n"
-                f"**Added:**\n{self.owners_text()}")
+        owners = self.store.data.get("owners") or {}
+        text = ("👥 **Other accounts**\n\n"
+                "Each one has its own login, logs and database, and can't touch your "
+                "main account. Tap an account below to control it.\n\n"
+                "To add one: open this bot from that id and tap **🔑 Get my own userbot** - "
+                "you get an **Allow** button here.\n\n"
+                "Control it from your main id: in its DM, send commands with `!` instead "
+                "of `.` (like `!alive`).")
         if note:
             text = note + "\n\n" + text
         rows = []
-        for uid, slot in self.slots.items():
-            label = (slot.store.data.get("account") or {}).get("name") or str(uid)
-            if slot.runner.running:
-                rows.append([self.btn("🔄", f"Restart {label}"[:30], f"m:sr_{uid}"),
-                             self.btn("⏹", "Stop", f"m:ss_{uid}")])
-            elif slot.store.session:
-                rows.append([self.btn("▶️", f"Run {label}"[:30], f"m:sr_{uid}")])
+        for uid in owners:
+            uid = int(uid)
+            name = (self.slots.get(uid) and self.slots[uid].account_text()) or str(uid)
+            if name == "—":
+                name = str(uid)
+            rows.append([self.btn("👤", f"{name} — {self.slot_status(uid)}"[:40], f"m:sa_{uid}")])
         rows.append([self.btn("🔃", "Refresh", "m:owners"), self.back("m:settings")])
+        await self.show(chat, text, rows, event)
+
+    async def account_panel(self, chat, uid, event=None, note=""):
+        if str(uid) not in (self.store.data.get("owners") or {}):
+            return await self.view_owners(chat, event, note="Not found.")
+        slot = self.slots.get(uid)
+        locked = uid in self.locked_users()
+        name = (slot and slot.account_text()) or "—"
+        text = f"👤 **{name}**\n`{uid}`\n\nStatus: {self.slot_status(uid)}"
+        if note:
+            text = note + "\n\n" + text
+        rows = []
+        if slot and not locked:
+            if slot.runner.running:
+                rows.append([self.btn("🔄", "Restart", f"m:sr_{uid}"), self.btn("⏹", "Stop", f"m:ss_{uid}")])
+            elif slot.store.session:
+                rows.append([self.btn("▶️", "Run", f"m:sr_{uid}")])
+        if locked:
+            rows.append([self.btn("🔓", "Unlock (let them use it)", f"m:lk_{uid}")])
+        else:
+            rows.append([self.btn("🔒", "Lock (freeze this account)", f"m:lk_{uid}")])
+        if slot and slot.store.session:
+            rows.append([self.btn("🚪", "Log this account out", f"m:lo_{uid}")])
+        rows.append([self.btn("🗑", "Remove completely", f"m:rm_{uid}")])
+        rows.append([self.back("m:owners")])
         await self.show(chat, text, rows, event)
 
     async def all_switch(self, chat, off, event=None):
@@ -692,36 +747,37 @@ class Manager:
         except Exception:
             pass
 
-    async def owner_cmd(self, chat, cmd, text):
+    async def owner_cmd(self, chat, cmd, text, event=None):
         parts = text.split()
         uid = int(parts[1]) if len(parts) > 1 and parts[1].isdigit() else 0
         if cmd == "/owners":
-            return await self.view_owners(chat)
+            return await self.view_owners(chat, event)
         if not uid:
-            return await self.view_owners(chat, note=f"Usage: `{cmd} 123456789`")
+            return await self.view_owners(chat, event, note=f"Usage: `{cmd} 123456789`")
         owners = self.store.data.setdefault("owners", {})
         if cmd == "/addowner":
             ok, note = self.add_owner(uid)
             if ok:
                 await self.welcome(uid)
-            return await self.view_owners(chat, note=note)
+            return await self.view_owners(chat, event, note=note)
         if str(uid) not in owners:
-            return await self.view_owners(chat, note="Not found.")
+            return await self.view_owners(chat, event, note="Not found.")
         slot = self.slots.pop(uid, None)
         if slot:
             await slot.cancel_login()
             await slot.runner.stop()
         owners.pop(str(uid))
-        pub = self.store.data.get("public_users") or []
-        if uid in pub:
-            pub.remove(uid)
+        for lst in ("public_users", "locked"):
+            seq = self.store.data.get(lst) or []
+            if uid in seq:
+                seq.remove(uid)
         self.store.save()
         for extra in (f"manager_{uid}.json", f"fun_mode_{uid}.json", f"userbot-logs-{uid}.txt"):
             try:
                 os.remove(os.path.join(DATA_DIR, extra))
             except OSError:
                 pass
-        return await self.view_owners(chat, note=f"🗑 Removed `{uid}`. Its userbot is stopped.")
+        return await self.view_owners(chat, event, note=f"🗑 Removed `{uid}`. Its userbot is stopped.")
 
     def save_userbots(self):
         """data/userbots.json: account ids of every userbot here (read by the
@@ -1192,8 +1248,11 @@ class Manager:
                     pass
             elif action[:3] in ("ok_", "no_") and action[3:].isdigit() and m is self:
                 return await self.answer_request(event, action)
+            elif action.startswith("sa_") and action[3:].isdigit() and m is self:
+                return await self.account_panel(chat, int(action[3:]), event)
             elif action[:3] in ("sr_", "ss_") and action[3:].isdigit() and m is self:
-                slot = self.slots.get(int(action[3:]))
+                uid = int(action[3:])
+                slot = self.slots.get(uid)
                 if not slot:
                     return await event.answer("Not found.", alert=True)
                 await event.answer("⏳ Working…")
@@ -1203,7 +1262,25 @@ class Manager:
                 else:
                     ok, msg = await slot.start_userbot()
                     note = "▶️ Started." if ok else f"❌ {msg}"
-                return await self.view_owners(chat, event, note=note)
+                return await self.account_panel(chat, uid, event, note=note)
+            elif action.startswith("lk_") and action[3:].isdigit() and m is self:
+                uid = int(action[3:])
+                await event.answer("⏳ Working…")
+                lock = uid not in self.locked_users()
+                await self.set_locked(uid, lock)
+                note = "🔒 Locked - this account is frozen." if lock else "🔓 Unlocked."
+                return await self.account_panel(chat, uid, event, note=note)
+            elif action.startswith("lo_") and action[3:].isdigit() and m is self:
+                uid = int(action[3:])
+                slot = self.slots.get(uid)
+                if not slot:
+                    return await event.answer("Not found.", alert=True)
+                await event.answer("⏳ Logging out…")
+                note = await slot.do_logout()
+                return await self.account_panel(chat, uid, event, note=note)
+            elif action.startswith("rm_") and action[3:].isdigit() and m is self:
+                await event.answer("⏳ Removing…")
+                return await self.owner_cmd(chat, "/delowner", f"/delowner {action[3:]}", event)
             elif action in ("all_on", "all_off") and m is self:
                 await event.answer("⏳ Working…")
                 return await self.all_switch(chat, action == "all_off", event)

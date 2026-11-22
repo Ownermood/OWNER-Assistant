@@ -208,6 +208,10 @@ Say honestly that real-Telegram behaviour is only confirmed on the owner's bot.
   account missing from the `owners` index (db number stored in the slot file as `db_index`),
   so accounts never vanish after a restart that lost the index. `/delowner` now deletes the
   slot file (+ fun_mode/log) so a removed account can't come back via self-heal.
+  #59: Settings → Other accounts is now a clean list - one button per account (name +
+  status) opening a per-account panel (`m:sa_<id>`) with Run/Stop, **Lock/Unlock**
+  (`m:lk_`, DB `locked` list - frozen account routed as guest, in `is_off`), **Logout**
+  (`m:lo_`, keeps it in the list to re-login), **Remove** (`m:rm_` = delowner).
 - Buttons are plain (no `style=` colours) everywhere — owner disliked the
   coloured buttons (removed in #32). Keep new buttons plain.
 
